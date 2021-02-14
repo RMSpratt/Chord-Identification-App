@@ -64,3 +64,18 @@ class NoteFactory:
 
         #If the note didn't have an octave indicated, it's invalid
         return ('invalid', -1)
+
+
+class Note:
+
+    def __init__(self, name, octave, value):
+        self.name = name
+        self.octave = octave
+        self.value = value
+
+    def __repr__(self):
+        return f"{self.name},{self.octave},{self.value}"
+
+    def __str__(self):
+        return f"{self.name}{self.octave}"
+

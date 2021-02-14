@@ -14,8 +14,9 @@ class Chord:
         self.intervals = []
         self.interval_string = ""
         self.name = ''
-        self.position = ''
+        self.position = 0
         self.bass_index = 0
+        self.has_seventh = False
 
         #Parse the chord string into the set of notes for the chord
         try:    
@@ -47,36 +48,89 @@ class Chord:
             interval = (second_note - first_note) % 12
 
             self.intervals.append(interval)
-            self.interval_string += str(interval)
 
-    def get_chord_intervals(self):
-        return self.intervals
+    def get_interval_string_info(self):
+        """Crafts this chord's interval string for identifying its name and quality.
+        
+            This method will iterate through all of the chord's listed intervals and create a string that only incorporates
+            the intervals between unique notes in the chord. Ex. C3 E3 G3 C4 will omit G3 -> C4
+        """
+
+        interval_string = ""
+
+        #The unique notes already found present in the chord
+        unique_notes = []
+
+        for i, curr_note in enumerate(self.notes[0:-1]):
+
+            next_note = self.notes[i+1]
+
+            if curr_note["name"] in unique_notes:
+                continue
+
+            unique_notes.append(curr_note["name"])
+
+            if next_note["name"] in unique_notes:
+
+                #If the next note is a duplicate, check the name of the one after it (if possible)
+                if i + 2 < len(self.notes):
+                    next_next_note = self.notes[i+2]
+
+                    new_interval = (next_next_note["value"] - curr_note["value"]) % 12
+                    interval_string += str(new_interval)
+                    
+            else:
+                interval_string += str(self.intervals[i])
+        
+        #If the final note is a unique note and wasn't added to the array to return, add it
+        if self.notes[-1]["name"] not in unique_notes:
+            unique_notes.append(self.notes[-1]["name"])
+
+        return (interval_string, unique_notes)
 
     def identify_chord(self):
         """Identifies this chord by setting its name and bass_index according to its bass index and chord quality."""
 
+        interval_string, unique_notes = self.get_interval_string_info()
+
         #Get the dictionary object representing the chord for the chord's interval string
-        chord_obj = music_info.INTERVAL_STRINGS[self.interval_string]
+        chord_obj = music_info.INTERVAL_STRINGS[interval_string]
 
         if chord_obj['quality'] == 'unknown':
+            print("Unknown : " + str(interval_string))
             self.name = 'Unknown Chord'
-            
+
         else:
-    
-            #Set this chord's bass note and get its name
-            self.bass_index = chord_obj['bass_index']
-            bass_note_name = self.notes[self.bass_index]['name']
 
-            #Get the quality of this chord from the value returned
-            chord_quality = chord_obj['quality']
+            chord_bass_note = ''
 
-            #Set the chord's name using its bass index and quality 
-            self.name += bass_note_name + chord_quality
+            if len(unique_notes) == len(self.notes):
+
+                #Set this chord's bass note and get its name
+                self.bass_index = chord_obj['bass_index']
+                chord_bass_note = self.notes[self.bass_index]['name']
+
+            else:
+        
+                chord_bass_note = unique_notes[chord_obj['bass_index']]
+
+                for i, note in enumerate(self.notes):
+
+                    if note['name'] == chord_bass_note:
+                        self.bass_index = i
+                        break
+
+            self.name += chord_bass_note + chord_obj['quality']
+            self.position = chord_obj['position']
+
+            #Check if this chord has a seventh
+            if len(unique_notes) == 4:
+                self.has_seventh = True
 
     def identify_numeral_by_key(self, key):
         """Gets and returns the roman numeral for this chord relative to the passed key."""
 
-        return music_info.identify_chord_numeral_for_key(key, self.name, self.bass_index)
+        return music_info.identify_chord_numeral_for_key(key, self.name, self.position, self.has_seventh)
 
     def parse_chord_string(self, chord_string):
         """Parses the passed string detailing this chord's notes into its individual notes."""

@@ -91,20 +91,24 @@ class SATBVoices(Enum):
 
 class ChordProgression():
     
-    def __init__(self, chords=None):
+    def __init__(self, chords=None, key=None):
         self.chords = []
+        self.numerals = []
         self.key = None
         self.errors = []
         self.warnings = []
 
-        if chords != None:
+        if chords:
             self.chords.extend(chords)
+
+        if key:
+            self.key = key
 
         
 class SATBProgression(ChordProgression):
     
-    def __init__(self, chords=None):
-        super().__init__(chords)
+    def __init__(self, chords=None, key=None):
+        super().__init__(chords, key)
 
         self.soprano_line = []
         self.alto_line = []
@@ -144,8 +148,8 @@ class SATBProgression(ChordProgression):
     def check_voice_movements(self, prev_chord, curr_chord):
         """Pairwise chord rule validation to check for parallel 5th/8ve movement errors or hidden 5th/8ve errors."""
 
-        prev_intervals = prev_chord.get_chord_intervals()
-        curr_intervals = curr_chord.get_chord_intervals()
+        prev_intervals = prev_chord.intervals
+        curr_intervals = curr_chord.intervals
 
         for prev, curr in zip(prev_intervals, curr_intervals):
 
@@ -193,10 +197,20 @@ class SATBProgression(ChordProgression):
     def validate_progression(self):
         """Multipart function that validates all of the chords in this progression for a series of voice-leading rules."""
 
+        if self.key == None:
+            print("ERR: A key must be specified for the chord progression for analysis.")
+            return
+
         prev_chord = None
 
         for index, chord in enumerate(self.chords, start=1):
             print(f"\nValidating chord: {index}")
+
+            new_numeral = chord.identify_numeral_by_key(self.key)
+            self.numerals.append(new_numeral)
+
+            if new_numeral == "Unknown":
+                self.errors.append({"type": "chord", "description": "Unknown chord in progression."})
 
             self.check_voicing_distances(chord)
 
@@ -214,10 +228,12 @@ class SATBProgression(ChordProgression):
         pass
 
 
+
 chord_one = Chord("C3, G3, E4, C5")
-chord_two = Chord("B2, A3, F4, D5")
+chord_two = Chord("B2, G3, F4, D5")
 chord_three = Chord("D3, G3, F4, B4")
 chord_four = Chord("E3, G3, E4, C5")
+chord_five = Chord('D0, Bb0, G1')
 
-sample_progression = SATBProgression([chord_one, chord_two, chord_three, chord_four])
-sample_progression.validate_progression()
+# sample_progression = SATBProgression([chord_one, chord_two, chord_three, chord_four], 'C')
+# sample_progression.validate_progression()
