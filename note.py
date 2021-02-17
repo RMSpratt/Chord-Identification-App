@@ -1,4 +1,3 @@
-
 from exceptions import InvalidNoteError
 
 class NoteFactory:
@@ -36,14 +35,13 @@ class NoteFactory:
 
         else:
 
+            note_index = self._note_names[note_name]
+
             #Calculate the note's numerical value based on its position on the Keyboard
             note_value = self.calculate_note_value(note_name, note_octave)
 
-            return {
-                'name': note_name,
-                'octave': note_octave,
-                'value': note_value
-            }
+            return Note(note_name, note_octave, note_value, note_index)
+            
 
     def parse_note(self, note_string):
         """Parses a given note string into its letter and octave components."""
@@ -68,14 +66,18 @@ class NoteFactory:
 
 class Note:
 
-    def __init__(self, name, octave, value):
+    def __init__(self, name, octave, value, index):
         self.name = name
         self.octave = octave
         self.value = value
+        self.index = index
 
     def __repr__(self):
-        return f"{self.name},{self.octave},{self.value}"
+        return f"{self.name},{self.octave},{self.value},{self.index}"
 
     def __str__(self):
         return f"{self.name}{self.octave}"
+
+    def get_interval(self, other_note):
+        return (other_note.index - self.index) % 12
 

@@ -1,53 +1,83 @@
-
 import musicInfo as music_info
 
 from note import NoteFactory
 from exceptions import InvalidChordError, InvalidNoteError
 
-class Chord:
-    """Class defining a chord as a set of 3-4 notes with a specific pattern of intervals between them."""
+
+class ChordFactory:
+    """Factory Class responsible for handling the creation of Chords using passed string or JSON/Dict-formatted data."""
 
     _note_factory = NoteFactory()
 
-    def __init__(self, chord_string):
-        self.notes = []
-        self.intervals = []
-        self.interval_string = ""
+    def create_chord(self, chord_info):
+        """Creates a chord using the passed chord string information."""
+
+        if type(chord_info) == str:
+            chord_data = self.parse_chord_string(chord_info)
+
+        elif type(chord_info) == dict:
+            chord_data = self.parse_chord_dict(chord_info)
+
+        else:
+            raise ValueError('Invalid chord information format received.')
+
+        if chord_data['valid']:
+            return Chord(chord_data['notes'])
+            
+        else:
+            raise ValueError(chord_data['error'])
+
+    def parse_chord_dict(self, chord_dict):
+        return {}
+
+    def parse_chord_string(self, chord_string):
+        """Parses the passed string detailing this chord's notes into its individual notes."""
+
+        chord_data = {}
+
+        notes = chord_string.split(',')
+
+        #Check if enough notes were provided for the chord
+        if len(notes) >= 3:
+            chord_data['notes'] = []
+
+            try:
+
+                for note_string in notes:
+                    note_string = note_string.strip()
+                    chord_note = self._note_factory.create_note(note_string)
+
+                    chord_data['notes'].append(chord_note)
+
+            except:
+                chord_data['valid'] = False
+                chord_data['error'] = 'One or more notes provided were invalid.'
+
+            else:
+                chord_data['valid'] = True
+
+        else:
+            chord_data['valid'] = False
+            chord_data['error'] = 'Not enough notes provided for the chord.'
+
+        return chord_data
+
+
+
+class Chord:
+    """Class defining a chord as a series of 3+ notes with a specific pattern of intervals between them."""
+
+    def __init__(self, chord_notes):
         self.name = ''
         self.position = 0
         self.bass_index = 0
         self.has_seventh = False
 
-        #Parse the chord string into the set of notes for the chord
-        try:    
-            self.parse_chord_string(chord_string)
-
-        except InvalidChordError as error:
-            print(error.value)
-            return
-
-        except InvalidNoteError as error:
-            print('An invalid note was provided for the chord: ', error.value)
-            return
-        
-        #Calculate the intervals in semitones between the notes in the chord
-        self.calculate_chord_intervals()
+        #Set the notes to the ones passed
+        self.notes = chord_notes
 
         #Identify the chord's position and inversion
         self.identify_chord()
-
-    def calculate_chord_intervals(self):
-        """Calculates the intervals in semitones between the notes in the chord."""
-  
-        self.notes.sort(key=lambda note: note['value'])
-
-        for i in range(0, len(self.notes)-1):
-            first_note = self.notes[i]['value']
-            second_note = self.notes[i+1]['value']
-
-            interval = (second_note - first_note) % 12
-
-            self.intervals.append(interval)
 
     def get_interval_string_info(self):
         """Crafts this chord's interval string for identifying its name and quality.
@@ -61,30 +91,31 @@ class Chord:
         #The unique notes already found present in the chord
         unique_notes = []
 
+        #Sort this chord's notes by value to get the proper interval string
+        self.notes.sort(key=lambda note: note.value)
+        
         for i, curr_note in enumerate(self.notes[0:-1]):
-
             next_note = self.notes[i+1]
 
-            if curr_note["name"] in unique_notes:
+            if curr_note.name in unique_notes:
                 continue
 
-            unique_notes.append(curr_note["name"])
+            unique_notes.append(curr_note.name)
 
-            if next_note["name"] in unique_notes:
+            #If the next note is a duplicate, check the name of the one after it (if possible)
+            if next_note.name in unique_notes:
 
-                #If the next note is a duplicate, check the name of the one after it (if possible)
                 if i + 2 < len(self.notes):
                     next_next_note = self.notes[i+2]
-
-                    new_interval = (next_next_note["value"] - curr_note["value"]) % 12
+                    new_interval = (next_next_note.value - curr_note.value) % 12
                     interval_string += str(new_interval)
                     
             else:
-                interval_string += str(self.intervals[i])
+                interval_string += str((next_note.value - curr_note.value) % 12)
         
         #If the final note is a unique note and wasn't added to the array to return, add it
-        if self.notes[-1]["name"] not in unique_notes:
-            unique_notes.append(self.notes[-1]["name"])
+        if self.notes[-1].name not in unique_notes:
+            unique_notes.append(self.notes[-1].name)
 
         return (interval_string, unique_notes)
 
@@ -108,7 +139,7 @@ class Chord:
 
                 #Set this chord's bass note and get its name
                 self.bass_index = chord_obj['bass_index']
-                chord_bass_note = self.notes[self.bass_index]['name']
+                chord_bass_note = self.notes[self.bass_index].name
 
             else:
         
@@ -116,7 +147,7 @@ class Chord:
 
                 for i, note in enumerate(self.notes):
 
-                    if note['name'] == chord_bass_note:
+                    if note.name == chord_bass_note:
                         self.bass_index = i
                         break
 
@@ -128,36 +159,63 @@ class Chord:
                 self.has_seventh = True
 
     def identify_numeral_by_key(self, key):
-        """Gets and returns the roman numeral for this chord relative to the passed key."""
+        """Gets and returns the roman numeral for this chord relative to the passed key.
+        
+        This function searches through the major and minor triads or sevenths for this chord to determine its function within the passed key.
+        If the chord is found within the passed key, its inversion string is also appended and returned.
+        """
 
-        return music_info.identify_chord_numeral_for_key(key, self.name, self.position, self.has_seventh)
+        chord_numeral = ''
 
-    def parse_chord_string(self, chord_string):
-        """Parses the passed string detailing this chord's notes into its individual notes."""
+        diatonic_chords = None
+        diatonic_numerals = None
+        mixture_chords = None
+        mixture_numerals = None
 
-        notes = chord_string.split(',')
+        #Check if we're searching for a major key
+        if key.upper():
+            diatonic_numerals = music_info.MAJOR_KEY_NUMERALS
+            mixture_numerals = music_info.MINOR_KEY_NUMERALS
 
-        #If the user didn't provide enough notes for the chord, it's invalid
-        if len(notes) < 3:
-            raise InvalidChordError(f"Not enough notes for the chord: {chord_string}")
+            if not self.has_seventh:
+                diatonic_chords = music_info.MAJOR_KEY_TRIADS
+                mixture_chords = music_info.MINOR_KEY_TRIADS
 
-        for note_string in notes:
-            note_string = note_string.strip()
+            else: 
+                diatonic_chords = music_info.MAJOR_KEY_SEVENTHS
+                mixture_chords = music_info.MINOR_KEY_SEVENTHS
 
-            chord_note = self._note_factory.create_note(note_string)
-            self.notes.append(chord_note)
+        #Else, we're searching for a minor key
+        else:
+            diatonic_numerals = music_info.MINOR_KEY_NUMERALS
+            mixture_numerals = music_info.MAJOR_KEY_NUMERALS
 
-    def print_chord_info(self):
-        """Outputs this chord's name and notes used for debugging purposes."""
+            if not self.has_seventh:
+                diatonic_chords = music_info.MINOR_KEY_TRIADS
+                mixture_chords = music_info.MAJOR_KEY_TRIADS
 
-        chord_notes = ''
+            else:
+                diatonic_chords = music_info.MINOR_KEY_SEVENTHS
+                mixture_chords = music_info.MAJOR_KEY_SEVENTHS
 
-        print(f"Name: {self.name}")
+        if self.name in diatonic_chords[key]:
+            chord_index = diatonic_chords[key].index(self.name)
+            chord_numeral = diatonic_numerals[chord_index]
 
-        for note in self.notes:
-            chord_notes += note['name'] + str(note['octave']) + " "
+        elif self.name in mixture_chords[key]:
+            chord_index = mixture_chords[key].index(self.name)
+            chord_numeral = mixture_numerals[chord_index]
 
-        print(f"Notes: {chord_notes}".strip())
+        #Modify the chord numeral string based on the inversion of the chord
+        if chord_numeral != '':
+
+            if not self.has_seventh and self.position < 3:
+                chord_numeral += music_info.INVERSION_TRIAD_STRINGS[self.position]
+
+            else:
+                chord_numeral += music_info.INVERSION_SEVENTH_STRINGS[self.position]
+
+        return chord_numeral
 
     def __repr__(self):
         """Returns a simple string representation of the chord for re-creation"""
@@ -166,7 +224,7 @@ class Chord:
 
         #Reconstruct the chord string passed to this class instance
         for _, note in enumerate(self.notes):
-            chord_string += note["name"] + str(note["octave"]) + ", "
+            chord_string += note.name + str(note.octave) + ", "
             
         #Remove the trailing comma
         return chord_string[0:-2]

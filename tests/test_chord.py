@@ -1,6 +1,6 @@
 import pytest
 
-from chord import Chord
+from chord import Chord, ChordFactory
 
 class TestChords:
 
@@ -14,13 +14,15 @@ class TestChords:
     def test_triad_properties(self):
         """Test case to check the properties of triad chords of different qualities and inversions."""
 
-        maj_chord_root = Chord('C3, E3, G3')
-        maj_chord_fv = Chord('F#0, D1, A0')
-        maj_chord_sv = Chord('E5, A5, C#6, E6')
+        test_factory = ChordFactory()
 
-        min_chord_root = Chord('C1, Eb1, G1, Eb2')
-        min_chord_fv = Chord('D4, B4, F#5, B5')
-        min_chord_sv = Chord('D0, Bb0, G1')
+        maj_chord_root = test_factory.create_chord('C3, E3, G3')
+        maj_chord_fv = test_factory.create_chord('F#0, D1, A0')
+        maj_chord_sv = test_factory.create_chord('E5, A5, C#6, E6')
+
+        min_chord_root = test_factory.create_chord('C1, Eb1, G1, Eb2')
+        min_chord_fv = test_factory.create_chord('D4, B4, F#5, B5')
+        min_chord_sv = test_factory.create_chord('D0, Bb0, G1')
 
         expected_out = [
             {'name': 'C', 'bass_index': 0, 'position': 0},
@@ -38,16 +40,18 @@ class TestChords:
     def test_seventh_properties(self):
         """Test case to check the properties of seventh chords of different qualities and inversions."""
 
-        maj_seventh_root = Chord('Eb2,G2,Bb2,D3')
-        maj_seventh_first = Chord('A1,C2,E2,F2')
-        dom_seventh_second = Chord('G5,E6,Bb6,C7')
-        dom_seventh_third = Chord('C3,F#3,A3,D3')
-        min_seventh_root = Chord('E0,B0,D1,G1')
-        min_seventh_second = Chord('F4,Ab4,Bb5,Db5')
-        halfdim_seventh_first = Chord('B2,E2,G3,C#3')
-        halfdim_seventh_third = Chord('F#1,B1,D2,G#2')
-        fulldim_seventh_one = Chord('A6,C7,Eb7,Gb7')
-        fulldim_seventh_two = Chord('F5,D5,Ab5,Cb6')
+        test_factory = ChordFactory()
+
+        maj_seventh_root = test_factory.create_chord('Eb2,G2,Bb2,D3')
+        maj_seventh_first = test_factory.create_chord('A1,C2,E2,F2')
+        dom_seventh_second = test_factory.create_chord('G5,E6,Bb6,C7')
+        dom_seventh_third = test_factory.create_chord('C3,F#3,A3,D3')
+        min_seventh_root = test_factory.create_chord('E0,B0,D1,G1')
+        min_seventh_second = test_factory.create_chord('F4,Ab4,Bb5,Db5')
+        halfdim_seventh_first = test_factory.create_chord('B2,E2,G3,C#3')
+        halfdim_seventh_third = test_factory.create_chord('F#1,B1,D2,G#2')
+        fulldim_seventh_one = test_factory.create_chord('A6,C7,Eb7,Gb7')
+        fulldim_seventh_two = test_factory.create_chord('F5,D5,Ab5,Cb6')
 
         expected_out = [
             {'name': 'Ebmaj7', 'bass_index': 0, 'position': 0},
