@@ -5,9 +5,9 @@ class NoteFactory:
 
     #The set of possible note names recognized by the program
     _note_names = {
-        "B#": 1, "C": 1, "Dbb": 1, "Bx": 2, "C#": 2, "Db": 2, "Cx": 3, "D": 3, "Ebb": 3, "D#": 4, "Eb": 4, "Fbb": 4,
-        "Dx": 5, "E": 5, "Fb": 5, "E#": 6, "F": 6, "Gbb": 6, "Ex": 7, "F#": 7, "Gb": 7, "Fx": 8, "G": 8, "Abb": 8, 
-        "G#": 9, "Ab": 9, "Gx": 10, "A": 10, "Bbb": 10, "A#": 11, "Bb": 11, "Cbb": 11, "B": 12, "Cb": 12
+        'B#': 0, 'C': 0, 'Dbb': 0, 'Bx': 1, 'C#': 1, 'Db': 1, 'Cx': 2, 'D': 2, 'Ebb': 2, 'D#': 3, 'Eb': 3, 'Fbb': 3,
+        'Dx': 4, 'E': 4, 'Fb': 4, 'E#': 5, 'F': 5, 'Gbb': 5, 'Ex': 6, 'F#': 6, 'Gb': 6, 'Fx': 7, 'G': 7, 'Abb': 7, 
+        'G#': 8, 'Ab': 8, 'Gx': 9, 'A': 9, 'Bbb': 9, 'A#': 10, 'Bb': 10, 'Cbb': 10, 'B': 11, 'Cb': 11
     }
 
     #The set of octaves a note can be defined as
@@ -73,10 +73,10 @@ class Note:
         self.index = index
 
     def __repr__(self):
-        return f"{self.name},{self.octave},{self.value},{self.index}"
+        return f'{self.name},{self.octave},{self.value},{self.index}'
 
     def __str__(self):
-        return f"{self.name}{self.octave}"
+        return f'{self.name}{self.octave}'
 
     def get_interval(self, other_note):
         return (other_note.index - self.index) % 12
