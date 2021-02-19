@@ -7,7 +7,7 @@ class TestChords:
     @pytest.fixture(scope = 'class')
     def get_test_chords(self):
         """Fixture to get a set of triad or seventh chords for testing."""
-        
+
         test_factory = ChordFactory()
 
         #Set of major, minor, diminished, and augmented triads for testing
@@ -115,6 +115,34 @@ class TestChords:
         
         self.compare_properties(test_triads, expected_out)
 
+    def test_seventh_numerals_major(self, get_test_chords):
+        """Test case to check the numerals of seventh chords relative to a few major keys."""
+
+        test_sevenths = get_test_chords(type='seventh')
+        test_keys = ['D','Ab','C#']
+
+        expected_out = [
+            ['bIIM7','bIIIM6/5','bVII4/3','I4/2','ii7','bvi4/3','viiø6/5','#ivø4/2','vo7','io7'],
+            ['VM7','VIM6/5','III4/3','#IV4/2','#v7','ii4/3','#iiiø6/5','#viiø4/2','#io7','#ivo7'],
+            ['bbIIIM7','bIVM6/5','bI4/3','bII4/2','biii7','bbvii4/3','iø6/5','vø4/2','bvio7','biio7']
+        ]
+
+        self.compare_numerals(test_sevenths, test_keys, expected_out)
+
+    def test_seventh_numerals_minor(self, get_test_chords):
+        """Test case to check the numerals of seventh chords relative to a few minor keys."""
+
+        test_sevenths = get_test_chords(type='seventh')
+        test_keys = ['f','b','d#']
+
+        expected_out = [
+            ['VIIM7','IM6/5','V4/3','#VI4/2','#vii7','iv4/3','#vø6/5','#iiø4/2','#iiio7','#vio7'],
+            ['bIVM7','bVM6/5','bII4/3','III4/2','iv7','bi4/3','iiø6/5','#viø4/2','viio7','iiio7'],
+            ['bbIIM7','bIIIM6/5','bVII4/3','bI4/2','bii7','bvi4/3','viiø6/5','ivø4/2','bvo7','bio7'],
+        ]
+
+        self.compare_numerals(test_sevenths, test_keys, expected_out)
+
     def test_seventh_properties(self, get_test_chords):
         """Test case to check the properties of seventh chords of different qualities and inversions."""
 
@@ -129,8 +157,8 @@ class TestChords:
             {'name': 'Bbmin7', 'bass_index': 3, 'position': 2},
             {'name': 'C#ø', 'bass_index': 2, 'position': 1},
             {'name': 'G#ø', 'bass_index': 3, 'position': 3},
-            {'name': 'Ao7', 'bass_index': 0, 'position': -1},
-            {'name': 'Do7', 'bass_index': 0, 'position': -1},
+            {'name': 'Ao7', 'bass_index': 0, 'position': 0},
+            {'name': 'Do7', 'bass_index': 0, 'position': 0},
         ]
 
         self.compare_properties(test_sevenths, expected_out)
