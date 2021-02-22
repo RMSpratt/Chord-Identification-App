@@ -4,7 +4,7 @@ from chord import Chord, ChordFactory
 
 class TestChords:
 
-    @pytest.fixture(scope = 'class')
+    @pytest.fixture(scope = 'session')
     def get_test_chords(self):
         """Fixture to get a set of triad or seventh chords for testing."""
 
@@ -20,7 +20,7 @@ class TestChords:
             test_factory.create_chord('D0,Bb0,G1'),
             test_factory.create_chord('D#2,A1,F#1'),
             test_factory.create_chord('F#3,C4,A3'),
-            test_factory.create_chord('A6,Eb7,Gb7'),
+            test_factory.create_chord('Bbb6,Eb7,Gb7'),
             test_factory.create_chord('E4,G#4,B#5'),
             test_factory.create_chord('Bb5,F#5,D6'),
             test_factory.create_chord('Bb5,F#6,D6'),
@@ -42,10 +42,10 @@ class TestChords:
 
         def get_chord_type(type):
             
-            if (type == 'triad'):
+            if type == 'triad':
                 return test_triads
 
-            else:
+            elif type == 'seventh':
                 return test_sevenths
 
         return get_chord_type
@@ -55,6 +55,7 @@ class TestChords:
 
         for i, chord in enumerate(chords):
             assert chord.get_name() == expected_out[i]['name']
+            assert chord.get_name(True) == expected_out[i]['slash_name']
             assert chord.bass_index == expected_out[i]['bass_index']
             assert chord.position == expected_out[i]['position']
 
@@ -64,6 +65,9 @@ class TestChords:
         for i, key in enumerate(keys):
             for j, chord in enumerate(chords):
                 assert chord.get_numeral_for_key(key) == expected_out[i][j]
+
+
+    ### TRIAD CHORD TESTING ###
 
     def test_triad_numerals_major(self, get_test_chords):
         """Test case to check the numerals of triad chords relative to a few major keys."""
@@ -99,21 +103,24 @@ class TestChords:
         test_triads = get_test_chords(type='triad')
 
         expected_out = [
-            {'name': 'C', 'bass_index': 0, 'position': 0},
-            {'name': 'D', 'bass_index': 2, 'position': 1},
-            {'name': 'A', 'bass_index': 1, 'position': 2},
-            {'name': 'Cm', 'bass_index': 0, 'position': 0},
-            {'name': 'Bm', 'bass_index': 1, 'position': 1},
-            {'name': 'Gm', 'bass_index': 2, 'position': 2},
-            {'name': 'D#o', 'bass_index': 2, 'position': 1},
-            {'name': 'F#o', 'bass_index': 0, 'position': 0},
-            {'name': 'Ebo', 'bass_index': 1, 'position': 2},
-            {'name': 'E+', 'bass_index': 0, 'position': 0},
-            {'name': 'F#+', 'bass_index': 0, 'position': 0},
-            {'name': 'Bb+', 'bass_index': 0, 'position': 0},
+            {'name': 'C', 'slash_name': 'C', 'bass_index': 0, 'position': 0},
+            {'name': 'D', 'slash_name': 'D/F#', 'bass_index': 2, 'position': 1},
+            {'name': 'A', 'slash_name': 'A/E', 'bass_index': 1, 'position': 2},
+            {'name': 'Cm', 'slash_name': 'Cm', 'bass_index': 0, 'position': 0},
+            {'name': 'Bm', 'slash_name': 'Bm/D', 'bass_index': 1, 'position': 1},
+            {'name': 'Gm', 'slash_name': 'Gm/D', 'bass_index': 2, 'position': 2},
+            {'name': 'D#o', 'slash_name': 'D#o/F#', 'bass_index': 2, 'position': 1},
+            {'name': 'F#o', 'slash_name': 'F#o', 'bass_index': 0, 'position': 0},
+            {'name': 'Ebo', 'slash_name': 'Ebo/Bbb', 'bass_index': 1, 'position': 2},
+            {'name': 'E+', 'slash_name': 'E+', 'bass_index': 0, 'position': 0},
+            {'name': 'F#+', 'slash_name': 'F#+', 'bass_index': 0, 'position': 0},
+            {'name': 'Bb+', 'slash_name': 'Bb+', 'bass_index': 0, 'position': 0},
         ]
         
         self.compare_properties(test_triads, expected_out)
+
+
+    ### SEVENTH CHORD TESTING ###
 
     def test_seventh_numerals_major(self, get_test_chords):
         """Test case to check the numerals of seventh chords relative to a few major keys."""
@@ -149,16 +156,60 @@ class TestChords:
         test_sevenths = get_test_chords(type='seventh')
         
         expected_out = [
-            {'name': 'Ebmaj7', 'bass_index': 0, 'position': 0},
-            {'name': 'Fmaj7', 'bass_index': 3, 'position': 1},
-            {'name': 'C7', 'bass_index': 3, 'position': 2},
-            {'name': 'D7', 'bass_index': 1, 'position': 3},
-            {'name': 'Emin7', 'bass_index': 0, 'position': 0},
-            {'name': 'Bbmin7', 'bass_index': 3, 'position': 2},
-            {'name': 'C#ø', 'bass_index': 2, 'position': 1},
-            {'name': 'G#ø', 'bass_index': 3, 'position': 3},
-            {'name': 'Ao7', 'bass_index': 0, 'position': 0},
-            {'name': 'Do7', 'bass_index': 0, 'position': 0},
+            {'name': 'Ebmaj7', 'slash_name': 'Ebmaj7', 'bass_index': 0, 'position': 0},
+            {'name': 'Fmaj7', 'slash_name': 'Fmaj7/A', 'bass_index': 3, 'position': 1},
+            {'name': 'C7', 'slash_name': 'C7/G', 'bass_index': 3, 'position': 2},
+            {'name': 'D7', 'slash_name': 'D7/C', 'bass_index': 1, 'position': 3},
+            {'name': 'Em7', 'slash_name': 'Em7', 'bass_index': 0, 'position': 0},
+            {'name': 'Bbm7', 'slash_name': 'Bbm7/F', 'bass_index': 3, 'position': 2},
+            {'name': 'C#ø', 'slash_name': 'C#ø/E', 'bass_index': 2, 'position': 1},
+            {'name': 'G#ø', 'slash_name': 'G#ø/F#', 'bass_index': 3, 'position': 3},
+            {'name': 'Ao7', 'slash_name': 'Ao7', 'bass_index': 0, 'position': 0},
+            {'name': 'Do7', 'slash_name': 'Do7', 'bass_index': 0, 'position': 0},
         ]
 
         self.compare_properties(test_sevenths, expected_out)
+
+
+    ### APPLIED/SECONDARY DOMINANT CHORD TESTING ###
+
+    def test_applied_dominants(self, get_test_chords):
+        """Test case to check the numerals of chords as secondary or applied dominants to other chords."""
+
+        test_factory = ChordFactory()
+        
+        test_base_chords = [
+            test_factory.create_chord('F1,A1,C1'),          #F major
+            test_factory.create_chord('Eb1,Gb1,Bb1'),       #Eb minor
+            test_factory.create_chord('Bb1,D1,F1'),         #Bb major
+            test_factory.create_chord('E1,G1,B1'),          #E minor   
+            test_factory.create_chord('Bb1,Db2,F2'),        #Bb minor
+            test_factory.create_chord('F#1,A1,C#1,E2'),     #F# minor
+            test_factory.create_chord('Eb1,G1,Bb1,D2'),     #Eb major
+            test_factory.create_chord('F1,A1,C1,E1'),       #F Major
+            test_factory.create_chord('Ab1,Cb1,Eb1,Ab1'),   #Ab minor
+            test_factory.create_chord('F#1,A1,C#1'),        #F# minor
+        ]
+
+        #The set of chords to act as applied dominants to the base chords
+        test_applied_chords = [
+            test_factory.create_chord('C1,E1,G1'),          #RP major triad (C)
+            test_factory.create_chord('Bb3,D3,Bb2,Bb2'),    #RP major triad (Bb)
+            test_factory.create_chord('Eb5,A4,C5'),         #RP diminished triad (Ao)
+            test_factory.create_chord('F#1,A1,D#1'),        #RP diminished triad (D#o)
+            test_factory.create_chord('F2,C3,A2,Eb3'),      #RP dominant seventh (F7)
+            test_factory.create_chord('C#3,E#2,C#2,B1'),    #TV dominant seventh (C#7)
+            test_factory.create_chord('D6,F6,Ab5,C6'),      #SV Half-diminished seventh (Dø)
+            test_factory.create_chord('E3,G2,D2,Bb2'),      #TV Half-diminished seventh (Eø)
+            test_factory.create_chord('G4,Db5,Bb4,Fb5'),    #RP Full-diminished seventh (Go7)
+            test_factory.create_chord('E#4,G#3,B3,D4'),     #FV Full-diminished seventh (E#o7)
+        ]
+
+        expected_out = ['V','V','viio','viio','V7','V4/2','viiø4/3','viiø4/2','viio7','viio6/5']
+
+        #Validate the output numeral for every pair of chords
+        for i, (base_chord, applied_chord) in enumerate(zip(test_base_chords, test_applied_chords)):
+            actual_out = applied_chord.get_secondary_dominant_numeral(base_chord)
+
+            assert(actual_out == expected_out[i])
+

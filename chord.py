@@ -28,21 +28,25 @@ class ChordFactory:
             raise ValueError(chord_data['error'])
 
     def parse_chord_dict(self, chord_dict):
-        return {}
+        """Parses the passed dict detailing this chord's notes into its individual notes."""
+
+        notes = chord_dict['notes']
+        chord_data = self.parse_chord_string(notes)
+
+        return chord_data
 
     def parse_chord_string(self, chord_string):
         """Parses the passed string detailing this chord's notes into its individual notes."""
 
-        chord_data = {}
-
         notes = chord_string.split(',')
+
+        chord_data = {}
 
         #Check if enough notes were provided for the chord
         if len(notes) >= 3:
             chord_data['notes'] = []
 
             try:
-
                 for note_string in notes:
                     note_string = note_string.strip()
                     chord_note = self._note_factory.create_note(note_string)
@@ -89,8 +93,8 @@ class Chord:
 
         interval_string = ""
 
-        #The unique notes already found present in the chord
-        unique_notes = []
+        #The notes already found present in the chord
+        found_notes = []
 
         #Sort this chord's notes by value to get the proper interval string
         self.notes.sort(key=lambda note: note.value)
@@ -98,27 +102,17 @@ class Chord:
         for i, curr_note in enumerate(self.notes[0:-1]):
             next_note = self.notes[i+1]
 
-            if curr_note.name in unique_notes:
-                continue
-
-            unique_notes.append(curr_note.name)
-
-            #If the next note is a duplicate, check the name of the one after it (if possible)
-            if next_note.name in unique_notes:
-
-                if i + 2 < len(self.notes):
-                    next_next_note = self.notes[i+2]
-                    new_interval = (next_next_note.value - curr_note.value) % 12
-                    interval_string += str(new_interval)
-                    
-            else:
+            if curr_note.name not in found_notes:
+                found_notes.append(curr_note.name)
+            
+            if next_note.name not in found_notes:
                 interval_string += str((next_note.value - curr_note.value) % 12)
-        
+         
         #If the final note is a unique note and wasn't added to the array to return, add it
-        if self.notes[-1].name not in unique_notes:
-            unique_notes.append(self.notes[-1].name)
+        if self.notes[-1].name not in found_notes:
+            found_notes.append(self.notes[-1].name)
 
-        return (interval_string, unique_notes)
+        return (interval_string, found_notes)
 
     def get_name(self, slash_notation=False):
         """Returns this chord's name in slash notation or a regular format."""
@@ -162,7 +156,7 @@ class Chord:
             self.position = chord_obj['position']
 
             #Check if this chord has a seventh
-            if len(unique_notes) == 4:
+            if self.quality in ['7','m7','maj7','ø','o7']:
                 self.has_seventh = True
 
     def get_numeral_for_key(self, key):
@@ -173,7 +167,10 @@ class Chord:
     def get_secondary_dominant_numeral(self, second_chord):
         """Returns this chord's numeral as a secondary dominant for the next chord, if it is one. Else, returns a blank string."""
 
-        return music_info.identify_secondary_dominant_numeral(self.get_name(), self.position, self.has_seventh, second_chord.notes[self.bass_index].name, second_chord.quality)
+        #Get the root of the passed chord from its bass index as the 'key'
+        base_chord_key = second_chord.notes[second_chord.bass_index].name
+
+        return music_info.identify_secondary_dominant_numeral(self.get_name(), self.position, self.has_seventh, base_chord_key, second_chord.quality)
 
     def __repr__(self):
         """Returns a simple string representation of the chord for re-creation"""
