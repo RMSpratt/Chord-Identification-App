@@ -3,6 +3,28 @@ from enum import Enum
 
 from chord import Chord, ChordFactory
 
+class SATBErrors(Enum):
+    ERR_SA_DISTANCE = 'Too much distance between soprano and alto voices'
+    ERR_AT_DISTANCE = 'Too much distance between alto and tenor voices'
+    ERR_TB_DISTANCE = 'Too much distance between tenor and bass voices'
+    ERR_SOPRANO_HIGH = 'The Soprano voice exceeds its highest allowable note'
+    ERR_SOPRANO_LOW = 'The Soprano voice exceeds its lowest allowable note'
+    ERR_ALTO_HIGH = 'The Alto voice exceeds its highest allowable note'
+    ERR_ALTO_LOW = 'The Alto voice exceeds its lowest allowable note'
+    ERR_TENOR_HIGH = 'The Tenor voice exceeds its highest allowable note'
+    ERR_TENOR_LOW = 'The Tenor voice exceeds its lowest allowable note'
+    ERR_BASS_HIGH = 'The Bass voice exceeds its highest allowable note'
+    ERR_BASS_LOW = 'The Bass voice exceeds its lowest allowable note'
+    ERR_PARALLEL_5TH = 'Movement between voicings in a chord creates parallel 5ths'
+    ERR_PARALLEL_8TH = 'Movement between voicings in a chord creates parallel octaves'
+    ERR_HIDDEN_5TH = 'Movement between voicings in a chord creates hidden 5ths'
+    ERR_HIDDEN_8TH = 'Movement between voicings in a chord creates hidden octaves'
+    ERR_VOICE_CROSS = 'Movement between voicings in a chord creates a voice crossing'
+    ERR_UNRESOLVED_LT = 'A leading tone is unresolved between parallel chords'
+    ERR_UNRESOLVED_7TH ='A 7th is unresolved between parallel chords'
+    ERR_UNKNOWN_CHORD = 'One or more chords are marked as unknown and may have improper notes'
+
+
 class SATBVoices(Enum):
     Bass = 1
     Tenor = 2
@@ -18,11 +40,10 @@ class SATBValidator():
         'voice_range': [[29,49],[40,55],[44,62],[51,67]]
     }
 
-    def __init__(self):
-        self._errors = []
-
     def __check_voice_distances(self, chord):
         """Individual chord rule validation for the spacing of the voices within the chord."""
+
+        distance_errors = []
 
         #Get the note for each SATB voice in the chord
         soprano_value = chord.notes[3].value 
@@ -32,13 +53,15 @@ class SATBValidator():
 
         #Check the distances between the four voices
         if (soprano_value - alto_value) > self._validation_settings['max_distance'][0]:
-            self._errors.append({'type': 'spacing', 'description': 'Too much distance between soprano and alto voices.'})
+            distance_errors.append({'type': 'spacing', 'description': SATBErrors.ERR_SA_DISTANCE})
 
         if alto_value - tenor_value > self._validation_settings['max_distance'][1]:
-            self._errors.append({'type': 'spacing', 'description': 'Too much distance between alto and tenor voices.'})
+            distance_errors.append({'type': 'spacing', 'description': SATBErrors.ERR_AT_DISTANCE})
 
         if tenor_value - bass_value > self._validation_settings['max_distance'][2]:
-            self._errors.append({'type': 'spacing', 'description': 'Too much distance between tenor and bass voices.'})
+            distance_errors.append({'type': 'spacing', 'description': SATBErrors.ERR_TB_DISTANCE})
+
+        return distance_errors
 
     def __check_voice_in_range(self, voice, note):
         """Individual chord rule validation to ensure that the given note for the specified voice is within its proper range.
@@ -47,21 +70,25 @@ class SATBValidator():
         Parameter: note - The note the voice is written for as an integer value.
         """
 
+        range_errors = []
+
         #Get the proper name for the voice by the index passed
         voice_name = SATBVoices(voice).name
 
         #Check if the passed note's value exceeds its lowest note for its voice
         if note.value < self._validation_settings['voice_range'][voice-1][0]:
-            self._errors.append({'type': 'range', 'description': f'{voice_name} voice is too low.'})
-            print(f'{voice_name} voice too low error.')
+            range_errors.append({'type': 'range', 'description': f'{voice_name} voice is too low.'})
 
         #Check if the passed note's value exceeds its highest note for its voice
         elif note.value > self._validation_settings['voice_range'][voice-1][1]:
-            self._errors.append({'type': 'range', 'description': f'{voice_name} voice is too high.'})
-            print(f'{voice_name} voice too high error.')
+            range_errors.append({'type': 'range', 'description': f'{voice_name} voice is too high.'})
+
+        return range_errors
 
     def __check_voice_movement(self, prev_chord, curr_chord):
         """Pairwise chord rule validation to check for parallel 5th/8ve movement errors or hidden 5th/8ve errors."""
+
+        movement_errors = []
 
         #Form every pair of notes in the previous chord and check the interval between the notes in semitones
         for i in range(0, len(prev_chord.notes) - 1):
@@ -73,21 +100,21 @@ class SATBValidator():
                     curr_interval = curr_chord.notes[i].get_interval(curr_chord.notes[j])
 
                     if prev_interval == curr_interval:
-                        self._errors.append({'type': 'movement', 'description': 'Parallel 5ths between two chords.'})
-                        print('Parallel 5th movement error.')
+                        movement_errors.append({'type': 'movement', 'description': SATBErrors.ERR_PARALLEL_5TH})
 
                 #Check for parallel 8ves
                 elif prev_interval == 0:
                     curr_interval = curr_chord.notes[i].get_interval(curr_chord.notes[j])
 
                     if prev_interval == curr_interval:
-                        self._errors.append({'type': 'movement', 'description': 'Parallel 8ves between two chords.'})
-                        print('Parallel 8ve movement error.')
+                        movement_errors.append({'type': 'movement', 'description': SATBErrors.ERR_PARALLEL_8TH})
+
+        return movement_errors
 
     def validate_progression(self, chords, key):
 
         #Create an instance variable to hold
-        self._errors = []
+        progression_errors = []
 
         #Holder for the previous chord while iterating
         prev_chord = None
@@ -98,24 +125,24 @@ class SATBValidator():
             chord_numeral = chord.get_numeral_for_key(key)
 
             if chord_numeral == 'Unknown':
-                self._errors.append({'type': 'chord', 'description': 'Unknown chord in progression.'})
+                progression_errors.append({'type': 'chord', 'description': SATBErrors.ERR_UNKNOWN_CHORD})
 
-            self.__check_voice_distances(chord)
+            progression_errors.extend(self.__check_voice_distances(chord))
 
             #Check for movement or resolution errors between the previous chord and the current one
             if prev_chord != None:
-                self.__check_voice_movement(prev_chord, chord)
+                progression_errors.extend(self.__check_voice_movement(prev_chord, chord))
 
             #Check for range errors between the current chord
             for j, note in enumerate(chord.notes, start=1):
-                self.__check_voice_in_range(j, note)
+                progression_errors.extend(self.__check_voice_in_range(j, note))
 
             prev_chord = chord
 
+        return progression_errors
 
 class ChordProgression():
     _chord_factory = ChordFactory()
-    _validator = SATBValidator()
 
     def __init__(self, chords=None, key=None):
         self.chords = []
@@ -152,13 +179,18 @@ class ChordProgression():
         if self.key:
             
             for chord in self.chords:
-                numeral = chord.identify_numeral_by_key(self.key)
-                chord_numerals.append(numeral)
+                chord_numerals.append(chord.identify_numeral_by_key(self.key))
 
         return chord_numerals
 
-    def get_progression_chord_names(self):
-        pass
+    def get_progression_chord_names(self, slash_notation=False):
+        """Returns the names of each chord within this progression."""
+
+        chord_names = []
+
+        for chord in self.chords:
+            chord_names.append(chord.get_name(slash_notation))
+
 
     def remove_chord(self, index=None):
         """Removes the chord at the specified index from this chord progression."""
@@ -169,12 +201,14 @@ class ChordProgression():
     def update_chord(self, index):
         pass
 
-    def validate_progression(self):
+    def validate_progression(self, validator):
         """Calls this class's SATB_Validator """
-        self._validator.validate_progression(self.chords, self.key)
+        self.satb_errors = validator.validate_progression(self.chords, self.key)
 
 
+#Temporary testing until proper tests are written
 chord_factory = ChordFactory()
+satb_validator = SATBValidator()
 
 chord_one = chord_factory.create_chord('C3, G3, E4, C5')
 chord_two = chord_factory.create_chord('B2, G3, F4, D5')
@@ -182,12 +216,6 @@ chord_three = chord_factory.create_chord('D3, G3, F4, B4')
 chord_four = chord_factory.create_chord('E3, G3, E4, C5')
 
 sample_progression = ChordProgression([chord_one, chord_two, chord_three, chord_four], 'C')
-sample_progression.validate_progression()
-# print(sample_progression.get_progression_chord_numerals())
-
-chord_five = chord_factory.create_chord('C3, E3, G3, Bb3')
-chord_six = chord_factory.create_chord('F3, A3, C4, E4')
-print(chord_five.get_numeral_for_key('C'))
-
-print(chord_five.get_secondary_dominant_numeral(chord_six))
-
+sample_progression.validate_progression(satb_validator)
+print(sample_progression.satb_errors)
+print(sample_progression.get_progression_chord_numerals())
