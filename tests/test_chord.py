@@ -171,7 +171,7 @@ class TestChords:
         self.compare_properties(test_sevenths, expected_out)
 
 
-    ### APPLIED/SECONDARY DOMINANT CHORD TESTING ###
+    # ### APPLIED/SECONDARY DOMINANT CHORD TESTING ###
 
     def test_applied_dominants(self, get_test_chords):
         """Test case to check the numerals of chords as secondary or applied dominants to other chords."""
