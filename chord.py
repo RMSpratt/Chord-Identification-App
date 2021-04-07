@@ -114,10 +114,20 @@ class Chord:
 
         return (interval_string, unique_notes)
 
+    def get_index_from_interval(self, interval): 
+
+        bass_note = self.notes[self.bass_index]
+
+        for i, note in enumerate(self.notes):
+
+            if abs(note.index - bass_note.index) == interval:
+                return i 
+
     def get_seventh_index(self):
         """Returns the index of this chord's seventh, if it has one."""
 
         if self.has_seventh:
+
             root_note = self.notes[self.bass_index]
             
             for i, note in enumerate(self.notes):
@@ -131,14 +141,14 @@ class Chord:
                 if interval == 11 and self.quality == 'maj7':
                     return i
 
-                elif interval == 10 and self.quality in ['7', 'min7', 'ø']:
+                elif interval == 10 and self.quality in ['7', 'm7', 'ø']:
                     return i
 
                 elif interval == 9 and self.quality == 'o7':
                     return i
 
-        else:
-            return -1
+
+        return -1
 
     def get_name(self, slash_notation=False):
         """Returns this chord's name in slash notation or a regular format."""
