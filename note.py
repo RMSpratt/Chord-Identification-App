@@ -1,4 +1,6 @@
+import musicInfo as music_info
 from exceptions import InvalidNoteError
+
 
 class NoteFactory:
     """This class is responsible for parsing note strings into proper note objects for a chord."""
@@ -42,7 +44,6 @@ class NoteFactory:
 
             return Note(note_name, note_octave, note_value, note_index)
             
-
     def parse_note(self, note_string):
         """Parses a given note string into its letter and octave components."""
 
@@ -65,6 +66,7 @@ class NoteFactory:
 
 
 class Note:
+    """Class holding all information relevant for defining a music note."""
 
     def __init__(self, name, octave, value, index):
         self.name = name
@@ -79,5 +81,9 @@ class Note:
         return f'{self.name}{self.octave}'
 
     def get_interval(self, other_note):
+        """Returns the interval between this note and another passed note."""
         return (other_note.index - self.index) % 12
 
+    def get_degree_in_key(self, key):
+        """Returns the index of this note """
+        return music_info.get_note_degree_in_key(self.name, key)
