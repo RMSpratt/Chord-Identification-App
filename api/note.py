@@ -1,5 +1,5 @@
-import musicInfo as music_info
-from exceptions import InvalidNoteError
+from .musicInfo import get_note_degree_in_key
+from .exceptions import InvalidNoteError
 
 
 class NoteFactory:
@@ -86,4 +86,4 @@ class Note:
 
     def get_degree_in_key(self, key):
         """Returns the index of this note """
-        return music_info.get_note_degree_in_key(self.name, key)
+        return get_note_degree_in_key(self.name, key)

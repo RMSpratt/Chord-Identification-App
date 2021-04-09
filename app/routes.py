@@ -1,6 +1,6 @@
 from app import app
 from flask import render_template, request, Response
-from api import requests 
+from api import musicFuncs 
 
 #Note: Routes must precede the function they are related to
 @app.route('/')
@@ -14,4 +14,11 @@ def analysis():
 
     notes = request.args.get('notes')
 
-    return render_template('analysis.html', data={"notes": 'C3'})
+    try: 
+        chord_name = musicFuncs.analyze_chord(notes) 
+
+    except:
+        chord_name = 'Invalid'
+
+    return render_template('analysis.html', data={"notes": chord_name})
+

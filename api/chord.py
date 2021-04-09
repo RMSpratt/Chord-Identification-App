@@ -1,7 +1,6 @@
-import musicInfo as music_info
-
-from note import NoteFactory
-from exceptions import InvalidChordError, InvalidNoteError
+from .musicInfo import identify_chord_numeral_for_key, identify_secondary_dominant_numeral, get_chord_for_intervals
+from .note import NoteFactory
+from .exceptions import InvalidChordError, InvalidNoteError
 
 
 class ChordFactory:
@@ -162,12 +161,12 @@ class Chord:
     def get_numeral_for_key(self, key):
         """Returns this chord's numeral relative to the given key"""
 
-        return music_info.identify_chord_numeral_for_key(key, self.notes[self.bass_index].name, self.quality, self.position, self.has_seventh)
+        return identify_chord_numeral_for_key(key, self.notes[self.bass_index].name, self.quality, self.position, self.has_seventh)
 
     def get_numeral_for_key_root(self, key):
         """Returns this chord's numeral relative to the given key without the inversion string."""
         
-        return music_info.identify_chord_numeral_for_key(key, self.notes[self.bass_index].name, self.quality, self.position, self.has_seventh, False)
+        return identify_chord_numeral_for_key(key, self.notes[self.bass_index].name, self.quality, self.position, self.has_seventh, False)
 
     def get_secondary_dominant_numeral(self, second_chord):
         """Returns this chord's numeral as a secondary dominant for the next chord, if it is one. Else, returns a blank string."""
@@ -175,7 +174,7 @@ class Chord:
         #Get the root of the passed chord from its bass index as the 'key'
         base_chord_key = second_chord.notes[second_chord.bass_index].name
 
-        return music_info.identify_secondary_dominant_numeral(self.get_name(), self.position, self.has_seventh, base_chord_key, second_chord.quality)
+        return identify_secondary_dominant_numeral(self.get_name(), self.position, self.has_seventh, base_chord_key, second_chord.quality)
 
     def identify_chord(self):
         """Identifies this chord by setting its name and bass_index according to its bass index and chord quality."""
@@ -183,7 +182,7 @@ class Chord:
         interval_string, unique_notes = self.__get_interval_string_info()
 
         #Get the dictionary object representing the chord for the chord's interval string
-        chord_obj = music_info.get_chord_for_intervals(interval_string)
+        chord_obj = get_chord_for_intervals(interval_string)
 
         if chord_obj['quality'] == 'unknown':
             self.bass_index = 0
