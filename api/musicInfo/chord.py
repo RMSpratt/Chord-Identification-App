@@ -111,7 +111,7 @@ class Chord:
             next_note = unique_notes[i+1]
 
             interval_string += str((next_note.value - curr_note.value) % 12)
-
+            
         return (interval_string, unique_notes)
 
     def get_index_from_interval(self, interval): 

@@ -128,7 +128,7 @@ class SATBValidator():
 
         return movement_errors
 
-    def __check_leading_resolution(self, prev_chord, curr_chord, key):
+    def __check_leading_resolution(self, prev_chord, curr_chord, key, curr_chord_index):
         """This function checks if the previous chord passed has a leading tone for the key passed, and ensures it resolves in 
             the following chord or was passed to the next chord if it is.
         """
@@ -166,7 +166,7 @@ class SATBValidator():
 
                 #If the seventh note doesn't appear in the current chord declare a seventh resolution error
                 if not passed_leading_tone:
-                    return {'type': 'resolution', 'description': SATBErrors.ERR_UNRESOLVED_LT.value}
+                    return {'type': 'resolution', 'code': 'ERR_UNRESOLVED_LT', 'details': {'chord_index': curr_chord_index - 1, 'voice_index': leading_tone_index}}
 
             return None
 
@@ -240,7 +240,7 @@ class SATBValidator():
                 if prev_chord.has_seventh == True:
                     if error := self.__check_seventh_resolution(prev_chord, chord, key, i): progression_errors.append(error)
 
-                if error := self.__check_leading_resolution(prev_chord, chord, key) : progression_errors.append(error)
+                if error := self.__check_leading_resolution(prev_chord, chord, key, i) : progression_errors.append(error)
 
             #Check for range errors between voices in the current chord
             for j, note in enumerate(chord.notes, start=1):

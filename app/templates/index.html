@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    </head>
+    <body>
+        <h1>Enter Your Chord Below</h1>
+
+        <form action="{{url_for('analysis')}}" method="GET">
+            <label for="noteInput">Notes:</label>
+            <input id="noteInput" type="text" name="notes">
+            <input type="submit" value="Submit">
+        </form>
+    </body>
+</html>

@@ -1,0 +1,157 @@
+id,bass_index,position,quality,description
+3,0,0,minor,Root position minor triad missing fifth.
+4,0,0,major,Root position major triad missing fifth.
+5,1,-1,add5,Root with added 5th.
+7,0,-1,add5,Root with added 5th.
+8,1,1,major,First inversion major triad missing fifth.
+9,2,1,minor,First inversion minor triad missing fifth.
+33,0,0,diminished,Root position diminished triad.
+34,0,0,minor,Root position minor triad.
+35,2,1,major,First inversion major triad.
+36,2,1,diminished,First inversion diminished triad.
+43,0,0,major,Root position major triad.
+44,0,0,augmented,Root position augmented triad.
+45,2,2,minor,Second inversion minor triad.
+53,1,2,minor,Second inversion minor triad.
+54,1,2,major,Second inversion major triad.
+63,1,2,diminished,Second inversion diminished triad.
+69,0,0,diminished,Root posiition diminished triad.
+78,0,0,minor,Root position minor triad.
+79,0,0,major,Root position major triad.
+87,1,1,major,First inversion major triad.
+88,1,1,augmented,First inversion augmented triad.
+89,2,2,minor,Second inversion minor triad.
+96,1,1,diminished,First inversion diminished triad.
+97,1,1,minor,First inversion minor triad.
+98,2,2,major,Second inversion major triad.
+99,2,2,diminished,Second inversion diminished triad.
+
+//Seventh Chords major7, dominant7, minor7, halfdim7, dim7
+
+14,1,3,major7,Third inversion major seventh chord missing fifth.
+17,1,-1,add5maj7,Root with added 5th and major 7th.
+23,1,3,minor7,Third inversion minor seventh chord missing fifth.
+24,1,3,dominant7,Third inversion dominant seventh chord missing fifth.
+37,0,0,minor7,Root position minor seventh chord missing fifth.
+41,2,-1,add5maj7,Root with added 5th and major 7th.
+46,0,0,dominant7,Root position dominant seventh chord missing fifth.
+47,0,0,major7,Root position major seventh chord missing fifth.
+58,2,3,major7,Third inversion major seventh chord missing fifth.
+59,2,3,minor7,Third inversion minor seventh chord missing fifth.
+62,2,1,dominant7,First inversion dominant seventh chord missing fifth.
+68,2,3,major7,Third inversion dominant seventh chord missing fifth.
+71,2,1,major7,First inversion major seventh chord missing fifth.
+72,2,1,minor7,First inversion minor seventh chord missing fifth.
+74,0,-1,add5maj7,Root with added 5th and major 7th.
+87,2,-1,add5maj7,Root with added 5th and major 7th.
+105,0,0,minor7,Root position minor seventh chord missing fifth.
+106,0,0,dominant7,Root position dominant seventh chord missing fifth.
+115,0,0,major7,Root position major seventh chord missing fifth.
+118,0,-1,add5maj7,Root with added 5th and major 7th.
+143,1,3,major7,Third inversion major seventh chord.
+179,1,3,major7,Third inversion major seventh chord.
+233,1,3,halfdim7,Third-inversion half-diminished seventh chord.
+234,1,3,minor7,Third inversion minor seventh chord.
+243,1,3,dominant7,Third inversion dominant seventh chord.
+269,1,3,halfdim7,Third-inversion half-diminished seventh chord.
+278,1,3,minor7,Third inversion minor seventh chord.
+279,1,3,dominant7,Third inversion dominant seventh chord.
+323,2,2,minor7,Second inversion minor seventh chord.
+324,2,2,dominant7,Second inversion dominant seventh chord.
+332,3,1,dominant7,First inversion dominant seventh chord.
+333,0,-1,dim7,Fully diminished seventh chord.
+334,0,0,halfdim7,Root position half-diminished seventh chord.
+341,3,1,major7,First inversion major seventh chord.
+342,3,1,halfdim7,First-inversion half-diminished seventh chord.
+343,0,0,minor7,Root position minor seventh chord.
+359,3,2,minor7,Second inversion minor seventh chord.
+368,3,2,dominant7,Second inversion dominant seventh chord.
+369,0,-1,dim7,Fully diminished seventh chord.
+378,0,0,halfdim7,Root position half-diminished seventh chord.
+379,0,0,minor7,Root position minor seventh chord.
+414,2,2,major7,Second inversion major seventh chord.
+423,2,2,halfdim7,Second-inversion half-diminished seventh chord.
+432,3,1,minor7,First inversion minor seventh chord.
+433,0,0,dominant7,Root position dominant seventh chord.
+434,0,0,major7,Root position major seventh chord.
+453,3,2,major7,Second inversion major seventh chord.
+459,3,2,halfdim7,Second-inversion half-diminished seventh chord.
+469,0,0,dominant7,Root position dominant seventh chord.
+478,0,0,major7,Root position major seventh chord.
+535,3,1,major7,Third inversion major seventh chord.
+536,3,3,halfdim7,Third-inversion half-diminished seventh chord.
+537,1,2,minor7,Second inversion minor seventh chord.
+545,3,3,minor7,Third inversion minor seventh chord.
+546,1,2,dominant7,Second inversion dominant seventh chord.
+547,1,2,major7,Second inversion major seventh chord.
+574,1,2,major7,Second inversion major seventh chord.
+587,2,3,major7,Third inversion major seventh chord.
+596,2,3,halfdim7,Third-inversion half-diminished seventh chord.
+597,2,3,minor7,Third inversion minor seventh chord.
+627,2,1,dominant7,First inversion dominant seventh chord.
+635,3,3,dominant7,Third inversion dominant seventh chord.
+636,0,-1,dim7,Fully diminished seventh chord.
+637,1,2,halfdim7,Second-inversion half-diminished seventh chord.
+645,0,0,halfdim7,Root position half-diminished seventh chord.
+687,2,3,dominant7,Third inversion dominant seventh chord.
+695,3,1,dominant7,First inversion dominant seventh chord.
+696,0,-1,dim7,Fully diminished seventh chord.
+697,0,0,halfdim7,Root position half-diminished seventh chord.
+711,1,-1,add5maj7,Root with added 5th and major 7th.
+714,2,1,major7,First inversion major seventh chord.
+717,2,1,major7,First inversion major seventh chord.
+726,2,1,halfdim7,First-inversion half-diminished seventh chord.
+727,2,1,minor7,First inversion minor seventh chord.
+735,0,0,minor7,Root position minor seventh chord.
+736,0,0,dominant7,Root position dominant 7th chord.
+745,0,0,major7,Root position major seventh chord.
+785,3,1,major7,First inversion major seventh chord.
+786,3,1,halfdim7,First-inversion half-diminished seventh chord.
+787,0,0,minor7,Root position minor seventh chord.
+795,3,1,minor7,First inversion minor seventh chord.
+796,0,0,dominant7,Root position dominant seventh chord.
+797,0,0,major7,Root position major seventh chord.
+810,1,1,dominant7,First inversion dominant seventh chord missing fifth.
+811,1,1,major7,First inversion major seventh chord missing fifth.
+854,2,3,major7,Third inversion major seventh chord.
+863,2,3,halfdim7,Third-inversion half-diminished seventh chord.
+872,3,2,minor7,Second inversion minor seventh chord.
+873,1,1,dominant7,First inversion dominant seventh chord.
+874,1,1,major7,First inversion major seventh chord.
+898,3,3,major7,Third inversion major seventh chord.
+910,1,1,minor7,First inversion minor seventh chord missing fifth.
+953,2,3,minor7,Third inversion minor seventh chord.
+954,2,3,dominant7,Third inversion dominant seventh chord.
+958,3,3,dominant7,Third inversion dominant seventh chord.
+962,3,2,dominant7,Second inversion dominant seventh chord.
+963,0,-1,dim7,Fully diminished seventh chord.
+964,1,1,halfdim7,First-inversion half-diminished seventh chord.
+971,3,2,major7,Second inversion major seventh chord.
+972,3,2,halfdim7,Second-inversion half-diminished seventh chord.
+973,1,1,minor7,First inversion minor seventh chord.
+989,3,3,minor7,Third inversion minor seventh chord.
+999,0,-1,dim7,Fully diminished seventh chord.
+1053,0,0,halfdim7,Root position half-diminished seventh chord.
+1054,0,0,minor7,Root position minor seventh chord.
+1063,0,0,dominant7,Root position dominant seventh chord.
+1089,0,0,halfdim7,Root position half-diminished seventh chord.
+1098,0,0,minor7,Root position minor seventh chord.
+1099,0,0,dominant7,Root position dominant seventh chord.
+1153,0,0,major7,Root position major seventh chord.
+1189,0,0,major7,Root position major seventh chord.
+3510,2,1,dominant7,First inversion dominant seventh chord.
+3511,2,1,major7,First inversion major seventh chord.
+3610,2,1,halfdim7,First-inversion half-diminished seventh chord.
+4510,2,1,minor7,First inversion minor seventh chord.
+5105,1,2,minor7,Second inversion minor seventh chord.
+5106,1,2,dominant7,Second inversion dominant seventh chord.
+5115,1,2,major7,Second inversion major seventh chord.
+6105,1,2,halfdim7,Second-inversion half-diminished seventh chord.
+8109,1,1,dominant7,First inversion dominant seventh chord.
+8118,1,1,major7,First inversion major seventh chord.
+8910,2,2,minor7,Second inversion minor seventh chord.
+9108,1,1,halfdim7,First-inversion half-diminished seventh chord.
+9109,1,1,minor7,First inversion minor seventh chord.
+9311,2,2,major7,Second inversion major seventh chord.
+9810,2,2,dominant7,Second inversion dominant seventh chord.
+9910,2,2,halfdim7,Second-inversion half-diminished seventh chord.
