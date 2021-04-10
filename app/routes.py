@@ -1,5 +1,5 @@
 from app import app
-from flask import render_template, request, Response
+from flask import render_template, request, Response, redirect, url_for
 from api import musicFuncs 
 
 #Note: Routes must precede the function they are related to
@@ -9,16 +9,14 @@ from api import musicFuncs
 def index():
     return render_template('index.html')
 
-@app.route('/analysis', methods=['GET'])
+@app.route('/analysis', methods=['GET', 'POST'])
 def analysis():
+    chords = request.form.getlist('chord')
+    key = request.form.get('key')
 
-    notes = request.args.get('notes')
+    print(f'Key: {key} and chords: {chords}')
 
-    try: 
-        chord_name = musicFuncs.analyze_chord(notes) 
+    progression_info = musicFuncs.analyze_progression(chords, key)
 
-    except:
-        chord_name = 'Invalid'
-
-    return render_template('analysis.html', data={"notes": chord_name})
+    return render_template('index.html', data={'chords': progression_info, 'key': key})
 
