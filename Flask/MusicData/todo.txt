@@ -1,4 +1,0 @@
-- Sevenths need better checking for resolutions
---> It's possible to carry a seventh to the next chord and not resolve it still
-
-- Testing chord progressions
