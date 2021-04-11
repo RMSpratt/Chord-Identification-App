@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="https://aarondavidnewman.github.io/vexflow_smoosic/releases/vexflow-debug.js"></script>
+    
+        <style>
+
+            * {
+                box-sizing: border-box;
+                margin: 0px;
+                padding: 0px;
+            }
+
+            html {
+                font-size: 16px;
+            }
+
+            label {
+                margin-right: 5px;
+            }
+
+            .form-chord {
+                display: inline-block;
+                margin: 10px 0px;
+                width: 48%;
+            }
+
+            .form-chord label {
+                width: 30%;
+            }
+
+            .form-chord input {
+                font-size: 0.75rem;
+                width: 70%;
+            }
+
+            .form-select {
+                display: inline-block;
+                width: 48%;
+            }
+
+            .ghost-note {
+                opacity: 0;
+            }
+
+            #chord-builder-form {
+                border: 2px solid black;
+                margin: 0 auto;
+                padding: 10px 2%;
+                width: 50%;
+            }
+
+            #chord-builder-form h2 {
+                margin-bottom: 20px;
+                text-align: center;
+            }
+
+            #progression-chords {
+                margin: 20px 0px;
+                min-height: 150px;
+            }
+
+            button {
+                font-size: 0.75rem;
+                margin: 0 9%;
+                height: 1.5rem;
+                width: 30%;
+            }
+
+            button:hover {
+                cursor: pointer;
+            }
+
+        </style>
+    </head>
+    <body>
+        <h1>Chord Progression Builder and Analysis Tool</h1>
+
+        <form action="{{url_for('index')}}" method="POST" id="chord-builder-form">
+            <h2>Chord Progression Builder Form</h2>
+            <div class="form-select">
+                <label for="keyOptions">Key:</label>
+                <select id="keyOptions" name="key">
+                    <option value="C" selected>C Major</option>
+                    <option value="G">G Major</option>
+                    <option value="D">D Major</option>
+                    <option value="A">A Major</option>
+                    <option value="E">E Major</option>
+                    <option value="B">B Major</option>
+                    <option value="F#">F# Major</option>
+                    <option value="C#">C# Major</option>
+                    <option value="F">F Major</option>
+                    <option value="Bb">Bb Major</option>
+                    <option value="Eb">Eb Major</option>
+                    <option value="Ab">Ab Major</option>
+                    <option value="Db">Db Major</option>
+                    <option value="Gb">Gb Major</option>
+                    <option value="Cb">Cb Major</option>
+                    <option value="Am">A minor</option>
+                    <option value="Em">E minor</option>
+                    <option value="F#m">F# minor</option>
+                    <option value="C#m">C# minor</option>
+                    <option value="G#m">G# minor</option>
+                    <option value="D#m">D# minor</option>
+                    <option value="A#m">A# minor</option>
+                    <option value="Dm">D minor</option>
+                    <option value="Gm">G minor</option>
+                    <option value="Cm">C minor</option>
+                    <option value="Fm">F minor</option>
+                    <option value="Bbm">Bb minor</option>
+                    <option value="Ebm">Eb minor</option>
+                    <option value="Abm">Ab minor</option>
+                </select>
+            </div>
+            <div class="form-select">
+                <label for="timeOptions">Time Signature:</label>
+                <select id="timeOptions" name="time">
+                    <option value="4/4" selected>4/4</option>
+                    <option value="3/4">3/4</option>
+                    <option value="6/8">6/8</option>
+                    <option value="12/8">12/8</option>
+                </select>
+            </div>
+            <div id="progression-chords">
+                <div class="form-chord">
+                    <label for="chordInput">Chord:</label>
+                    <input id="chordInput" type="text" name="chord">
+                </div>
+                <div class="form-chord">
+                    <label for="chordInput">Chord:</label>
+                    <input id="chordInput" type="text" name="chord">
+                </div>
+                <div class="form-chord">
+                    <label for="chordInput">Chord:</label>
+                    <input id="chordInput" type="text" name="chord">
+                </div>
+                <div class="form-chord">
+                    <label for="chordInput">Chord:</label>
+                    <input id="chordInput" type="text" name="chord">
+                </div>
+            </div>
+            <div id="form-buttons">
+                <button id="addChordBtn">Add Chord</button>
+                <button>Generate Progression</button>
+            </div>
+        </form>
+        <div id='stave-svg'></div>
+        <script>
+
+            let addBtn = document.getElementById('addChordBtn');
+
+            addBtn.onclick = (ev) => {
+                ev.preventDefault();
+
+                let formChordsSection = document.getElementById('progression-chords');
+
+                let newChordDiv = document.createElement('div');
+                newChordDiv.setAttribute('class', 'form-chord');
+
+                let newChordLabel = document.createElement('label');
+                newChordLabel.setAttribute('for', 'newChord2');
+                newChordLabel.innerText = "Chord:";
+
+                let newChordInput = document.createElement('input');
+                newChordInput.setAttribute('id', 'newChord2');
+                newChordInput.setAttribute('name', 'chord');
+
+                newChordDiv.appendChild(newChordLabel);
+                newChordDiv.appendChild(newChordInput);
+                formChordsSection.appendChild(newChordDiv);
+            }
+        </script>
+
+        <!-- Script to build the stave -->
+        <script>
+
+            let data = null;
+            let key = null;
+            let chord_notes = [];
+
+            let VF = Vex.Flow;
+
+            "{% if data is defined and data.key is defined %}"
+                data = "{{data}}";
+                key = "{{data.key}}";
+                time = "{{data.time}}"
+            "{% endif %}";
+
+            "{% if data is defined and data.chords is defined %}"
+                "{% for chord in data.chords['chords'] %}"
+                    chord_notes.push({'name': "{{ chord.name }}", 'numeral': "{{ chord.numeral }}", 'notes': "{{ chord.notes }}"})
+                "{% endfor %}"
+            "{% endif %}"
+
+            function buildStave(key, chords, time) {
+
+                //The div to put the music stave svg inside
+                let staffDiv = document.getElementById('stave-svg');
+
+                //Create the svg renderer
+                let renderer = new VF.Renderer(staffDiv, VF.Renderer.Backends.SVG);
+                renderer.resize(500, 250);
+
+                let context = renderer.getContext();
+
+                //Create the staves
+                let trebleStave = new VF.Stave(15, 25, 460)
+                    .addClef('treble')
+                    .addTimeSignature(time)
+                    .addKeySignature(key);
+        
+                trebleStave.setContext(context).draw();
+
+                let bassStave = new VF.Stave(15, 100, 460)
+                    .addClef('bass')
+                    .addTimeSignature(time)
+                    .addKeySignature(key);
+
+                bassStave.setContext(context).draw();
+
+                //Draw the stave connectors to form the grand staff
+                let brace = new Vex.Flow.StaveConnector(trebleStave, bassStave).setType(3);
+                let lineLeft = new Vex.Flow.StaveConnector(trebleStave, bassStave).setType(1);
+                let lineRight = new Vex.Flow.StaveConnector(trebleStave, bassStave).setType(6);
+                
+                brace.setContext(context).draw();
+                lineLeft.setContext(context).draw();
+                lineRight.setContext(context).draw();
+
+                let svgNotes = [];
+                let trebleNotes = [];
+                let bassNotes = [];
+
+                //Format each chord's notes to the notation for VexFlow expected
+                getFormattedChords(chords);
+
+                let voiceInfo = getPianoVoices(chords);
+                let voices = voiceInfo[0];
+                let ghostNotes = voiceInfo[1];
+
+                //Format and justify the notes to 400 pixels
+                let trebleFormatter = new VF.Formatter().joinVoices([voices[0]]).format([voices[0]], 400);
+                let bassFormatter = new VF.Formatter().joinVoices([voices[1]]).format([voices[1]], 400);
+
+                let trebleBeams = VF.Beam.generateBeams(voices[0].tickables);
+                let bassBeams = VF.Beam.generateBeams(voices[1].tickables);
+
+                voices[0].draw(context, trebleStave);
+                voices[1].draw(context, bassStave);
+          
+                trebleBeams.forEach(function(beam) {
+                    beam.setContext(context).draw();
+                });
+
+                bassBeams.forEach(function(beam) {
+                    beam.setContext(context).draw();
+                });
+
+                //Iterate through the score's ghost notes and hide them
+                for (let note_id of ghostNotes) {
+                    note_id = 'vf-' + note_id;
+
+                    let ghostNote = document.getElementById(note_id).childNodes[0];
+                    ghostNote.setAttribute('class', 'ghost-note');
+                }
+
+                let modifierElements = document.getElementsByTagName('text');
+                
+                //Set the vertical position of the chord numerals and chord names
+                for (let modifier of modifierElements) {
+
+                    let modifierText = modifier.innerHTML.toLowerCase();
+                    
+                    if (modifierText.includes('i') || modifierText.includes('v')) {
+                        modifier.setAttribute('y', staffDiv.offsetHeight - 10);
+                    }
+
+                    else {
+                        modifier.setAttribute('y', staffDiv.offsetHeight - (staffDiv.offsetHeight - 30));
+                    }
+                }
+            }
+
+            /* Function: getPianoVoices
+             * Description: This function separates notes in each chord to place them within the treble or bass clef.
+            */ 
+            function getPianoVoices(chords) {
+
+                let voices = [];
+                let trebleVoiceNotes = [];
+                let bassVoiceNotes = [];
+                let ghostNotes = [];
+
+                let numBeats;
+               
+                //Iterate through each chord
+                for (let chord of chords) {
+                    
+                    let trebleNotes = [];
+                    let bassNotes = [];
+
+                    chord.notes.forEach(function (note, i) {
+                        let staveNote;
+                        
+                        note.charAt(note.length - 1) >= 4 ? trebleNotes.push(note) : bassNotes.push(note);    
+                    })
+
+                    if (trebleNotes.length > 0) {
+                        trebleVoiceNotes.push(new VF.StaveNote({clef: 'treble', keys: trebleNotes, duration: 'q'}));
+                    }
+                    
+                    //Track the ID of the 'ghost' note so that it can be hidden later
+                    else {
+
+                        let ghostNote = new VF.StaveNote({clef: 'treble', keys: ['b/4'], duration: 'q'});
+                        ghostNotes.push(ghostNote.attrs.id);
+                        trebleVoiceNotes.push(ghostNote);
+                    }
+
+                    if (bassNotes.length > 0) {
+                        bassVoiceNotes.push(new VF.StaveNote({clef: 'bass', keys: bassNotes, duration: 'q'}));
+                    }
+
+                    //Track the ID of the 'ghost' note so that it can be hidden later
+                    else {
+                        let ghostNote = new VF.StaveNote({clef: 'bass', keys: ['d/3'], duration: 'q'});
+                        ghostNotes.push(ghostNote.attrs.id);
+                        bassVoiceNotes.push(ghostNote)
+                    }
+                }
+
+                //Add chord names to each chord
+                chords.forEach(function (chord, i) {
+
+                    let chordName = new VF.ChordSymbol()
+                        .setFontSize(14)
+                        .addText(chord.name)
+                        .setVertical('top')
+                        .setHorizontal('center');
+
+                    let chordNumeral = new VF.ChordSymbol()
+                        .addText(chord.numeral)
+                        .setVertical('bottom')
+                        .setHorizontal('center');
+       
+                    trebleVoiceNotes[i].addModifier(0, chordName);
+                    bassVoiceNotes[i].addModifier(0, chordNumeral);
+                });
+
+                //Get the number of beats to draw, (both arrays will be equal size)
+                numBeats = trebleVoiceNotes.length;
+
+                //Build the voices to display
+                voices[0] = new VF.Voice({num_beats: numBeats, beat_value: 4})
+                    .setStrict(false)
+                    .addTickables(trebleVoiceNotes);
+
+                voices[1] = new VF.Voice({num_beats: numBeats, beat_value: 4})
+                    .setStrict(false)
+                    .addTickables(bassVoiceNotes);
+
+                voices[0].tickables[0].classes
+
+                return [voices, ghostNotes];
+            }
+
+            /* Function: getSATBVoices
+             * Description: This function separates notes in each chord to match SATB voicing rules.
+            */ 
+            function getSATBVoices() {
+
+                let voices = [];
+
+                let sopranoNotes = [];
+                let altoNotes = [];
+                let tenorNotes = [];
+                let bassNotes = [];
+
+                for (let chord of chords) {
+                    bassNotes.push(new VF.StaveNote({clef: 'bass', keys: chord.notes[0], duration: 'q'}));
+                    tenorNotes.push(new VF.StaveNote({clef: 'bass', keys: chord.notes[1], duration: 'q'}));
+                    altoNotes.push(new VF.StaveNote({clef: 'treble', keys: chord.notes[2], duration: 'q'}));
+                    sopranoNotes.push(new VF.StaveNote({clef: 'treble', keys: chord.notes[3], duration: 'q'}));
+                }
+
+                //Create voices with each line of notes
+                voices[0] = new VF.Voice({num_beats: 4, beat_value: 4})
+                    .setStrict(false)
+                    .addTickables(bassNotes);
+
+                voices[1] = new VF.Voice({num_beats: 4, beat_value: 4})
+                    .setStrict(false)
+                    .addTickables(tenorNotes);
+            
+                voices[2] = new VF.Voice({num_beats: 4, beat_value: 4})
+                    .setStrict(false)
+                    .addTickables(altoNotes);
+
+                voices[3] = new VF.Voice({num_beats: 4, beat_value: 4})
+                    .setStrict(false)
+                    .addTickables(sopranoNotes);
+
+                return voices;
+            }
+
+            /* Function: getFormattedChords
+             * Description: This function is used to format the notes in each chord for display in VexFlow.
+             * The notes are modified directly in each chord object.
+            */ 
+            function getFormattedChords(chords) {
+
+                let formattedChords = [];
+
+                for (let chord of chords) {
+    
+                    let chordNotes = chord.notes;
+                    let formattedNotes = [];
+
+                    //Reformat each note --> '<letter>/<octave>' i.e. c/4
+                    for (let note of chordNotes.split(',')) {
+                        note = note.trim()
+                        note = note.toLowerCase();
+                        note = note.substr(0, note.length - 1) + '/' + note.substr(-1);
+                        formattedNotes.push(note);
+                    }
+
+                    chord.notes = formattedNotes;
+                }
+            }
+
+            if (key !== null && chord_notes.length > 0) {
+                buildStave(key, chord_notes, time);
+            }
+            
+        </script>
+    </body>
+</html>
