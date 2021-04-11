@@ -1,6 +1,6 @@
-from .musicInfo import identify_chord_numeral_for_key, identify_secondary_dominant_numeral, get_chord_for_intervals
-from .note import NoteFactory
-from .exceptions import InvalidChordError, InvalidNoteError
+from musicInfo import identify_chord_numeral_for_key, identify_secondary_dominant_numeral, get_chord_for_intervals
+from note import NoteFactory
+from exceptions import InvalidChordError, InvalidNoteError
 
 
 class ChordFactory:

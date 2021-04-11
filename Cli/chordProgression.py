@@ -1,8 +1,8 @@
 import enum
 from enum import Enum
 
-from .chord import Chord, ChordFactory
-from .musicInfo import get_key_note_for_degree, get_leading_tone_in_key
+from chord import Chord, ChordFactory
+from musicInfo import get_key_note_for_degree, get_leading_tone_in_key
 
 class SATBErrors(Enum):
     ERR_SA_DISTANCE = 'Too much distance between soprano and alto voices'

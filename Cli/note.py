@@ -1,5 +1,5 @@
-from .musicInfo import get_note_degree_in_key
-from .exceptions import InvalidNoteError
+from musicInfo import get_note_degree_in_key
+from exceptions import InvalidNoteError
 
 
 class NoteFactory:
