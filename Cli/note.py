@@ -1,4 +1,4 @@
-from musicInfo import get_note_degree_in_key
+from musicInfo import get_note_degree_in_key, get_note_accidental_in_key
 from exceptions import InvalidNoteError
 
 
@@ -85,5 +85,9 @@ class Note:
         return (other_note.index - self.index) % 12
 
     def get_degree_in_key(self, key):
-        """Returns the index of this note """
+        """Returns the index of this note"""
         return get_note_degree_in_key(self.name, key)
+
+    def get_accidental_for_key(self, key):
+        """Returns the accidental this note has relative to a key"""
+        return get_note_accidental_in_key(self.name, key)

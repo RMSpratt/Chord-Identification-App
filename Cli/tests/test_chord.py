@@ -67,6 +67,29 @@ class TestChords:
                 assert chord.get_numeral_for_key(key) == expected_out[i][j]
 
 
+    ### GENERAL CHORD TESTING ###
+    def test_accidentals(self, get_test_chords):
+        """Test case to check the accidentals for notes within each chord relative to a key"""
+
+        test_triads = get_test_chords(type='triad')
+        test_keys = ['C','a']
+
+        expected_out = [
+            ['','',''],['#','',''],['','','#',''],['','b','','b'],['','','#',''],['','b',''],
+            ['#','','#'],['#','',''],['bb','b','b'],['','#','#'],['#','b',''],['b','','#']
+        ]
+        
+        #Compare accidentals for each given key
+        for key in test_keys:
+            for (i, chord) in enumerate(test_triads):
+
+                expected_accidentals = expected_out[i]
+                actual_accidentals = chord.get_note_accidentals_for_key(key)
+                print(chord)
+                for (expected, actual) in zip(expected_accidentals, actual_accidentals):
+                    assert expected == actual
+
+
     ### TRIAD CHORD TESTING ###
 
     def test_triad_numerals_major(self, get_test_chords):
@@ -212,4 +235,3 @@ class TestChords:
             actual_out = applied_chord.get_secondary_dominant_numeral(base_chord)
 
             assert(actual_out == expected_out[i])
-

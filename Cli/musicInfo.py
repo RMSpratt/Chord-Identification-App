@@ -384,6 +384,39 @@ def get_note_degree_in_key(name, key):
     return -1
 
 
+def get_note_accidental_in_key(search_name, key):
+    """Searches for the given note in the passed key and returns its accidental string if it doesn't exist within the key."""
+    
+    if (key[0].isupper()):
+        key_notes = MAJOR_KEY_NOTES[key]
+
+    else:
+        key = key[0].upper() + key[1:]
+        key_notes = MINOR_KEY_NOTES[key]
+
+    for note_name in key_notes:
+
+        if note_name[0] == search_name[0]:
+            key_note_index = NOTE_INDICES[note_name]
+            search_note_index = NOTE_INDICES[search_name]
+
+    #Return the appropriate accidental string for the note
+    if search_note_index == key_note_index + 2 or search_note_index == key_note_index - 10:
+        return 'x'
+
+    elif search_note_index == key_note_index + 1 or search_note_index == key_note_index - 11:
+        return '#'
+
+    elif search_note_index == key_note_index - 1 or search_note_index == key_note_index + 11:
+        return 'b'
+
+    elif search_note_index == key_note_index - 2 or search_note_index == key_note_index + 10:
+        return 'bb'
+
+    else:
+        return ''
+
+
 def identify_chord_numeral_for_key(key, bass_note, quality, position, has_seventh=False, get_inversion=True):
     """Gets and returns the roman numeral for this chord relative to the passed key.
     
