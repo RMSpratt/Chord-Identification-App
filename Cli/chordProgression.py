@@ -280,6 +280,17 @@ class ChordProgression():
             else:
                 self.chords.append(new_chord)
 
+    def get_progression_chord_accidentals(self):
+        """Returns the accidentals for each chord in this progression for the progression's key"""
+
+        accidentals = []
+
+        if self.key:
+            for chord in self.chords:
+                accidentals.append(chord.get_accidentals_for_key(self.key))
+
+        return accidentals
+
     def get_progression_chord_numerals(self):
         """Returns the numerals for each chord within this progression."""
 

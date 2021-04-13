@@ -72,20 +72,34 @@ class TestChords:
         """Test case to check the accidentals for notes within each chord relative to a key"""
 
         test_triads = get_test_chords(type='triad')
-        test_keys = ['C','a']
+        test_keys = ['C','f#','Gb']
 
         expected_out = [
-            ['','',''],['#','',''],['','','#',''],['','b','','b'],['','','#',''],['','b',''],
-            ['#','','#'],['#','',''],['bb','b','b'],['','#','#'],['#','b',''],['b','','#']
+            [
+                ['','',''],['#','',''],['','','#',''],['','b','','b'],['','','#',''],['','b',''],
+                ['#','','#'],['#','',''],['bb','b','b'],['','#','#'],['#','b',''],['b','','#']
+            ],
+            [
+                ['n','','n'],['','',''],['','','',''],['n','b','n','b'],['','','',''],['','b','n'],
+                ['','','#'],['','','n'],['bb','b','b'],['','','#'],['','b',''],['b','','']
+            ],
+            [
+                ['n','n','n'],['#','n','n'],['n','n','#','n'],['n','','n',''],['n','n','#','n'],['n','','n'],
+                ['#','n','#'],['#','n','n'],['bb','',''],['n','#','#'],['#','','n'],['','n','#']
+            ]
         ]
         
         #Compare accidentals for each given key
-        for key in test_keys:
-            for (i, chord) in enumerate(test_triads):
+        for (i, key) in enumerate(test_keys):
 
-                expected_accidentals = expected_out[i]
-                actual_accidentals = chord.get_note_accidentals_for_key(key)
+            expected_key_accidentals = expected_out[i]
+
+            for (j, chord) in enumerate(test_triads):
+
+                expected_accidentals = expected_key_accidentals[j]
+                actual_accidentals = chord.get_accidentals_for_key(key)
                 print(chord)
+
                 for (expected, actual) in zip(expected_accidentals, actual_accidentals):
                     assert expected == actual
 

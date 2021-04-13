@@ -122,6 +122,16 @@ class Chord:
             if abs(note.index - bass_note.index) == interval:
                 return i 
 
+    def get_accidentals_for_key(self, key):
+        """Returns an array of accidentals for this chord's notes"""
+
+        accidentals = []
+
+        for note in self.notes:
+            accidentals.append(note.get_accidental_for_key(key))
+
+        return accidentals
+
     def get_seventh_index(self):
         """Returns the index of this chord's seventh, if it has one."""
 

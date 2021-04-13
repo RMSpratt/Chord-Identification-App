@@ -47,8 +47,6 @@ class SATBValidator():
 
         #Check the distances between the four voices
         if (soprano_value - alto_value) > self._validation_settings['max_distance'][0]:
-            print(chord.notes[3], soprano_value, chord.notes[2], alto_value)
-            print(soprano_value - alto_value)
             distance_errors.append({'type': 'spacing', 'code': 'ERR_SA_DISTANCE', 'details': {'chord_index': chord_index}})
 
         if alto_value - tenor_value > self._validation_settings['max_distance'][1]:
@@ -229,8 +227,6 @@ class SATBValidator():
         prev_chord = None
 
         for i, chord in enumerate(progression, start=1):
-            print(f'\nValidating chord: {i} {chord.get_numeral_for_key(key)}')
-
             progression_errors.extend(self.__check_voice_distances(chord, i))
     
             #Check for movement or resolution errors between the previous chord and the current one
@@ -280,13 +276,23 @@ class ChordProgression():
             else:
                 self.chords.append(new_chord)
 
+    def get_progression_chord_accidentals(self):
+        """Returns the accidentals for each chord in this progression for the progression's key"""
+
+        accidentals = []
+
+        if self.key:
+            for chord in self.chords:
+                accidentals.append(chord.get_accidentals_for_key(self.key))
+
+        return accidentals
+
     def get_progression_chord_numerals(self):
         """Returns the numerals for each chord within this progression."""
 
         chord_numerals = []
 
         if self.key:
-            
             for chord in self.chords:
                 chord_numerals.append(chord.get_numeral_for_key(self.key))
 

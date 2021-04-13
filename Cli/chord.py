@@ -158,7 +158,7 @@ class Chord:
         else:
             return f'{self.notes[self.bass_index].name}{self.quality}'
 
-    def get_note_accidentals_for_key(self, key):
+    def get_accidentals_for_key(self, key):
         """Returns an array of accidentals for this chord's notes"""
 
         accidentals = []

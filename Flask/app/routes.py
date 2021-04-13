@@ -8,13 +8,17 @@ from api import musicFuncs
 
 def index():
 
-    chords = request.form.getlist('chord')
+    return render_template('index.html')
+
+@app.route('/analysis', methods=["POST",])
+def analysis():
+
+    chords = request.form.get('chords')
     key = request.form.get('key')
     time = request.form.get('time')
 
-    print(f'Key: {key} and chords: {chords}')
-
+    chords = chords.split('|')
+    
     progression_info = musicFuncs.analyze_progression(chords, key)
 
-    return render_template('index.html', data={'chords': progression_info, 'key': key, 'time': time})
-
+    return {'chords': progression_info, 'time': time, 'key': key}

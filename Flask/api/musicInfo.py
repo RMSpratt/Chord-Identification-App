@@ -31,7 +31,7 @@ MAJOR_KEY_NOTES = {
     'E': ['E','F#','G#','A','B','C#','D#'],
     'F': ['F','G','A','Bb','C','D','Eb'],
     'F#': ['F#','G#','A#','B','C#','D#','E#'],
-    'Gb': ['Gb','Ab','Bb','C','Db','Eb','F'],
+    'Gb': ['Gb','Ab','Bb','Cb','Db','Eb','F'],
     'G': ['G','A','B','C','D','E','F#'],
     'Ab': ['Ab','Bb','C','Db','Eb','F','G'],
     'A': ['A','B','C#','D','E','F#','G#'],
@@ -363,6 +363,63 @@ def get_leading_tone_in_key(key):
     key = key[0].upper() + key[1:]
 
     return MAJOR_KEY_NOTES[key][6]
+
+
+def get_note_accidental_in_key(search_name, key):
+    """Searches for the given note in the passed key and returns its accidental string if it doesn't exist within the key."""
+    
+    accidental_strings = ['bb', 'b', 'n', '#', 'x']
+    accidental_index = 0
+   
+    #Get the notes for the passed key
+    if (key[0].isupper()):
+        key_notes = MAJOR_KEY_NOTES[key]
+
+    else:
+        key = key[0].upper() + key[1:]
+        key_notes = MINOR_KEY_NOTES[key]
+
+    #Search for the note by its letter name in the passed key
+    for note_name in key_notes:
+
+        #Get the index of the note being searched for and the note as it appears in the key, i.e. C = 0, C# = 1, Cx = 2
+        if note_name[0] == search_name[0]:
+            key_note_index = NOTE_INDICES[note_name]
+            key_note_name = note_name
+            search_note_index = NOTE_INDICES[search_name]
+
+    #Get the sign of the note as it normally appears in the key
+    if 'bb' in key_note_name: 
+        accidental_index = 0
+
+    elif 'b' in key_note_name:
+        accidental_index = 1
+
+    elif '#' in key_note_name:
+        accidental_index = 3
+
+    elif 'x' in key_note_name:
+        accidental_index = 4
+
+    #No sign indicates the note is natural, no sharp(s) or flat(s)
+    else:
+        accidental_index = 2
+
+    #Return the appropriate accidental string for the note
+    if search_note_index == key_note_index + 2 or search_note_index == key_note_index - 10:
+        return accidental_strings[accidental_index + 2]
+
+    elif search_note_index == key_note_index + 1 or search_note_index == key_note_index - 11:
+        return accidental_strings[accidental_index + 1]
+
+    elif search_note_index == key_note_index - 1 or search_note_index == key_note_index + 11:
+        return accidental_strings[accidental_index - 1]
+ 
+    elif search_note_index == key_note_index - 2 or search_note_index == key_note_index + 10:
+        return accidental_strings[accidental_index - 2]
+
+    else:
+        return ''
 
 
 def get_note_degree_in_key(name, key):
