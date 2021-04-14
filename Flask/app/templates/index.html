@@ -195,9 +195,6 @@
                 let ghostNotes;
                 let noteBeams = [];
 
-                //Format each chord's notes to the notation for VexFlow expected
-                getFormattedChords(chords);
-
                 if (drawMode === 'piano') {
                     staveInfo = getPianoVoices(chords, time);
                     voices = staveInfo[0];
@@ -584,31 +581,6 @@
                 }
 
                 return [voices, ghostNotes];
-            }
-
-            /* Function: getFormattedChords
-             * Description: This function is used to format the notes in each chord for display in VexFlow.
-             * The notes are modified directly in each chord object.
-            */ 
-            function getFormattedChords(chords) {
-
-                let formattedChords = [];
-
-                for (let chord of chords) {
-    
-                    let chordNotes = chord.notes;
-                    let formattedNotes = [];
-
-                    //Reformat each note --> '<letter>/<octave>' i.e. c/4
-                    for (let note of chordNotes.split(',')) {
-                        note = note.trim()
-                        note = note.toLowerCase();
-                        note = note.substr(0, note.length - 1) + '/' + note.substr(-1);
-                        formattedNotes.push(note);
-                    }
-
-                    chord.notes = formattedNotes;
-                }
             }
 
             $(document).on('submit','#chord-builder-form',function(e) {

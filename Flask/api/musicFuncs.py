@@ -50,6 +50,43 @@ def analyze_progression(chords, key='C', validate=False):
 
     #Create the progression object to return
     for i, (name, numeral, chord) in enumerate(zip(chord_names, chord_numerals, progression_chords)):
-        progression_obj['chords'].append({'name': name, 'numeral': numeral, 'notes': str(chord), 'accidentals': chord_accidentals[i]})
+        formatted_notes = format_chord(chord)
+        progression_obj['chords'].append({'name': name, 'numeral': numeral, 'notes': formatted_notes, 'accidentals': chord_accidentals[i]})
 
     return progression_obj
+
+
+def format_chord(chord):
+    """Function to format the set of chords to return to be suitable for VexFlow's expected format"""
+    
+    formatted_notes = []
+
+    notes = str(chord)
+
+    for note in notes.split(','):
+        note = note.strip()
+        note = note.lower()
+        note = note[:-1] + '/' + note[-1]
+        formatted_notes.append(note)
+
+    return formatted_notes
+
+
+
+# let formattedChords = [];
+
+# for (let chord of chords) {
+
+#     let chordNotes = chord.notes;
+#     let formattedNotes = [];
+
+#     //Reformat each note --> '<letter>/<octave>' i.e. c/4
+#     for (let note of chordNotes.split(',')) {
+#         note = note.trim()
+#         note = note.toLowerCase();
+#         note = note.substr(0, note.length - 1) + '/' + note.substr(-1);
+#         formattedNotes.push(note);
+#     }
+
+#     chord.notes = formattedNotes;
+# }
