@@ -1,8 +1,13 @@
+"""This test module holds all testing functions for testing the Chord class functions and the 
+Note functions by extension.
+"""
+
 import pytest
 
-from chord import Chord, ChordFactory
+from music.chord import ChordFactory
 
 class TestChords:
+    """Set of functions for testing Chord functionality."""
 
     @pytest.fixture(scope = 'session')
     def get_test_chords(self):
@@ -40,15 +45,18 @@ class TestChords:
             test_factory.create_chord('F5,D5,Ab5,Cb6'),
         ]
 
-        def get_chord_type(type):
+        def get_chord_type(chord_type):
             
-            if type == 'triad':
+            if chord_type == 'triad':
                 return test_triads
 
-            elif type == 'seventh':
+            elif chord_type == 'seventh':
                 return test_sevenths
 
         return get_chord_type
+
+
+    ## HELPER METHODS ##
 
     def compare_properties(self, chords, expected_out):
         """Helper method to validate each chord's basic identification properties."""
@@ -56,11 +64,11 @@ class TestChords:
         for i, chord in enumerate(chords):
             assert chord.get_name() == expected_out[i]['name']
             assert chord.get_name(True) == expected_out[i]['slash_name']
-            assert chord.bass_index == expected_out[i]['bass_index']
+            assert chord.root_index == expected_out[i]['root_index']
             assert chord.position == expected_out[i]['position']
 
     def compare_numerals(self, chords, keys, expected_out):
-        """Helper method to check each passed chord's numeral relative to the list of passed keys."""
+        """Checks each passed chord's numeral relative to the list of passed keys."""
 
         for i, key in enumerate(keys):
             for j, chord in enumerate(chords):
@@ -71,7 +79,7 @@ class TestChords:
     def test_accidentals(self, get_test_chords):
         """Test case to check the accidentals for notes within each chord relative to a key"""
 
-        test_triads = get_test_chords(type='triad')
+        test_triads = get_test_chords(chord_type='triad')
         test_keys = ['C','f#','Gb']
 
         expected_out = [
@@ -88,7 +96,7 @@ class TestChords:
                 ['#','n','#'],['#','n','n'],['bb','',''],['n','#','#'],['#','','n'],['','n','#']
             ]
         ]
-        
+
         #Compare accidentals for each given key
         for (i, key) in enumerate(test_keys):
 
@@ -109,7 +117,7 @@ class TestChords:
     def test_triad_numerals_major(self, get_test_chords):
         """Test case to check the numerals of triad chords relative to a few major keys."""
 
-        test_triads = get_test_chords(type='triad')
+        test_triads = get_test_chords(chord_type='triad')
         test_keys = ['C','F#','Bb']
 
         expected_out = [
@@ -122,8 +130,8 @@ class TestChords:
 
     def test_triad_numerals_minor(self, get_test_chords):
         """Test case to check the numerals of triad chords relative to a few minor keys."""
-        
-        test_triads = get_test_chords(type='triad')
+
+        test_triads = get_test_chords(chord_type='triad')
         test_keys = ['e','g','a']
 
         expected_out = [
@@ -137,23 +145,23 @@ class TestChords:
     def test_triad_properties(self, get_test_chords):
         """Test case to check the properties of triad chords of different qualities and inversions."""
 
-        test_triads = get_test_chords(type='triad')
+        test_triads = get_test_chords(chord_type='triad')
 
         expected_out = [
-            {'name': 'C', 'slash_name': 'C', 'bass_index': 0, 'position': 0},
-            {'name': 'D', 'slash_name': 'D/F#', 'bass_index': 2, 'position': 1},
-            {'name': 'A', 'slash_name': 'A/E', 'bass_index': 1, 'position': 2},
-            {'name': 'Cm', 'slash_name': 'Cm', 'bass_index': 0, 'position': 0},
-            {'name': 'Bm', 'slash_name': 'Bm/D', 'bass_index': 1, 'position': 1},
-            {'name': 'Gm', 'slash_name': 'Gm/D', 'bass_index': 2, 'position': 2},
-            {'name': 'D#o', 'slash_name': 'D#o/F#', 'bass_index': 2, 'position': 1},
-            {'name': 'F#o', 'slash_name': 'F#o', 'bass_index': 0, 'position': 0},
-            {'name': 'Ebo', 'slash_name': 'Ebo/Bbb', 'bass_index': 1, 'position': 2},
-            {'name': 'E+', 'slash_name': 'E+', 'bass_index': 0, 'position': 0},
-            {'name': 'F#+', 'slash_name': 'F#+', 'bass_index': 0, 'position': 0},
-            {'name': 'Bb+', 'slash_name': 'Bb+', 'bass_index': 0, 'position': 0},
+            {'name': 'C', 'slash_name': 'C', 'root_index': 0, 'position': 0},
+            {'name': 'D', 'slash_name': 'D/F#', 'root_index': 2, 'position': 1},
+            {'name': 'A', 'slash_name': 'A/E', 'root_index': 1, 'position': 2},
+            {'name': 'Cm', 'slash_name': 'Cm', 'root_index': 0, 'position': 0},
+            {'name': 'Bm', 'slash_name': 'Bm/D', 'root_index': 1, 'position': 1},
+            {'name': 'Gm', 'slash_name': 'Gm/D', 'root_index': 2, 'position': 2},
+            {'name': 'D#o', 'slash_name': 'D#o/F#', 'root_index': 2, 'position': 1},
+            {'name': 'F#o', 'slash_name': 'F#o', 'root_index': 0, 'position': 0},
+            {'name': 'Ebo', 'slash_name': 'Ebo/Bbb', 'root_index': 1, 'position': 2},
+            {'name': 'E+', 'slash_name': 'E+', 'root_index': 0, 'position': 0},
+            {'name': 'F#+', 'slash_name': 'F#+', 'root_index': 0, 'position': 0},
+            {'name': 'Bb+', 'slash_name': 'Bb+', 'root_index': 0, 'position': 0},
         ]
-        
+
         self.compare_properties(test_triads, expected_out)
 
 
@@ -162,7 +170,7 @@ class TestChords:
     def test_seventh_numerals_major(self, get_test_chords):
         """Test case to check the numerals of seventh chords relative to a few major keys."""
 
-        test_sevenths = get_test_chords(type='seventh')
+        test_sevenths = get_test_chords(chord_type='seventh')
         test_keys = ['D','Ab','C#']
 
         expected_out = [
@@ -176,7 +184,7 @@ class TestChords:
     def test_seventh_numerals_minor(self, get_test_chords):
         """Test case to check the numerals of seventh chords relative to a few minor keys."""
 
-        test_sevenths = get_test_chords(type='seventh')
+        test_sevenths = get_test_chords(chord_type='seventh')
         test_keys = ['f','b','d#']
 
         expected_out = [
@@ -188,21 +196,21 @@ class TestChords:
         self.compare_numerals(test_sevenths, test_keys, expected_out)
 
     def test_seventh_properties(self, get_test_chords):
-        """Test case to check the properties of seventh chords of different qualities and inversions."""
+        """Test case to check seventh chord properties of different qualities and inversions."""
 
-        test_sevenths = get_test_chords(type='seventh')
-        
+        test_sevenths = get_test_chords(chord_type='seventh')
+
         expected_out = [
-            {'name': 'Ebmaj7', 'slash_name': 'Ebmaj7', 'bass_index': 0, 'position': 0},
-            {'name': 'Fmaj7', 'slash_name': 'Fmaj7/A', 'bass_index': 3, 'position': 1},
-            {'name': 'C7', 'slash_name': 'C7/G', 'bass_index': 3, 'position': 2},
-            {'name': 'D7', 'slash_name': 'D7/C', 'bass_index': 1, 'position': 3},
-            {'name': 'Em7', 'slash_name': 'Em7', 'bass_index': 0, 'position': 0},
-            {'name': 'Bbm7', 'slash_name': 'Bbm7/F', 'bass_index': 3, 'position': 2},
-            {'name': 'C#ø', 'slash_name': 'C#ø/E', 'bass_index': 2, 'position': 1},
-            {'name': 'G#ø', 'slash_name': 'G#ø/F#', 'bass_index': 3, 'position': 3},
-            {'name': 'Ao7', 'slash_name': 'Ao7', 'bass_index': 0, 'position': 0},
-            {'name': 'Do7', 'slash_name': 'Do7', 'bass_index': 0, 'position': 0},
+            {'name': 'Ebmaj7', 'slash_name': 'Ebmaj7', 'root_index': 0, 'position': 0},
+            {'name': 'Fmaj7', 'slash_name': 'Fmaj7/A', 'root_index': 3, 'position': 1},
+            {'name': 'C7', 'slash_name': 'C7/G', 'root_index': 3, 'position': 2},
+            {'name': 'D7', 'slash_name': 'D7/C', 'root_index': 1, 'position': 3},
+            {'name': 'Em7', 'slash_name': 'Em7', 'root_index': 0, 'position': 0},
+            {'name': 'Bbm7', 'slash_name': 'Bbm7/F', 'root_index': 3, 'position': 2},
+            {'name': 'C#ø', 'slash_name': 'C#ø/E', 'root_index': 2, 'position': 1},
+            {'name': 'G#ø', 'slash_name': 'G#ø/F#', 'root_index': 3, 'position': 3},
+            {'name': 'Ao7', 'slash_name': 'Ao7', 'root_index': 0, 'position': 0},
+            {'name': 'Do7', 'slash_name': 'Do7', 'root_index': 0, 'position': 0},
         ]
 
         self.compare_properties(test_sevenths, expected_out)
@@ -210,11 +218,11 @@ class TestChords:
 
     # ### APPLIED/SECONDARY DOMINANT CHORD TESTING ###
 
-    def test_applied_dominants(self, get_test_chords):
-        """Test case to check the numerals of chords as secondary or applied dominants to other chords."""
+    def test_applied_dominants(self):
+        """Test case to check the numerals of chords as applied dominants to other chords."""
 
         test_factory = ChordFactory()
-        
+
         test_base_chords = [
             test_factory.create_chord('F1,A1,C1'),          #F major
             test_factory.create_chord('Eb1,Gb1,Bb1'),       #Eb minor
@@ -248,4 +256,4 @@ class TestChords:
         for i, (base_chord, applied_chord) in enumerate(zip(test_base_chords, test_applied_chords)):
             actual_out = applied_chord.get_secondary_dominant_numeral(base_chord)
 
-            assert(actual_out == expected_out[i])
+            assert actual_out == expected_out[i]

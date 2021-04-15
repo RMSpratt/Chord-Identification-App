@@ -1,7 +1,7 @@
 import json
 
 from .chord import ChordFactory
-from .chordProgression import ChordProgression
+from .chord_progression import ChordProgression
 
 apiFactory = ChordFactory()
 
