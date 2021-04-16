@@ -52,6 +52,33 @@ class TestChordProgressions:
 
         assert len(test_errors) == 0
 
+    def test_doubling_errors(self):
+        """Test for errors with doubling tendancy tones in a chord."""
+
+        #I - V6 - I - iii - IV - V
+        lt_double_prog = self.create_progression(['F2,A3,F4,C5','E2,C4,G5,E5','F2,C4,A4,F5','A2,C4,E4,E5','Bb2,Bb3,F4,D5','C3,E3,G4,E5'],'F')
+        lt_double_errors = lt_double_prog.validate_progression()
+
+        lt_double_expected = [
+            {'code': 'ERR_DOUBLED_LT', 'type': 'spelling', 'chord_index': 2},
+            {'code': 'ERR_DOUBLED_LT', 'type': 'spelling', 'chord_index': 4},
+            {'code': 'ERR_DOUBLED_LT', 'type': 'spelling', 'chord_index': 6},
+        ]
+
+        #i - iv7 - i6 - iiø6/5 (iim7 technically) - V7
+        seventh_double_prog = self.create_progression(['E3,B3,G4,E5','A2,G3,G4,C5','G2,G3,E4,B4','A2,F#3,E4,E5','B2,A3,A4,D#5'],'e')
+        seventh_double_errors = seventh_double_prog.validate_progression()
+
+        seventh_double_expected = [
+            {'code': 'ERR_DOUBLED_7TH', 'type': 'spelling', 'chord_index': 2},
+            {'code': 'ERR_DOUBLED_7TH', 'type': 'spelling', 'chord_index': 4},
+            {'code': 'ERR_DOUBLED_7TH', 'type': 'spelling', 'chord_index': 5}
+        ]
+
+        self.validate_satb_errors(lt_double_expected, lt_double_errors, 'spelling')
+        self.validate_satb_errors(seventh_double_expected, seventh_double_errors, 'spelling')
+
+
     def test_leading_tone_resolution(self):
         """Test for leading tone resolution errors."""
 
@@ -123,8 +150,28 @@ class TestChordProgressions:
         self.validate_satb_errors(seventh_expected_two, seventh_errors_two, 'resolution')
         self.validate_satb_errors(seventh_expected_three, seventh_errors_three, 'resolution')
 
-    def test_spelling_errors(self):
-        """Testing for basic chordal spelling errors including voice range, voice spacing, and notes used."""
+    def test_range_errors(self):
+        """Testing that the voices in a chord stay within their acceptable range."""
+
+        #I6 - iii - V4/3 (Test voice high and low range errors)
+        test_range_prog = self.create_progression(['F4,Bb4,F5,D6','D3,F3,D4,A4','C2,A2,Eb3,F3'],'Bb')
+        test_range_errors = test_range_prog.validate_progression()
+
+        test_range_expected = [
+            {'code': 'ERR_BASS_HIGH', 'type': 'range', 'chord_index': 1},
+            {'code': 'ERR_TENOR_HIGH', 'type': 'range', 'chord_index': 1},
+            {'code': 'ERR_ALTO_HIGH', 'type': 'range', 'chord_index': 1},
+            {'code': 'ERR_SOPRANO_HIGH', 'type': 'range', 'chord_index': 1},
+            {'code': 'ERR_BASS_LOW', 'type': 'range', 'chord_index': 3},
+            {'code': 'ERR_TENOR_LOW', 'type': 'range', 'chord_index': 3},
+            {'code': 'ERR_ALTO_LOW', 'type': 'range', 'chord_index': 3},
+            {'code': 'ERR_SOPRANO_LOW', 'type': 'range', 'chord_index': 3}
+        ]
+
+        self.validate_satb_errors(test_range_expected, test_range_errors, 'range')
+
+    def test_spacing_errors(self):
+        """Testing for the spacing between voices in a chord."""
 
         #i - iiø6/5 - viio6/5 - i  (Test voice spacing errors)
         test_spacing_prog = self.create_progression(['A2,E3,A4,E5','D3,A3,B3,F5','B2,G3,D4,F5','A2,A3,C4,E5'],'a')
@@ -137,21 +184,29 @@ class TestChordProgressions:
             {'code': 'ERR_SA_DISTANCE', 'type': 'spacing', 'chord_index': 4},
         ]
 
-        #I6 - iii - V4/3 (Test voice high and low range errors)
-        test_range_prog = self.create_progression(['F4,Bb4,F5,D6','D3,F3,D4,A4','C2,A2,Eb3,F3'],'Bb')
-        test_range_errors = test_range_prog.validate_progression()
+        self.validate_satb_errors(test_spacing_expected, test_spacing_errors, 'spacing')
 
-        print(test_range_errors)
-        test_range_expected = [
-            {'code': 'ERR_BASS_HIGH', 'type': 'range', 'chord_index': 1},
-            {'code': 'ERR_TENOR_HIGH', 'type': 'range', 'chord_index': 1},
-            {'code': 'ERR_ALTO_HIGH', 'type': 'range', 'chord_index': 1},
-            {'code': 'ERR_SOPRANO_HIGH', 'type': 'range', 'chord_index': 1},
-            {'code': 'ERR_BASS_LOW', 'type': 'range', 'chord_index': 3},
-            {'code': 'ERR_TENOR_LOW', 'type': 'range', 'chord_index': 3},
-            {'code': 'ERR_ALTO_LOW', 'type': 'range', 'chord_index': 3},
-            {'code': 'ERR_SOPRANO_LOW', 'type': 'range', 'chord_index': 3}
+    def test_spelling_errors(self):
+        """Testing for basic spelling errors including the number of notes in a chord
+        and chords unknown to the progression's key.
+        """
+
+        test_unknown_prog = self.create_progression(['C3,F#3,C4,A5','G2,C4,D4,G5','C#3,D#4,E4,C#5'],'C')
+        test_unknown_errors = test_unknown_prog.validate_progression()
+
+        test_num_voices_prog = self.create_progression(['C3,F3,C4','C3,C4,C5,C6,C7'],'C')
+        test_num_voices_errors = test_num_voices_prog.validate_progression()
+
+        test_unknown_expected = [
+            {'code': 'ERR_UNKNOWN_CHORD', 'type': 'spelling', 'chord_index': 1},
+            {'code': 'ERR_UNKNOWN_CHORD', 'type': 'spelling', 'chord_index': 2},
+            {'code': 'ERR_UNKNOWN_CHORD', 'type': 'spelling', 'chord_index': 3},
         ]
 
-        self.validate_satb_errors(test_spacing_expected, test_spacing_errors, 'spacing')
-        self.validate_satb_errors(test_range_expected, test_range_errors, 'range')
+        test_num_voices_expected = [
+            {'code': 'ERR_NUM_VOICES', 'type': 'spelling', 'chord_index': 1},
+            {'code': 'ERR_NUM_VOICES', 'type': 'spelling', 'chord_index': 2},
+        ]
+        
+        self.validate_satb_errors(test_unknown_expected, test_unknown_errors, 'spelling')
+        self.validate_satb_errors(test_num_voices_expected, test_num_voices_errors, 'spelling')

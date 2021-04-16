@@ -15,8 +15,8 @@ NOTE_INDICES = {
 }
 
 #The lists of diatonic and modal mixture chords in a major key
-MAJOR_KEY_NUMERALS = ['I','ii','iii','IV','V','vi','viio']
-MAJOR_MIXTURE_NUMERALS = ['i','iio','bIII','iv','v','bVI','bVII']
+MAJOR_KEY_NUMERALS = ['I','ii','iii','IV','V','vi','viio','viiø']
+MAJOR_MIXTURE_NUMERALS = ['i','iiø','iio','bIII','iv','v','bVI','bVII']
 
 #The lists of diatonic and modal mixture chords in a minor key
 MINOR_KEY_NUMERALS = ['i','iio','III','iv','v','VI','VII']
@@ -33,7 +33,7 @@ MAJOR_KEY_NOTES = {
     'D': ['D','E','F#','G','A','B','C#'],
     'Eb': ['Eb','F','G','Ab','Bb','C','D'],
     'E': ['E','F#','G#','A','B','C#','D#'],
-    'F': ['F','G','A','Bb','C','D','Eb'],
+    'F': ['F','G','A','Bb','C','D','E'],
     'F#': ['F#','G#','A#','B','C#','D#','E#'],
     'Gb': ['Gb','Ab','Bb','Cb','Db','Eb','F'],
     'G': ['G','A','B','C','D','E','F#'],
@@ -43,18 +43,18 @@ MAJOR_KEY_NOTES = {
     'B': ['B','C#','D#','E','F#','G#','A#'],
 }
 
-#The list of notes naturally found in every key
+#The list of notes naturally found in every minor key
 MINOR_KEY_NOTES = {
     'C': ['C','D','Eb','F','G','Ab','Bb'],
     'C#': ['C#','D#','E','F#','G#','A','B'],
     'D': ['D','E','F','G','A','Bb','C'],
     'D#': ['D#','E#','F#','G#','A#','B','C#'],
-    'Eb': ['Eb','Fb','Gb','Ab','Bb','C','Db'],
+    'Eb': ['Eb','Fb','Gb','Ab','Bb','Cb','Db'],
     'E': ['E','F#','G','A','B','C','D'],
     'F': ['F','G','Ab','Bb','C','Db','Eb'],
     'F#': ['F#','G#','A','B','C#','D','E'],
     'G': ['G','A','Bb','C','D','Eb','F'],
-    'G#': ['G#','A#','B','C#','D#','E#','F#'],
+    'G#': ['G#','A#','B','C#','D#','E','F#'],
     'Ab': ['Ab','Bb','Cb','Db','Eb','Fb','Gb'],
     'A': ['A','B','C','D','E','F','G'],
     'Bb': ['Bb','C','Db','Eb','F','Gb','Ab'],
@@ -137,7 +137,7 @@ INVERSION_TRIAD_STRINGS = ['','6','6/4']
 INVERSION_SEVENTH_STRINGS = ['7','6/5','4/3','4/2']
 
 #The mapping of interval strings to a matching chord quality and chord inversion
-INTERVAL_STRINGS = defaultdict(lambda: {'root_index': 'unknown', 'quality': 'unknown'})
+INTERVAL_STRINGS = defaultdict(lambda: {'root_index': 0, 'quality': 'unknown', 'position': 0})
 INTERVAL_STRINGS.update(
     {
         '3': {'root_index': 0, 'quality': 'm', 'position': 0},
@@ -146,6 +146,7 @@ INTERVAL_STRINGS.update(
         '7': {'root_index': 0, 'quality': 'add5', 'position': 0},
         '8': {'root_index': 1, 'quality': '', 'position': 1},
         '9': {'root_index': 2, 'quality': 'm', 'position': 1},
+        '25': {'root_index': 0, 'quality': 'sus2', 'position': 0},
         '33': {'root_index': 0, 'quality': 'o', 'position': 0},
         '34': {'root_index': 0, 'quality': 'm', 'position': 0},
         '35': {'root_index': 2, 'quality': '', 'position': 1},
@@ -153,6 +154,7 @@ INTERVAL_STRINGS.update(
         '43': {'root_index': 0, 'quality': '', 'position': 0},
         '44': {'root_index': 0, 'quality': '+', 'position': 0},
         '45': {'root_index': 2, 'quality': 'm', 'position': 1},
+        '52': {'root_index': 0, 'quality': 'sus4', 'position': 0},
         '53': {'root_index': 1, 'quality': 'm', 'position': 2},
         '54': {'root_index': 1, 'quality': '', 'position': 2},
         '63': {'root_index': 1, 'quality': 'o', 'position': 2},
@@ -316,7 +318,7 @@ def __get_notes_for_key(key):
 def get_chord_relation_for_key(key, numeral):
     """Returns the relation of a chord with the given numeral relative to the given key."""
 
-    chord_relation = 'unknown'
+    chord_relation = ''
 
     #If the numeral has a slash, it indicates an applied chord
     if '/' in numeral:
@@ -325,10 +327,10 @@ def get_chord_relation_for_key(key, numeral):
     #Check for the numeral relative to a major key
     if key[0].isupper():
 
-        if numeral in MAJOR_KEY_NUMERALS[key]:
+        if numeral in MAJOR_KEY_NUMERALS:
             chord_relation = 'diatonic'
 
-        elif numeral in MINOR_KEY_NUMERALS[key]:
+        elif numeral in MAJOR_MIXTURE_NUMERALS:
             chord_relation = 'mixture'
 
         else:
@@ -337,10 +339,10 @@ def get_chord_relation_for_key(key, numeral):
     #Check for the numeral relative to a minor key
     else:
 
-        if numeral in MINOR_KEY_NUMERALS[key]:
+        if numeral in MINOR_KEY_NUMERALS:
             chord_relation = 'diatonic'
 
-        elif numeral in MAJOR_KEY_NUMERALS[key]:
+        elif numeral in MINOR_MIXTURE_NUMERALS:
             chord_relation = 'mixture'
 
         else: 
