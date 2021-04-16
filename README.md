@@ -7,4 +7,5 @@ The project is currently divided into a CLI folder and a Flask web-proect folder
 Tests for the chord identification functionality can be found in the tests/ folder within the CLI sub-directory. 
 
 A screenshot showcasing current progress with the web app is below:
+
 ![image](https://user-images.githubusercontent.com/10410051/115084168-764ed580-9ed6-11eb-8fd6-a9c9b6b45575.png)
