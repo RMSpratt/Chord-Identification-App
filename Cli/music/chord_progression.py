@@ -1,6 +1,7 @@
 """This module exports the ChordProgression class and makes use of the SATB validator."""
 
 from .chord import ChordFactory
+from .music_info import get_chord_relation_for_key, identify_secondary_dominant_numeral
 from .satb_validator import validate_progression
 
 
@@ -29,7 +30,7 @@ class ChordProgression():
             new_chord = self._chord_factory.create_chord(chord_string)
 
         except ValueError:
-            print(f'The chord {chord_string} could not be created.')
+            print(f'The chord {chord_string} could not be created and added to the progression.')
 
         else:
 
@@ -50,15 +51,26 @@ class ChordProgression():
 
         return accidentals
 
-    def get_progression_chord_numerals(self):
-        """Returns the numerals for each chord within this progression."""
+    def get_progression_chord_numerals(self, use_applied=False):
+        """Returns the numerals for each chord within this progression.
+        If use_applied is True, the appplied dominant numerals for chords will be used where possible.
+        """
 
         chord_numerals = []
 
         if self.key:
 
-            for chord in self.chords:
-                chord_numerals.append(chord.get_numeral_for_key(self.key))
+            for i, chord in enumerate(self.chords):
+                chord_numeral = chord.get_numeral_for_key(self.key)
+                chord_relation = get_chord_relation_for_key(self.key, chord_numeral)
+
+                if use_applied and chord_relation == 'chromatic' and i < len(self.chords) - 1:
+                    applied_numeral = chord.get_secondary_dominant_numeral(self.chords[i+1])
+
+                    if applied_numeral != '':
+                        chord_numeral = applied_numeral + '/' + self.chords[i+1].get_numeral_for_key(self.key, False)
+
+                chord_numerals.append(chord_numeral)
 
         return chord_numerals
 

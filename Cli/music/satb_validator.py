@@ -220,18 +220,26 @@ def __check_seventh_resolution(prev_chord, curr_chord, key, curr_chord_index):
     return resolution_error
 
 
+def __get_dim7_numeral(numeral):
+    """Helper function to check if fully-diminished seventh chord is also a leading tone diminished seventh chord."""
+
+    if numeral in ['bvio','vio','ivo','iio','viio','#viio']:
+        numeral = 'viio'
+
+    return numeral
+        
 def __get_dim7_seventh_index(chord, key):
     """Helper function to get the proper seventh of a fully-diminished vii chord."""
 
     seventh_index = 0
 
-    if chord.get_numeral_for_key(key) == 'vio7':
+    if chord.get_numeral_for_key(key, False) in ['vio', 'bvio']:
         seventh_index = 0
 
-    elif chord.get_numeral_for_key(key)  == 'ivo7':
+    elif chord.get_numeral_for_key(key, False) == 'ivo':
         seventh_index = chord.get_indices_from_interval(3)[0]
 
-    elif chord.get_numeral_for_key(key) == 'iio7':
+    elif chord.get_numeral_for_key(key, False) == 'iio':
         seventh_index = chord.get_indices_from_interval(6)[0]
 
     else:
@@ -241,25 +249,52 @@ def __get_dim7_seventh_index(chord, key):
 
 
 def validate_progression(progression, key):
-    """Public function to validate the passed chord progression according to SATB notation rules."""
+    """Central function to validate the passed chord progression according to SATB notation rules."""
 
     #Create an instance variable to hold
     progression_errors = []
 
     #Holder for the previous chord while iterating
     prev_chord = None
+    prev_relation = None
 
     for i, chord in enumerate(progression, start=1):
-        chord_numeral = chord.get_numeral_for_key(key, False)
-        chord_relation = get_chord_relation_for_key(key, chord_numeral)
+        current_key = key
+        chord_numeral = chord.get_numeral_for_key(current_key, False)
+
+        if chord.quality == 'o7':
+            chord_numeral = __get_dim7_numeral(chord_numeral)
+
+        chord_relation = get_chord_relation_for_key(current_key, chord_numeral)
 
         #1) Check for spelling errors
         if len(chord) != 4:
             progression_errors.append({'type': 'spelling', 'code': 'ERR_NUM_VOICES', 'details': {'chord_index': i}})
             continue    
 
-        if chord_relation == 'chromatic' or chord.quality not in ['','m','o','+','ø','o7','maj7','m7','7']:
+        if chord.quality not in ['','m','o','+','ø','o7','maj7','m7','7']:
             progression_errors.append({'type': 'spelling', 'code': 'ERR_UNKNOWN_CHORD', 'details': {'chord_index': i}})
+
+        #Check for applied chords including the special case V/iv in a minor key
+        elif chord_relation == 'chromatic' or (chord_relation == 'mixture' and chord_numeral == 'I'):
+
+            try: 
+                next_chord = progression[i]
+                secondary_numeral = chord.get_secondary_dominant_numeral(next_chord, False)
+    
+                if secondary_numeral != '':
+                    chord_numeral = secondary_numeral
+                    chord_relation = 'applied'
+                    current_key = next_chord.get_root_name()
+    
+                    if next_chord.quality in ['m', 'm7']:
+                        current_key = current_key.lower()
+
+                else:
+                    progression_errors.append({'type': 'spelling', 'code': 'ERR_UNKNOWN_CHORD', 'details': {'chord_index': i}})
+
+            except IndexError:
+                progression_errors.append({'type': 'spelling', 'code': 'ERR_UNKNOWN_CHORD', 'details': {'chord_index': i}})
 
         #2) Get voice spacing errors
         progression_errors.extend(__check_voice_spacing(chord, i))
@@ -269,24 +304,36 @@ def validate_progression(progression, key):
             progression_errors.extend(__check_voice_in_range(j, note, i))
 
         #4) Get tendancy tone doubling errors
-        if chord_numeral in ['Imaj7', 'iii', 'V', 'vii']:
-            if error := __check_chord_doubling(chord, i, key, 'leading') : progression_errors.append(error)
+        if chord_numeral in ['Imaj7', 'iii', 'V', 'viio', 'viiø']:
+            if error := __check_chord_doubling(chord, i, current_key, 'leading') : progression_errors.append(error)
 
         if chord.has_seventh:
-            if error := __check_chord_doubling(chord, i, key, 'seventh') : progression_errors.append(error)
+            if error := __check_chord_doubling(chord, i, current_key, 'seventh') : progression_errors.append(error)
 
         #4) Get movement and resolution errors between chords
         if prev_chord:
             progression_errors.extend(__check_voice_movement(prev_chord, chord, i))
 
-            if prev_chord.has_seventh:
-                if error := __check_seventh_resolution(prev_chord, chord, key, i): progression_errors.append(error)
+            #If the previous chord was an applied chord, adjust the key to use
+            if prev_relation == 'applied':
+                altered_key = chord.get_root_name()
+
+                if prev_chord.has_seventh:
+                    if error := __check_seventh_resolution(prev_chord, chord, altered_key, i): progression_errors.append(error)
                 
-            if prev_chord.get_numeral_for_key(key, False) in ['Imaj7', 'iii', 'V', 'vii']:
-                if error := __check_leading_resolution(prev_chord, chord, key, i) : progression_errors.append(error)
+                if prev_chord.get_numeral_for_key(altered_key, False) in ['Imaj7', 'iii', 'V', 'viio', 'viiø']:
+                    if error := __check_leading_resolution(prev_chord, chord, altered_key, i) : progression_errors.append(error)
 
+            #Else, check the chords for the progression key as normal
+            else:
 
+                if prev_chord.has_seventh:
+                    if error := __check_seventh_resolution(prev_chord, chord, current_key, i): progression_errors.append(error)
+                
+                if prev_chord.get_numeral_for_key(current_key, False) in ['Imaj7', 'iii', 'V', 'vii']:
+                    if error := __check_leading_resolution(prev_chord, chord, current_key, i) : progression_errors.append(error)
 
         prev_chord = chord
+        prev_relation = chord_relation
 
     return progression_errors

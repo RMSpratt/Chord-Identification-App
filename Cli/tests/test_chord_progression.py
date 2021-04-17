@@ -78,25 +78,31 @@ class TestChordProgressions:
         self.validate_satb_errors(lt_double_expected, lt_double_errors, 'spelling')
         self.validate_satb_errors(seventh_double_expected, seventh_double_errors, 'spelling')
 
-
-    def test_leading_tone_resolution(self):
+    def test_lt_resolution_errors(self):
         """Test for leading tone resolution errors."""
 
         #I - V4/3 - V6/5 - I6
         lt_prog_one = self.create_progression(['G2,B3,D4,G4','A2,F#3,D4,C5','F#2,A3,D4,C5','B2,G3,D4,B4'],'G')
+        
         lt_errors_one = lt_prog_one.validate_progression()
+        lt_expected_one = [{'code': 'ERR_UNRESOLVED_LT', 'type': 'resolution', 'chord_index': 3, 'voice_index': 0}]
 
         #I - iii - IV - V7
         lt_prog_two = self.create_progression(['Cb2,Cb3,Gb4,Eb5','Eb3,Bb3,Gb4,Eb5','Fb3,Ab3,Fb4,Cb4',
         'Gb3,Gb3,Fb4,Bb4'],'Cb')
-
-        lt_errors_two = lt_prog_two.validate_progression()
-
-        lt_expected_one = [{'code': 'ERR_UNRESOLVED_LT', 'type': 'resolution', 'chord_index': 3, 'voice_index': 0}]
+        
+        lt_errors_two = lt_prog_two.validate_progression() 
         lt_expected_two = [{'code': 'ERR_UNRESOLVED_LT', 'type': 'resolution', 'chord_index': 2, 'voice_index': 1}]
         
+        #i - V/iv - iv
+        lt_prog_three = self.create_progression(['D#3,A#3,F#4,D#5','D#3,A#3,Fx4,D#5','G#2,B3,D#4,B4'],'d#')
+        
+        lt_errors_three = lt_prog_three.validate_progression()
+        lt_expected_three = [{'code': 'ERR_UNRESOLVED_LT', 'type': 'resolution', 'chord_index': 2, 'voice_index': 2}]
+
         self.validate_satb_errors(lt_expected_one, lt_errors_one, 'resolution')
         self.validate_satb_errors(lt_expected_two, lt_errors_two, 'resolution')
+        self.validate_satb_errors(lt_expected_three, lt_errors_three, 'resolution')
 
     def test_movement_errors(self):
         """Test for movement errors in a chord progression."""
@@ -115,40 +121,48 @@ class TestChordProgressions:
         parallel_errors = parallel_prog.validate_progression()
 
         self.validate_satb_errors(parallel_expected, parallel_errors, 'movement')
-        
-    def test_seventh_resolution(self):
+
+    def test_seventh_resolution_errors(self):
         """Test for seventh resolution errors."""
 
         #i - V4/3 - i6 - iv6/5 - V (Validate chord quality 7 and m7 resolution)
         seventh_prog_one = self.create_progression(['F#2,A3,F#4,C#5','G#2,B3,E#4,C#5','A2,C#4,F#4,A4','D3,B3,F#4,A4','C#3,G#3,E#4,C#5'], 'f#')
+        
         seventh_errors_one = seventh_prog_one.validate_progression()
-
-        #i - viio - i - viio4/2 - i (Validate chord quality o7 resolution)
-        seventh_prog_two = self.create_progression(['Ab3,Ab2,Cb4,Eb4','G2,Bb3,Fb4,Db5','Ab2,Cb4,Ab4,Eb5','G3,Fb2,Db4,Bb4','Ab2,Ab3,Eb4,Cb4'],'ab')
-        seventh_errors_two = seventh_prog_two.validate_progression()
-
-        #I - IV7 - iiø6/5 - V (Validate chord quality maj7 and ø resolution)
-        seventh_prog_three = self.create_progression(['Eb2,G3,Eb4,Bb4','Ab2,G3,Eb4,C5','Ab2,C4,F4,Eb5','Bb2,D4,F4,Bb4'], 'Eb')
-        seventh_errors_three = seventh_prog_three.validate_progression()
-
         seventh_expected_one = [
             {'code': 'ERR_UNRESOLVED_7TH', 'type': 'resolution', 'chord_index': 2, 'voice_index': 1},
             {'code': 'ERR_UNRESOLVED_7TH', 'type': 'resolution', 'chord_index': 4, 'voice_index': 3}
         ]
 
+        #i - viio - i - viio4/2 - i (Validate chord quality o7 resolution)
+        seventh_prog_two = self.create_progression(['Ab3,Ab2,Cb4,Eb4','G2,Bb3,Fb4,Db5','Ab2,Cb4,Ab4,Eb5','G3,Fb2,Db4,Bb4','Ab2,Ab3,Eb4,Cb4'],'ab')
+        
+        seventh_errors_two = seventh_prog_two.validate_progression()
         seventh_expected_two = [
             {'code': 'ERR_UNRESOLVED_7TH', 'type': 'resolution', 'chord_index': 2, 'voice_index': 2},
             {'code': 'ERR_UNRESOLVED_7TH', 'type': 'resolution', 'chord_index': 4, 'voice_index': 0}
         ]
 
+        #I - IV7 - iiø6/5 - V (Validate chord quality maj7 and ø resolution)
+        seventh_prog_three = self.create_progression(['Eb2,G3,Eb4,Bb4','Ab2,G3,Eb4,C5','Ab2,C4,F4,Eb5','Bb2,D4,F4,Bb4'], 'Eb')
+        seventh_errors_three = seventh_prog_three.validate_progression()
         seventh_expected_three = [
             {'code': 'ERR_UNRESOLVED_7TH', 'type': 'resolution', 'chord_index': 2, 'voice_index': 1},
             {'code': 'ERR_UNRESOLVED_7TH', 'type': 'resolution', 'chord_index': 3, 'voice_index': 3}
         ]
 
+        #ii - V7/V - V
+        seventh_prog_four = self.create_progression(['C#3,C#4,G#4,E5','C#3,B3,G#4,E#5','F#3,C#4,A#4,F#5'],'B')
+        
+        seventh_errors_four = seventh_prog_four.validate_progression()
+        seventh_expected_four = [
+            {'code': 'ERR_UNRESOLVED_7TH', 'type': 'resolution', 'chord_index': 2, 'voice_index': 1}
+        ]
+
         self.validate_satb_errors(seventh_expected_one, seventh_errors_one, 'resolution')
         self.validate_satb_errors(seventh_expected_two, seventh_errors_two, 'resolution')
         self.validate_satb_errors(seventh_expected_three, seventh_errors_three, 'resolution')
+        self.validate_satb_errors(seventh_expected_four, seventh_errors_four, 'resolution')
 
     def test_range_errors(self):
         """Testing that the voices in a chord stay within their acceptable range."""
@@ -210,3 +224,44 @@ class TestChordProgressions:
         
         self.validate_satb_errors(test_unknown_expected, test_unknown_errors, 'spelling')
         self.validate_satb_errors(test_num_voices_expected, test_num_voices_errors, 'spelling')
+
+    
+    ### SPECIFIC TEST CASES FOR APPLIED CHORDS ### 
+
+    def test_applied_chords(self):
+        """Test for proper recognition of applied chords in a progression."""
+
+        #ii - V4/3-->ii - ii6
+        applied_prog_one = self.create_progression(['Eb3,Bb3,Gb4,Eb5','F3,Bb3,Ab4,D5','Gb3,Bb4,Gb4,Eb5'], 'Db')
+        applied_one_numerals = applied_prog_one.get_progression_chord_numerals(True)
+        applied_one_expected = ['ii', 'V4/3/ii', 'ii6']
+
+        #i - V7/VI - VI
+        applied_prog_two = self.create_progression(['C#3,C#4,E4,G#4','E3,B3,D4,G#4','A2,A3,C#4,A4'],'c#')
+        applied_two_numerals = applied_prog_two.get_progression_chord_numerals(True)
+        applied_two_expected = ['i', 'V7/VI', 'VI']
+
+        for (expected, actual) in zip(applied_one_expected, applied_one_numerals):
+                    assert expected == actual
+                    
+        for (expected, actual) in zip(applied_two_expected, applied_two_numerals):
+            assert expected == actual
+
+    def test_applied_doubling_errors(self):
+        """Test for doubling erros in applied chords."""
+
+        #V - viio6/V - V6/5 
+        lt_double_prog = self.create_progression(['C3,C4,G4,E5','D3,B3,F4,B4','E3,C4,G4,Bb4'],'F')
+
+        lt_double_errors = lt_double_prog.validate_progression()
+        lt_double_expected = [{'code': 'ERR_DOUBLED_LT', 'type': 'spelling', 'chord_index': 2}]
+   
+        #I - V7/IV - IV
+        seventh_double_prog = self.create_progression(['D3,A3,F#4,D5','D3,C4,F#4,C5','G3,G3,G4,B4'],'D')
+        
+        seventh_double_errors = seventh_double_prog.validate_progression()
+        seventh_double_expected = [{'code': 'ERR_DOUBLED_7TH', 'type': 'spelling', 'chord_index': 2}]
+
+        self.validate_satb_errors(lt_double_expected, lt_double_errors, 'spelling')
+        self.validate_satb_errors(seventh_double_expected, seventh_double_errors, 'spelling')
+

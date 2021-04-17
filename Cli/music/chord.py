@@ -2,7 +2,7 @@
     and the ChordFactory class for creating chords.
 """
 
-from .music_info import identify_chord_numeral_for_key, identify_secondary_dominant_numeral, get_chord_for_intervals
+from .music_info import identify_chord_numeral_for_key, identify_secondary_dominant_numeral, get_chord_for_intervals, identify_applied_numeral
 from .note import NoteFactory
 
 
@@ -152,6 +152,11 @@ class Chord:
 
         return matching_notes
 
+    def get_root_name(self):
+        """Returns the name of this chord's root note."""
+
+        return self.notes[self.root_index].name
+
     def get_seventh_index(self):
         """Returns the index of this chord's seventh, if it has one."""
 
@@ -189,24 +194,27 @@ class Chord:
         else:
             return f'{self.notes[self.root_index].name}{self.quality}'
 
-    def get_numeral_for_key(self, key, inversion_string=True):
+    def get_numeral_for_key(self, key, use_inversion=True):
         """Returns this chord's numeral relative to the given key. The inversion string is included if specified."""
 
         numeral = ''
 
         if self.quality != 'unknown':
-            numeral = identify_chord_numeral_for_key(key, {"root_note": self.notes[self.root_index].name, 
-            "quality": self.quality, "position": self.position, "has_seventh": self.has_seventh}, inversion_string)
+            numeral = identify_chord_numeral_for_key(key, {"root": self.notes[self.root_index].name, 
+            "quality": self.quality, "position": self.position, "has_seventh": self.has_seventh}, use_inversion)
 
         return numeral
 
-    def get_secondary_dominant_numeral(self, second_chord):
-        """Returns this chord's numeral as a secondary dominant for the next chord, if it acts as one."""
+    def get_secondary_dominant_numeral(self, base_chord, use_inversion=True):
+        """Returns this chord's numeral as a secondary dominant for the passed chord, if it acts as one."""
 
         #Get the root of the passed chord from its root index as the 'key'
-        base_chord_key = second_chord.notes[second_chord.root_index].name
+        base_chord_root = base_chord.get_root_name()
 
-        return identify_secondary_dominant_numeral(self.get_name(), self.position, self.has_seventh, base_chord_key, second_chord.quality)
+        return identify_applied_numeral(base_chord_root, base_chord.quality, {'root': self.notes[self.root_index].name, 
+        'quality': self.quality, 'position': self.position, 'has_seventh': self.has_seventh}, use_inversion)
+
+        # return identify_secondary_dominant_numeral(self.get_name(), self.position, self.has_seventh, base_chord_key, second_chord.quality)
 
     def __identify_chord(self):
         """Identifies the name and quality of this chord by determining its root index and position."""
