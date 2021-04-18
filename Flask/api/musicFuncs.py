@@ -6,12 +6,6 @@ from .chord_progression import ChordProgression
 apiFactory = ChordFactory()
 
 
-def analyze_chord(notes):
-    new_chord = apiFactory.create_chord(notes)
-
-    return (new_chord.get_name())
-
-
 def analyze_progression(chords, key='C', validate=False):
 
     progression_chords = []
@@ -40,7 +34,7 @@ def analyze_progression(chords, key='C', validate=False):
 
     #Get the names and numerals from the progression
     chord_names = new_progression.get_progression_chord_names(True)
-    chord_numerals = new_progression.get_progression_chord_numerals()
+    chord_numerals = new_progression.get_progression_chord_numerals(True)
 
     #Get any accidentals for the chords in this key
     chord_accidentals = new_progression.get_progression_chord_accidentals()
@@ -70,23 +64,3 @@ def format_chord(chord):
         formatted_notes.append(note)
 
     return formatted_notes
-
-
-
-# let formattedChords = [];
-
-# for (let chord of chords) {
-
-#     let chordNotes = chord.notes;
-#     let formattedNotes = [];
-
-#     //Reformat each note --> '<letter>/<octave>' i.e. c/4
-#     for (let note of chordNotes.split(',')) {
-#         note = note.trim()
-#         note = note.toLowerCase();
-#         note = note.substr(0, note.length - 1) + '/' + note.substr(-1);
-#         formattedNotes.push(note);
-#     }
-
-#     chord.notes = formattedNotes;
-# }

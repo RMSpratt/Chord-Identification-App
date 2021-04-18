@@ -12,7 +12,16 @@
             }
 
             html {
+                font-family: Arial, Helvetica, sans-serif;
                 font-size: 16px;
+            }
+
+            header {
+                background-color: orange;
+                box-shadow: 0 5px 5px darkorange;
+                height: 75px;
+                padding: 20px 5px;
+                margin-bottom: 50px;
             }
 
             label {
@@ -60,6 +69,12 @@
                 min-height: 150px;
             }
 
+            #stave-svg {
+                margin: 0 5%;
+                overflow: auto;
+                width: 90%;
+            }
+
             button {
                 font-size: 0.75rem;
                 margin: 0 9%;
@@ -74,83 +89,87 @@
         </style>
     </head>
     <body>
-        <h1>Chord Progression Builder and Analysis Tool</h1>
-
-        <form id="chord-builder-form" method="POST">
-            <h2>Chord Progression Builder Form</h2>
-            <div class="form-select">
-                <label for="keyOptions">Key:</label>
-                <select id="keyOptions" name="key">
-                    <option value="C" selected>C Major</option>
-                    <option value="G">G Major</option>
-                    <option value="D">D Major</option>
-                    <option value="A">A Major</option>
-                    <option value="E">E Major</option>
-                    <option value="B">B Major</option>
-                    <option value="F#">F# Major</option>
-                    <option value="C#">C# Major</option>
-                    <option value="F">F Major</option>
-                    <option value="Bb">Bb Major</option>
-                    <option value="Eb">Eb Major</option>
-                    <option value="Ab">Ab Major</option>
-                    <option value="Db">Db Major</option>
-                    <option value="Gb">Gb Major</option>
-                    <option value="Cb">Cb Major</option>
-                    <option value="Am">A minor</option>
-                    <option value="Em">E minor</option>
-                    <option value="F#m">F# minor</option>
-                    <option value="C#m">C# minor</option>
-                    <option value="G#m">G# minor</option>
-                    <option value="D#m">D# minor</option>
-                    <option value="A#m">A# minor</option>
-                    <option value="Dm">D minor</option>
-                    <option value="Gm">G minor</option>
-                    <option value="Cm">C minor</option>
-                    <option value="Fm">F minor</option>
-                    <option value="Bbm">Bb minor</option>
-                    <option value="Ebm">Eb minor</option>
-                    <option value="Abm">Ab minor</option>
-                </select>
-            </div>
-            <div class="form-select">
-                <label for="timeOptions">Time Signature:</label>
-                <select id="timeOptions" name="time">
-                    <option value="4/4" selected>4/4</option>
-                    <option value="3/4">3/4</option>
-                    <option value="6/8">6/8</option>
-                    <option value="12/8">12/8</option>
-                </select>
-            </div>
-            <div id="progression-chords">
-                <div class="form-chord">
-                    <label for="chordInput">Chord:</label>
-                    <input id="chordInput" type="text" name="chord">
+        <header>
+            <h1>Chord Progression Builder and Analysis Tool</h1>
+        </header>
+        <main>
+            <form id="chord-builder-form" method="POST">
+                <h2>Chord Progression Builder Form</h2>
+                <div class="form-select">
+                    <label for="keyOptions">Key:</label>
+                    <select id="keyOptions" name="key">
+                        <option value="C" selected>C Major</option>
+                        <option value="G">G Major</option>
+                        <option value="D">D Major</option>
+                        <option value="A">A Major</option>
+                        <option value="E">E Major</option>
+                        <option value="B">B Major</option>
+                        <option value="F#">F# Major</option>
+                        <option value="C#">C# Major</option>
+                        <option value="F">F Major</option>
+                        <option value="Bb">Bb Major</option>
+                        <option value="Eb">Eb Major</option>
+                        <option value="Ab">Ab Major</option>
+                        <option value="Db">Db Major</option>
+                        <option value="Gb">Gb Major</option>
+                        <option value="Cb">Cb Major</option>
+                        <option value="Am">A minor</option>
+                        <option value="Em">E minor</option>
+                        <option value="F#m">F# minor</option>
+                        <option value="C#m">C# minor</option>
+                        <option value="G#m">G# minor</option>
+                        <option value="D#m">D# minor</option>
+                        <option value="A#m">A# minor</option>
+                        <option value="Dm">D minor</option>
+                        <option value="Gm">G minor</option>
+                        <option value="Cm">C minor</option>
+                        <option value="Fm">F minor</option>
+                        <option value="Bbm">Bb minor</option>
+                        <option value="Ebm">Eb minor</option>
+                        <option value="Abm">Ab minor</option>
+                    </select>
                 </div>
-                <div class="form-chord">
-                    <label for="chordInput">Chord:</label>
-                    <input id="chordInput" type="text" name="chord">
+                <div class="form-select">
+                    <label for="timeOptions">Time Signature:</label>
+                    <select id="timeOptions" name="time">
+                        <option value="4/4" selected>4/4</option>
+                        <option value="3/4">3/4</option>
+                        <option value="6/8">6/8</option>
+                        <option value="12/8">12/8</option>
+                    </select>
                 </div>
-                <div class="form-chord">
-                    <label for="chordInput">Chord:</label>
-                    <input id="chordInput" type="text" name="chord">
+                <div id="progression-chords">
+                    <div class="form-chord">
+                        <label for="chordInput">Chord:</label>
+                        <input id="chordInput" type="text" name="chord">
+                    </div>
+                    <div class="form-chord">
+                        <label for="chordInput">Chord:</label>
+                        <input id="chordInput" type="text" name="chord">
+                    </div>
+                    <div class="form-chord">
+                        <label for="chordInput">Chord:</label>
+                        <input id="chordInput" type="text" name="chord">
+                    </div>
+                    <div class="form-chord">
+                        <label for="chordInput">Chord:</label>
+                        <input id="chordInput" type="text" name="chord">
+                    </div>
                 </div>
-                <div class="form-chord">
-                    <label for="chordInput">Chord:</label>
-                    <input id="chordInput" type="text" name="chord">
+                <div>
+                    <label for="displayPiano">Piano:</label>
+                    <input id="displayPiano" type="radio" name="chordDisplay" value="piano" checked>
+                    <label for="displaySATB">SATB:</label>
+                    <input id="displaySATB" type="radio" name="chordDisplay" value="SATB">
                 </div>
-            </div>
-            <div>
-                <label for="displayPiano">Piano:</label>
-                <input id="displayPiano" type="radio" name="chordDisplay" value="piano" checked>
-                <label for="displaySATB">SATB:</label>
-                <input id="displaySATB" type="radio" name="chordDisplay" value="SATB">
-            </div>
-            <div id="form-buttons">
-                <button id="addChordBtn">Add Chord</button>
-                <button>Generate Progression</button>
-            </div>
-        </form>
-        <div id='stave-svg'></div>
+                <div id="form-buttons">
+                    <button id="addChordBtn">Add Chord</button>
+                    <button>Generate Progression</button>
+                </div>
+            </form>
+            
+            <div id='stave-svg'></div>
+        </main>
         <script>
 
             let addBtn = document.getElementById('addChordBtn');
@@ -187,12 +206,6 @@
                 let staffDiv = document.getElementById('stave-svg');
                 staffDiv.innerHTML = '';
 
-                //Create the svg renderer
-                let renderer = new VF.Renderer(staffDiv, VF.Renderer.Backends.SVG);
-                renderer.resize(1200, 500);
-
-                let context = renderer.getContext();
-
                 let noteFormatter = new VF.Formatter();
 
                 let staveInfo;
@@ -209,12 +222,12 @@
                         for (let j = 0; j < voices.length; j++) {
                             noteFormatter
                                 .joinVoices([voices[j][i]])
-                                .format([voices[j][i]], 400);
+                                .format([voices[j][i]], 375);
                             VF.Beam.generateBeams(voices[j][i].tickables);
                         }
                     }
 
-                    drawFullSVG(voices, time, key, context, 'piano');
+                    drawFullSVG(voices, time, key, 'piano', staffDiv);
 
                 } else {
                     staveInfo = getSATBVoices(chords, time);
@@ -226,7 +239,7 @@
                         for (let j = 0; j < voices.length; j++) {
                             noteFormatter
                                 .joinVoices([voices[j][i]])
-                                .format([voices[j][i]], 400);
+                                .format([voices[j][i]], 375);
 
                             if (j === 0 || j === 2) {
                                 VF.Beam.generateBeams(voices[j][i].tickables, {
@@ -240,7 +253,7 @@
                         }
                     }
 
-                    drawFullSVG(voices, time, key, context, 'SATB');
+                    drawFullSVG(voices, time, key, 'SATB', staffDiv);
                 }
 
                 //Iterate through the score's ghost notes and hide them
@@ -268,20 +281,43 @@
                 }
             }
 
-            function drawFullSVG(voices, time, key, context, chordMode = 'piano') {
-                let numBars = voices[0].length;
+            function drawFullSVG(voices, time, key, chordMode, staveSvg) {
+
+                let LEAD_BAR_WIDTH = 450;
+                let BAR_WIDTH = 400;
+
                 let barXOffset = 15;
                 let trebleYOffset = 25;
                 let bassYOffset = 125;
+
+                //Create the svg renderer
+                let renderer = new VF.Renderer(staveSvg, VF.Renderer.Backends.SVG);
+                let context;
+
+                let numBars = voices[0].length;
                 let lineBarCount = 0;
 
+                renderer.resize(1275, 300 + (300 * (Math.floor(numBars / 3))));
+                context = renderer.getContext();
+
                 for (let i = 0; i < numBars; i++) {
-                    let trebleStave = new VF.Stave(barXOffset, trebleYOffset, 400);
-                    let bassStave = new VF.Stave(barXOffset, bassYOffset, 400);
+                    let trebleStave;
+                    let bassStave;
                     let ornamentations = [];
 
-                    //Each new barline has the clef and key signature drawn
-                    if (lineBarCount == 0) {
+                    //The first bar of each line draws the key signature and clef
+                    if (i % 3 === 0) {
+  
+                        //If this isn't the first line, increment the y offsets and reset the x offset
+                        if (i > 0) {
+                            barXOffset = 15;
+                            trebleYOffset += 300;
+                            bassYOffset += 300;
+                        }
+
+                        trebleStave = new VF.Stave(barXOffset, trebleYOffset, LEAD_BAR_WIDTH);
+                        bassStave = new VF.Stave(barXOffset, bassYOffset, LEAD_BAR_WIDTH);
+
                         ornamentations.push(
                             new Vex.Flow.StaveConnector(trebleStave, bassStave).setType(3)
                         );
@@ -290,7 +326,6 @@
                         );
 
                         trebleStave.addClef('treble').addKeySignature(key);
-
                         bassStave.addClef('bass').addKeySignature(key);
 
                         //The very first bar has the time signature
@@ -298,6 +333,13 @@
                             trebleStave.addTimeSignature(time);
                             bassStave.addTimeSignature(time);
                         }
+                        barXOffset += 450
+                    }
+
+                    else {
+                        trebleStave = new VF.Stave(barXOffset, trebleYOffset, BAR_WIDTH);
+                        bassStave = new VF.Stave(barXOffset, bassYOffset, BAR_WIDTH);
+                        barXOffset += 400;
                     }
 
                     //Add the end barline to the last bar in the progression
@@ -328,17 +370,6 @@
                         voices[0][i].draw(context, trebleStave);
                         voices[1][i].draw(context, bassStave);
                     }
-
-                    //Create a new barline for every three bars drawn
-                    if (lineBarCount == 2) {
-                        lineBarCount = 0;
-                        trebleYOffset += 125;
-                        bassYOffset += 125;
-                        barXOffset = 15;
-                    }
-
-                    lineBarCount += 1;
-                    barXOffset += 400;
                 }
             }
 
@@ -395,6 +426,7 @@
                         .setVertical('bottom')
                         .setHorizontal('center');
 
+                    console.log(chordNumeral);
                     //If the number of beats has exceed the number allowed for the bar, create a new array to hold notes for the next bar
                     if (barBeatCount > beatsPerBar) {
                         barIndex += 1;
@@ -570,8 +602,8 @@
                     });
 
                     //Add the name and numeral to the notes of the chord
-                    notes[0].addModifier(0, chordName);
-                    notes[3].addModifier(0, chordNumeral);
+                    notes[3].addModifier(0, chordName);
+                    notes[0].addModifier(0, chordNumeral);
 
                     //Save each note to the appropriate voice
                     bassNotes[barIndex].push(notes[0]);

@@ -31,14 +31,17 @@ MAJOR_KEY_NOTES = {
     'C#': ['C#', 'D#', 'E#', 'F#', 'G#', 'A#', 'B#'],
     'Db': ['Db','Eb','F','Gb','Ab','Bb','C'],
     'D': ['D','E','F#','G','A','B','C#'],
+    'D#': ['D#','E#','Fx','G#','A#','B#','Cx'],
     'Eb': ['Eb','F','G','Ab','Bb','C','D'],
     'E': ['E','F#','G#','A','B','C#','D#'],
     'F': ['F','G','A','Bb','C','D','E'],
     'F#': ['F#','G#','A#','B','C#','D#','E#'],
     'Gb': ['Gb','Ab','Bb','Cb','Db','Eb','F'],
     'G': ['G','A','B','C','D','E','F#'],
+    'G#': ['G#','A#','B#','C#','D#','E#','Fx'],
     'Ab': ['Ab','Bb','C','Db','Eb','F','G'],
     'A': ['A','B','C#','D','E','F#','G#'],
+    'A#': ['A#','B#','Cx','D#','E#','Fx','Gx'],
     'Bb': ['Bb','C','D','Eb','F','G','A'],
     'B': ['B','C#','D#','E','F#','G#','A#'],
 }
@@ -57,6 +60,7 @@ MINOR_KEY_NOTES = {
     'G#': ['G#','A#','B','C#','D#','E','F#'],
     'Ab': ['Ab','Bb','Cb','Db','Eb','Fb','Gb'],
     'A': ['A','B','C','D','E','F','G'],
+    'A#': ['A#','B#','C#','D#','E#','F#','G#'],
     'Bb': ['Bb','C','Db','Eb','F','Gb','Ab'],
     'B': ['B','C#','D','E','F#','G','A'],
 }
@@ -320,10 +324,6 @@ def get_chord_relation_for_key(key, numeral):
 
     chord_relation = ''
 
-    #If the numeral has a slash, it indicates an applied chord
-    if '/' in numeral:
-        chord_relation = 'applied'
-
     #Check for the numeral relative to a major key
     if key[0].isupper():
 
@@ -454,7 +454,7 @@ def identify_chord_numeral_for_key(key, chord_info, get_inversion=True):
     chord_numeral = ''
 
     #Extract the chord's information passed
-    root_note = chord_info['root_note']
+    root_note = chord_info['root']
     position = chord_info['position']
     quality = chord_info['quality']
     has_seventh = chord_info['has_seventh']
@@ -525,80 +525,86 @@ def identify_chord_numeral_for_key(key, chord_info, get_inversion=True):
     return chord_numeral
 
 
-def identify_chord_type_by_key(key, root_note, quality, has_seventh):
-    """Function to return the relationship of the passed chord (described by root_note, quality, and seventh) 
-    and the passed key.
-    """
+def identify_applied_numeral(base_chord_key, base_chord_quality, applied_chord_info, use_inversion):
 
-    diatonic_chords = None
-    mixture_chords = None
+    applied_numeral = ''
 
-    chord_name = f'{root_note}{quality}'
-    chord_type = 'unknown'
+    if base_chord_quality in ['','m','maj7','7','m7']:
 
-    #Check if we're searching for a major key
-    if key[0].isupper():
+        #If the base chord is of minor quality, use a minor key
+        if base_chord_quality in ['m', 'm7']:
+            base_chord_key = base_chord_key.lower()
 
-        if not has_seventh:
-            diatonic_chords = MAJOR_KEY_TRIADS
-            mixture_chords = MINOR_KEY_TRIADS
+        #Fully-diminished applied-dominant seventh chords are a special case, inversions must be checked for
+        if applied_chord_info['quality'] == 'o7':
 
-        else: 
-            diatonic_chords = MAJOR_KEY_SEVENTHS
-            mixture_chords = MINOR_KEY_SEVENTHS
+            diminished_numeral = identify_chord_numeral_for_key(base_chord_key, applied_chord_info)
 
-    #Else, we're searching for a minor key
-    else:
+            if use_inversion:
 
-        if not has_seventh:
-            diatonic_chords = MINOR_KEY_TRIADS
-            mixture_chords = MAJOR_KEY_TRIADS
+                if diminished_numeral in ['bvio7','vio7']:
+                    applied_numeral = 'viio4/2'
+
+                elif diminished_numeral == 'ivo7':
+                    applied_numeral = 'viio4/3'
+
+                elif diminished_numeral == 'iio7':
+                    applied_numeral = 'viio6/5'
+
+                elif diminished_numeral in ['viio7','#viio7']:
+                    applied_numeral = 'viio7'
+
+            elif diminished_numeral in ['iio7','ivo7','bvio7','vio7','viio7','#viio7']:
+                applied_numeral = 'viio'
 
         else:
-            diatonic_chords = MINOR_KEY_SEVENTHS
-            mixture_chords = MAJOR_KEY_SEVENTHS
+            retrieved_numeral = identify_chord_numeral_for_key(base_chord_key, applied_chord_info, False)
 
-    if chord_name in diatonic_chords[key]:
-        chord_type = 'diatonic'
+            #Dominant or leading tone triad
+            if retrieved_numeral in ['V', 'viio', 'viiø']:
+                applied_numeral = retrieved_numeral
 
-    elif chord_name in mixture_chords[key]:
-        chord_type = 'mixture'
+            #Leading tone triad in a minor key
+            elif retrieved_numeral in ['#viio', '#viiø']:
+                applied_numeral = retrieved_numeral[1:]
 
-    else: 
-        chord_type = 'other'
+            #If the chord was a applied dominant and the user wants its inversion string, append it to the numeral
+            if applied_numeral != '' and use_inversion:
 
-    return chord_type
+                if applied_chord_info['has_seventh']:
+                    applied_numeral += INVERSION_SEVENTH_STRINGS[applied_chord_info['position']]
+                
+                else:
+                    applied_numeral += INVERSION_TRIAD_STRINGS[applied_chord_info['position']]
 
+    return applied_numeral
 
 def identify_secondary_dominant_numeral(applied_chord_name, applied_chord_position, applied_chord_has_seventh, base_chord_key, base_chord_quality):
     """Identifies and returns the numeral for the applied chord if it is an applied dominant to the base chord."""
 
     applied_dominant_numeral = ''
+ 
+    #Only major and minor chords can have an applied dominant
+    if base_chord_quality in ['','m','maj7','7','m7']:
 
-    #Fully-diminished applied-dominant seventh chords are a special case, inversions must be checked for
-    if 'o7' in applied_chord_name:
+        #Fully-diminished applied-dominant seventh chords are a special case, inversions must be checked for
+        if 'o7' in applied_chord_name:
 
-        diminished_numeral = identify_chord_numeral_for_key(base_chord_key, {'root_note': applied_chord_name[0:-2], 'quality': 'o7', 'position': 0, 'has_seventh': True}, True)
+            diminished_numeral = identify_chord_numeral_for_key(base_chord_key, {'root': applied_chord_name[0:-2], 'quality': 'o7', 'position': 0, 'has_seventh': True}, True)
 
-        if diminished_numeral == 'bvio7':
-            applied_dominant_numeral = 'viio4/2'
+            if diminished_numeral == 'bvio7':
+                applied_dominant_numeral = 'viio4/2'
 
-        elif diminished_numeral == 'ivo7':
-            applied_dominant_numeral = 'viio4/3'
+            elif diminished_numeral == 'ivo7':
+                applied_dominant_numeral = 'viio4/3'
 
-        elif diminished_numeral == 'iio7':
-            applied_dominant_numeral = 'viio6/5'
+            elif diminished_numeral == 'iio7':
+                applied_dominant_numeral = 'viio6/5'
 
-        elif diminished_numeral == 'viio7':
-            applied_dominant_numeral = diminished_numeral
+            elif diminished_numeral == 'viio7':
+                applied_dominant_numeral = diminished_numeral
 
-        return applied_dominant_numeral
-
-    else:
-
-        #Only major and minor chords can have an applied dominant
-        if base_chord_quality in ['','m','maj7','7','m7']:
-
+        else:
             if applied_chord_has_seventh:
                 base_major_chords = MAJOR_KEY_SEVENTHS[base_chord_key]
                 base_minor_chords = MINOR_KEY_SEVENTHS[base_chord_key]
@@ -627,14 +633,13 @@ def identify_secondary_dominant_numeral(applied_chord_name, applied_chord_positi
                 elif applied_chord_name == base_major_chords[6] and applied_chord_position == 0:
                     applied_dominant_numeral += MAJOR_KEY_NUMERALS[6]
 
+            #If the chord was a applied dominant, get its inversion string
+            if applied_dominant_numeral != '':
 
-    #If the chord was a applied dominant, get its inversion string
-    if applied_dominant_numeral != '':
-
-        if applied_chord_has_seventh:
-            applied_dominant_numeral += INVERSION_SEVENTH_STRINGS[applied_chord_position]
-        
-        else:
-            applied_dominant_numeral += INVERSION_TRIAD_STRINGS[applied_chord_position]
+                if applied_chord_has_seventh:
+                    applied_dominant_numeral += INVERSION_SEVENTH_STRINGS[applied_chord_position]
+                
+                else:
+                    applied_dominant_numeral += INVERSION_TRIAD_STRINGS[applied_chord_position]
 
     return applied_dominant_numeral
