@@ -2,7 +2,7 @@
 four-part harmony writing rules.
 """
 
-from .music_info import get_key_note_for_degree, get_leading_tone_in_key, get_chord_relation_for_key
+from .music_info import get_key_note_for_degree, get_leading_tone_in_key, get_chord_relation_for_key, get_lt_numeral_for_dim7
 
 _validation_settings = {
     'max_distance': [12, 12, 24],
@@ -219,14 +219,6 @@ def __check_seventh_resolution(prev_chord, curr_chord, key, curr_chord_index):
 
     return resolution_error
 
-
-def __get_dim7_numeral(numeral):
-    """Helper function to check if fully-diminished seventh chord is also a leading tone diminished seventh chord."""
-
-    if numeral in ['bvio','vio','ivo','iio','viio','#viio']:
-        numeral = 'viio'
-
-    return numeral
         
 def __get_dim7_seventh_index(chord, key):
     """Helper function to get the proper seventh of a fully-diminished vii chord."""
@@ -263,7 +255,7 @@ def validate_progression(progression, key):
         chord_numeral = chord.get_numeral_for_key(current_key, False)
 
         if chord.quality == 'o7':
-            chord_numeral = __get_dim7_numeral(chord_numeral)
+            chord_numeral = get_lt_numeral_for_dim7(chord_numeral)
 
         chord_relation = get_chord_relation_for_key(current_key, chord_numeral)
 
@@ -276,7 +268,7 @@ def validate_progression(progression, key):
             progression_errors.append({'type': 'spelling', 'code': 'ERR_UNKNOWN_CHORD', 'details': {'chord_index': i}})
 
         #Check for applied chords including the special case V/iv in a minor key
-        elif chord_relation == 'chromatic' or (chord_relation == 'mixture' and chord_numeral == 'I'):
+        elif chord_relation == 'chromatic' or (chord_relation == 'mixture' and chord_numeral in ['I', 'III', 'III7', 'III6/5', 'III4/3', 'III4/2']):
 
             try: 
                 next_chord = progression[i]

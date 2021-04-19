@@ -15,6 +15,12 @@ class TestChordProgressions:
     
         return test_progression
 
+    def validate_chord_numerals(self, expected_numerals, actual_numerals):
+        """Helper function to validate a chord progression's identified numerals."""
+
+        for (expected, actual) in zip(expected_numerals, actual_numerals):
+            assert expected == actual
+                    
     def validate_satb_errors(self, expected_errors, actual_errors, error_filter=None):
         """Helper function to compare a list of expected errors with a list of actual errors"""
 
@@ -41,12 +47,33 @@ class TestChordProgressions:
                 assert expected['voice_one'] == actual['details']['voice_one']
                 assert expected['voice_two'] == actual['details']['voice_two']
 
+
+    ### TESTING BASIC CHORD PROGRESSION FUNCTIONS ###
+    def test_numeral_identification(self):
+        """Test the chord progression class's ability to identify chord numerals.
+        
+        Note: The main goal of this test is to check that fully-diminished seventh chords are converted properly.
+        """
+
+        #i - viio7 - i - viio6/5 - i6 - iv - V7 - VI
+        progression_one = self.create_progression(
+            ['G2,G3,D4,Bb4','F#2,A3,Eb4,C5','G2,G3,D4,Bb4','A2,F#3,Eb4,C5','Bb2,G3,D4,D5','C3,G3,Eb4,C5',
+            'D3,F#3,C4,A4','Eb3,G3,Bb3,G4'],'g')
+
+        progression_numerals = progression_one.get_progression_chord_numerals()
+        expected_numerals = ['i','viio7','i','viio6/5','i6','iv','V7','VI']
+
+        self.validate_chord_numerals(expected_numerals, progression_numerals)
+        
+
+    ### TESTING FOUR-PART HARMONY RULE VIOLATIONS ###
     def test_no_errors(self):
         """Test for chord progression with no errors."""
 
         #I - V4/3 - viio4/3 - I6 - bVI - iv - iio6/5 - V - I
         normal_progression = self.create_progression(
-            ['E2,B3,E4,G#4', 'F#2,B3,D#4,A4', 'A2,C#4,F#4,D#5', 'G#2,B3,G#4,E5', 'C3,G3,E4,C5', 'A2,A3,E4,C5', 'A2,C4,F#4,E5', 'B2,B3,F#4,D#5', 'E2,B3,G#4,E5'], 'E')
+            ['E2,B3,E4,G#4', 'F#2,B3,D#4,A4', 'A2,C#4,F#4,D#5', 'G#2,B3,G#4,E5', 'C3,G3,E4,C5', 'A2,A3,E4,C5', 
+            'A2,C4,F#4,E5', 'B2,B3,F#4,D#5', 'E2,B3,G#4,E5'], 'E')
 
         test_errors = normal_progression.validate_progression()
 
@@ -228,7 +255,7 @@ class TestChordProgressions:
     
     ### SPECIFIC TEST CASES FOR APPLIED CHORDS ### 
 
-    def test_applied_chords(self):
+    def test_applied_numerals(self):
         """Test for proper recognition of applied chords in a progression."""
 
         #ii - V4/3-->ii - ii6
@@ -241,14 +268,11 @@ class TestChordProgressions:
         applied_two_numerals = applied_prog_two.get_progression_chord_numerals(True)
         applied_two_expected = ['i', 'V7/VI', 'VI']
 
-        for (expected, actual) in zip(applied_one_expected, applied_one_numerals):
-                    assert expected == actual
-                    
-        for (expected, actual) in zip(applied_two_expected, applied_two_numerals):
-            assert expected == actual
+        self.validate_chord_numerals(applied_one_expected, applied_one_numerals)
+        self.validate_chord_numerals(applied_two_expected, applied_two_numerals)
 
     def test_applied_doubling_errors(self):
-        """Test for doubling erros in applied chords."""
+        """Test for doubling errors in applied chords."""
 
         #V - viio6/V - V6/5 
         lt_double_prog = self.create_progression(['C3,C4,G4,E5','D3,B3,F4,B4','E3,C4,G4,Bb4'],'F')
@@ -264,4 +288,3 @@ class TestChordProgressions:
 
         self.validate_satb_errors(lt_double_expected, lt_double_errors, 'spelling')
         self.validate_satb_errors(seventh_double_expected, seventh_double_errors, 'spelling')
-

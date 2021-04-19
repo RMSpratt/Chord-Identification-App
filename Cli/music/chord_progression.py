@@ -1,7 +1,7 @@
 """This module exports the ChordProgression class and makes use of the SATB validator."""
 
 from .chord import ChordFactory
-from .music_info import get_chord_relation_for_key, identify_secondary_dominant_numeral
+from .music_info import get_chord_relation_for_key, get_lt_numeral_for_dim7, identify_secondary_dominant_numeral
 from .satb_validator import validate_progression
 
 
@@ -30,7 +30,7 @@ class ChordProgression():
             new_chord = self._chord_factory.create_chord(chord_string)
 
         except ValueError:
-            print(f'The chord {chord_string} could not be created and added to the progression.')
+            raise ValueError('The chord to create: ' + str(new_chord) + ' is invalid.')
 
         else:
 
@@ -62,9 +62,16 @@ class ChordProgression():
 
             for i, chord in enumerate(self.chords):
                 chord_numeral = chord.get_numeral_for_key(self.key)
+
+                #Convert fully-diminished seventh chords to be relative to the leading tone if applicable
+                if chord.quality == 'o7':
+                    chord_numeral = get_lt_numeral_for_dim7(chord_numeral)
+
                 chord_relation = get_chord_relation_for_key(self.key, chord_numeral)
 
-                if use_applied and chord_relation == 'chromatic' and i < len(self.chords) - 1:
+                #Convert chromatic chords acting as applied dominants to the proceding chord to have an applied numeral
+                if use_applied and (chord_relation == 'chromatic' or chord_numeral in ['I', 'III', 'III7', 'III6/5', 'III4/3', 'III4/2']) and i < len(self.chords) - 1:
+
                     applied_numeral = chord.get_secondary_dominant_numeral(self.chords[i+1])
 
                     if applied_numeral != '':
@@ -87,8 +94,11 @@ class ChordProgression():
     def remove_chord(self, index=None):
         """Removes the chord at the specified index from this chord progression."""
 
-        if index:
+        if isinstance(index, int) and index in [0, len(self.chords) - 1]:
             self.chords.pop(index)
+        
+        else:
+            raise IndexError('The index provided is out of range.')
 
     def validate_progression(self):
         """Validates this chord progression using the passed progression SATB validator"""

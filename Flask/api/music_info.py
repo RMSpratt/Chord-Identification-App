@@ -315,22 +315,37 @@ def __get_notes_for_key(key):
 
     return key_notes
     
+def __strip_inversion_string(numeral):
+
+    stripped_numeral = numeral
+
+    #Remove the numeral's inversion string if present
+    for i, char in enumerate(numeral):
+        if char.isdigit():
+            stripped_numeral = numeral[0:i]
+            break
+
+    return stripped_numeral
+
 
 #### PUBLIC METHODS ####
 
 
-def get_chord_relation_for_key(key, numeral):
+def get_chord_relation_for_key(key, search_numeral):
     """Returns the relation of a chord with the given numeral relative to the given key."""
 
     chord_relation = ''
 
+    #Strip the numeral if it has an inversion string
+    search_numeral = __strip_inversion_string(search_numeral)
+
     #Check for the numeral relative to a major key
     if key[0].isupper():
 
-        if numeral in MAJOR_KEY_NUMERALS:
+        if search_numeral in MAJOR_KEY_NUMERALS:
             chord_relation = 'diatonic'
 
-        elif numeral in MAJOR_MIXTURE_NUMERALS:
+        elif search_numeral in MAJOR_MIXTURE_NUMERALS:
             chord_relation = 'mixture'
 
         else:
@@ -339,10 +354,10 @@ def get_chord_relation_for_key(key, numeral):
     #Check for the numeral relative to a minor key
     else:
 
-        if numeral in MINOR_KEY_NUMERALS:
+        if search_numeral in MINOR_KEY_NUMERALS:
             chord_relation = 'diatonic'
 
-        elif numeral in MINOR_MIXTURE_NUMERALS:
+        elif search_numeral in MINOR_MIXTURE_NUMERALS:
             chord_relation = 'mixture'
 
         else: 
@@ -357,12 +372,42 @@ def get_chord_for_intervals(interval_string):
     return INTERVAL_STRINGS[interval_string]
 
 
+def get_lt_numeral_for_dim7(diminished_numeral, use_inversion=True):
+    """Modifies the passed numeral as a new numeral built from the leading tone, if applicable.
+    True is returned if the diminished numeral was converted, and False otherwise.
+    """
+
+    lt_numeral = diminished_numeral
+
+    if use_inversion:
+
+        if lt_numeral in ['bvio7','vio7']:
+            lt_numeral = 'viio4/2'
+
+        elif lt_numeral == 'ivo7':
+            lt_numeral = 'viio4/3'
+
+        elif lt_numeral == 'iio7':
+            lt_numeral = 'viio6/5'
+
+        elif lt_numeral in ['viio7','#viio7']:
+            lt_numeral = 'viio7'
+
+    else:
+        
+        if lt_numeral in ['iio7','ivo7','bvio7','vio7','viio7','#viio7']:
+            lt_numeral = 'viio7'
+
+    return lt_numeral
+
+
 def get_key_note_for_degree(key, degree):
     """Returns the name of the note at the specified scale degree within the passed key."""
     
     key_notes = __get_notes_for_key(key)
 
     return key_notes[degree]
+
 
 def get_leading_tone_in_key(key):
     """Returns the leading tone for the passed key whether major or minor."""
@@ -540,23 +585,11 @@ def identify_applied_numeral(base_chord_key, base_chord_quality, applied_chord_i
 
             diminished_numeral = identify_chord_numeral_for_key(base_chord_key, applied_chord_info)
 
-            if use_inversion:
+            diminished_numeral = get_lt_numeral_for_dim7(diminished_numeral, use_inversion)
 
-                if diminished_numeral in ['bvio7','vio7']:
-                    applied_numeral = 'viio4/2'
-
-                elif diminished_numeral == 'ivo7':
-                    applied_numeral = 'viio4/3'
-
-                elif diminished_numeral == 'iio7':
-                    applied_numeral = 'viio6/5'
-
-                elif diminished_numeral in ['viio7','#viio7']:
-                    applied_numeral = 'viio7'
-
-            elif diminished_numeral in ['iio7','ivo7','bvio7','vio7','viio7','#viio7']:
-                applied_numeral = 'viio'
-
+            if diminished_numeral in ['viio7', 'viio6/5', 'viio4/3', 'viio4/2']:
+                applied_numeral = diminished_numeral
+                
         else:
             retrieved_numeral = identify_chord_numeral_for_key(base_chord_key, applied_chord_info, False)
 
