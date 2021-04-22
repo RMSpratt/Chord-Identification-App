@@ -1,21 +1,41 @@
-"""Module containing functions for validating a chord progression by 20th-century
+'''
+Module containing functions for validating a chord progression by 20th-century 
 four-part harmony writing rules.
-"""
 
-from .music_info import get_key_note_for_degree, get_leading_tone_in_key, get_chord_relation_for_key, get_lt_numeral_for_dim7
+Note: The validation rules in this progression assume the following fully-diminished seventh
+chords to be based on the leading tone: iio7, ivo7, vio7, bvio7.
+'''
 
-_validation_settings = {
+from .music_info import get_note_name_for_degree, get_leading_tone_in_key
+from .music_info import get_chord_relation_for_key, get_lt_numeral_for_dim7
+
+#Set of validation parameters used for validating the SATB chord progression
+_VALIDATION_SETTINGS = {
     'max_distance': [12, 12, 24],
-    'voice_range': [[26,50],[36,57],[43,62],[47,69]]
+    'voice_range': [[26,50],[36,57],[43,62],[47,69]],
+    'chord_types': ['','m','o','+','7','M7','m7','ø','o7', '7b5'],
+    'seventh_chords': ['7','maj7','m7','ø','o7'],
+    'special_chromatic_chords': ['bII','bVI7','VI7','II7b5','VI7b5']
 }
 
 
-def __check_chord_doubling(chord, chord_index, key, type='seventh'):
-    """Individual chord rule validation for the notes doubled within the chord."""
+def __check_chord_doubling(chord, chord_index, key, tendancy_tone):
+    '''
+    Validates a chord's doubled notes and returns errors for doubled tendancy tones.
+
+    Parameters:
+        chord (Chord): The chord to validate
+        chord_index (int): The index of the chord in the progression
+        key (str): The key the chord progression is in
+        tendancy_tone (str): The tendancy tone to check for, (leading tone or chordal seventh)
+
+    Return:
+        doubling_error: An error for the chord's doubling or None
+    '''
 
     doubling_error = None
 
-    if type == 'leading':
+    if tendancy_tone == 'leading':
         leading_tone = get_leading_tone_in_key(key)
 
         if len(chord.find_notes_by_name(leading_tone)) > 1:
@@ -23,93 +43,73 @@ def __check_chord_doubling(chord, chord_index, key, type='seventh'):
         
     else:
         seventh_index = None
-        seventh_name = ''
 
-        #Special case for fully-diminished chords to convert them to their more likely vii counterpart
+        #Special case for fully-diminished chords to convert them to their vii counterpart
         if chord.quality == 'o7':
             seventh_index = __get_dim7_seventh_index(chord, key)
 
         else:
             seventh_index = chord.get_seventh_index()
 
-        seventh_name = chord.notes[seventh_index].name
+        seventh_name = chord.get_note_name_at_index(seventh_index)
 
         if len(chord.find_notes_by_name(seventh_name)) > 1:
             doubling_error = {'type': 'spelling', 'code': 'ERR_DOUBLED_7TH', 'details': {'chord_index': chord_index}}
 
     return doubling_error
 
-
 def __check_voice_spacing(chord, chord_index):
-    """Individual chord rule validation for the spacing of the voices within the chord."""
+    '''Validates the passed chord by the intervals (spacing) between voices.'''
 
-    max_distances = [12, 12, 24]
+    max_distances = _VALIDATION_SETTINGS['max_distance']
 
     distance_errors = []
 
-    #Get the note for each SATB voice in the chord
-    soprano_value = chord.notes[3].value 
-    alto_value = chord.notes[2].value
-    tenor_value = chord.notes[1].value
-    bass_value = chord.notes[0].value
+    #Get the distance between each adjacent pairing of voices
+    soprano_alto_distance = chord.notes[3].get_interval(chord.notes[2], True)
+    alto_tenor_distance = chord.notes[2].get_interval(chord.notes[1], True)
+    tenor_bass_distance = chord.notes[1].get_interval(chord.notes[0], True)
 
-    #Check the distances between the four voices
-    if (soprano_value - alto_value) > _validation_settings['max_distance'][0]:
+    #Verify that none of the distances exceed the maximum distance allowed
+    if soprano_alto_distance > max_distances[0]:
         distance_errors.append({'type': 'spacing', 'code': 'ERR_SA_DISTANCE', 'details': {'chord_index': chord_index}})
 
-    if alto_value - tenor_value > max_distances[1]:
+    if alto_tenor_distance > max_distances[1]:
         distance_errors.append({'type': 'spacing', 'code': 'ERR_AT_DISTANCE', 'details': {'chord_index': chord_index}})
 
-    if tenor_value - bass_value > max_distances[2]:
+    if tenor_bass_distance > max_distances[2]:
         distance_errors.append({'type': 'spacing', 'code': 'ERR_TB_DISTANCE', 'details': {'chord_index': chord_index}})
 
     return distance_errors
 
-def __check_voice_in_range(voice_index, note, chord_index):
-    """Rule validation to ensure that the note for the specified voice is within its proper range.
+def __check_voice_in_range(chord, chord_index):
+    '''
+    Rule validation to ensure that the note for the specified voice is within its proper range.
     
-    Parameter: voice - An ENUM (S, A, T, B) indicating which voice the corresponding note is associated with.
-    Parameter: note - The note the voice is written for as an integer value.
-    """
+    Parameters:
+        chord - The chord to validate
+        chord_index - The index (position) of the chord in the progression
+    '''
 
-    max_voice_ranges = [[26,50],[36,57],[43,62],[47,69]]
+    max_voice_ranges = _VALIDATION_SETTINGS['voice_range']
+
+    range_low_codes = ['ERR_BASS_LOW', 'ERR_TENOR_LOW', 'ERR_ALTO_LOW', 'ERR_SOPRANO_LOW']
+    range_high_codes = ['ERR_BASS_HIGH', 'ERR_TENOR_HIGH', 'ERR_ALTO_HIGH', 'ERR_SOPRANO_HIGH']
 
     range_errors = []
 
-    #Check if the passed note's value exceeds its lowest note for its voice
-    if note.value < max_voice_ranges[voice_index-1][0]:
+    for i, note in enumerate(chord.notes):
 
-        if voice_index == 1:
-            range_errors.append({'type': 'range', 'code': 'ERR_BASS_LOW', 'details': {'chord_index': chord_index}})
+        if note.value < max_voice_ranges[i][0]:
+            range_errors.append({'type': 'range', 'code': range_low_codes[i], 'details': {'chord_index': chord_index}})
 
-        elif voice_index == 2:
-            range_errors.append({'type': 'range', 'code': 'ERR_TENOR_LOW', 'details': {'chord_index': chord_index}})
-
-        elif voice_index == 3:
-            range_errors.append({'type': 'range', 'code': 'ERR_ALTO_LOW', 'details': {'chord_index': chord_index}})
-
-        else:
-            range_errors.append({'type': 'range', 'code': 'ERR_SOPRANO_LOW', 'details': {'chord_index': chord_index}})
-
-    #Check if the passed note's value exceeds its highest note for its voice
-    elif note.value > max_voice_ranges[voice_index-1][1]:
-
-        if voice_index == 1:
-            range_errors.append({'type': 'range', 'code': 'ERR_BASS_HIGH', 'details': {'chord_index': chord_index}})
-
-        elif voice_index == 2:
-            range_errors.append({'type': 'range', 'code': 'ERR_TENOR_HIGH', 'details': {'chord_index': chord_index}})
-
-        elif voice_index == 3:
-            range_errors.append({'type': 'range', 'code': 'ERR_ALTO_HIGH', 'details': {'chord_index': chord_index}})
-
-        else:
-            range_errors.append({'type': 'range', 'code': 'ERR_SOPRANO_HIGH', 'details': {'chord_index': chord_index}})
+        elif note.value > max_voice_ranges[i][1]:
+            range_errors.append({'type': 'range', 'code': range_high_codes[i], 'details': {'chord_index': chord_index}})
 
     return range_errors
 
 def __check_voice_movement(prev_chord, curr_chord, curr_chord_index):
-    """Pairwise chord rule validation to check for parallel 5th/8ve movement errors or hidden 5th/8ve errors."""
+    '''Pairwise chord rule validation to check for parallel 5th/8ve movement errors or hidden 5th/8ve errors.'''
 
     movement_errors = []
 
@@ -136,56 +136,76 @@ def __check_voice_movement(prev_chord, curr_chord, curr_chord_index):
 
     return movement_errors
 
-def __check_leading_resolution(prev_chord, curr_chord, key, curr_chord_index):
-    """This function checks if the previous chord passed has a leading tone for the key passed, 
+def __check_leading_resolution(prev_chord, curr_chord, key, prev_chord_index):
+    '''
+    This function checks if the previous chord passed has a leading tone for the key passed, 
     and ensures it resolves in the following chord or was passed to the next chord if it is.
-    """
+    '''
 
-    leading_tone_name = None
-    leading_tone_index = None
-    resolution_value = None
-
+    #The error to return for the chord or None if there isn't an error
     resolution_error = None
 
-    leading_tone_name =  get_leading_tone_in_key(key)
+    #The value of the note the leading tone must resolve to
+    resolution_values = []
+    
+    leading_tone_index = -1
+    leading_tone_name = get_leading_tone_in_key(key)
+
+    prev_numeral = prev_chord.get_numeral_for_key(key)
 
     #Search for the leading tone in the previous chord
-    for i, note in enumerate(prev_chord.notes):
-        if note.name == leading_tone_name:
+    for i, note in enumerate(prev_chord.get_note_names()):
+        print(note)
+        if note == leading_tone_name:
             leading_tone_index = i
-            resolution_value = note.value + 1
             break
 
-    #Ensure that the leading tone appears in the chord (catches sus chords)
-    if leading_tone_index != None:
+    #If the chord contains the leading tone, validate its resolution
+    if leading_tone_index != -1:
+
+        #Set the possible resolution notes for the leading tone
+        resolution_values.append(get_note_name_for_degree(key, 1))
+
+        #V7 chords can resolve the lt to scale degree 5 if the lt isn't in the soprano voice
+        if prev_numeral == 'V7' and leading_tone_index != 3:
+            resolution_values.append(get_note_name_for_degree(key, 5))
 
         #If the leading tone doesn't resolve, check if it was passed to the next chord
-        if curr_chord.notes[leading_tone_index].value != resolution_value:
-            passed_leading_tone = False
+        if curr_chord.get_note_name_at_index(leading_tone_index) not in resolution_values:
+            new_leading_tone_index = -1
 
-            for note in curr_chord.notes:
-                if note.name == leading_tone_name:
-                    passed_leading_tone = True
+            for i, note in enumerate(curr_chord.get_note_names()):
+                if note == leading_tone_name:
+                    new_leading_tone_index = i
 
-            #If the seventh note doesn't appear in the current chord declare a seventh resolution error
-            if not passed_leading_tone:
+            #If the leading tone was passed to the current chord, return a warning for a delayed resolution
+            if new_leading_tone_index != -1:
+                resolution_error = {'type': 'warning', 'code': 'WARN_DELAYED_LT', 
+                'details': {'chord_index': prev_chord_index, 'lt_index': new_leading_tone_index, 
+                'resolve_notes': resolution_values}}
+
+            #Else, return a resolution error
+            else:
+                print('Add the error')
                 resolution_error = {'type': 'resolution', 'code': 'ERR_UNRESOLVED_LT', 
-                'details': {'chord_index': curr_chord_index - 1, 'voice_index': leading_tone_index}}
+                'details': {'chord_index': prev_chord_index, 'voice_index': leading_tone_index}}
 
     return resolution_error
 
     
 def __check_seventh_resolution(prev_chord, curr_chord, key, curr_chord_index):
-    """This function gets the index of the seventh in the previous chord passed, and ensures it resolves 
+    '''
+    This function gets the index of the seventh in the previous chord passed, and ensures it resolves 
     in the following chord or is passed to that chord otherwise.
-    """
+    '''
 
     resolution_error = None
 
-    #Get the index of the seventh from the previous chord, and its name and note value accordingly
     seventh_index = None
+    resolution_note = ''
 
-    #Special case for fully-diminished chords to convert them to their more likely vii counterpart
+    #1) Determine the index of the chordal seventh
+
     if prev_chord.quality == 'o7':
         seventh_index = __get_dim7_seventh_index(prev_chord, key)
         
@@ -195,15 +215,11 @@ def __check_seventh_resolution(prev_chord, curr_chord, key, curr_chord_index):
     seventh_name = prev_chord.notes[seventh_index].name
     seventh_degree = prev_chord.notes[seventh_index].get_degree_in_key(key)
 
-    #Get the name of the note that the seventh must resolve to
-    if seventh_degree != 0:    
-        resolved_note = get_key_note_for_degree(key, seventh_degree - 1)
-
-    else:
-        resolved_note = get_key_note_for_degree(key, 6)
+    #2) Get the name of the note that the chordal seventh must resolve to
+    resolution_note = get_note_name_for_degree(key, seventh_degree)
 
     #Check if the voice in the current chord at the index of the seventh is the resolution note
-    if curr_chord.notes[seventh_index].name != resolved_note:
+    if curr_chord.notes[seventh_index].name != resolution_note:
 
         passed_seventh = False
 
@@ -221,19 +237,23 @@ def __check_seventh_resolution(prev_chord, curr_chord, key, curr_chord_index):
 
         
 def __get_dim7_seventh_index(chord, key):
-    """Helper function to get the proper seventh of a fully-diminished vii chord."""
+    '''Helper function to get the proper seventh of a fully-diminished vii chord.'''
 
     seventh_index = 0
 
-    if chord.get_numeral_for_key(key, False) in ['vio', 'bvio']:
+    #Third-inversion, 7th is the base note
+    if chord.get_numeral_for_key(key) in ['bvio7', 'vio7']:
         seventh_index = 0
 
-    elif chord.get_numeral_for_key(key, False) == 'ivo':
+    #Second-inversion, 7th is a minor 3rd above the base
+    elif chord.get_numeral_for_key(key) == 'ivo7':
         seventh_index = chord.get_indices_from_interval(3)[0]
 
-    elif chord.get_numeral_for_key(key, False) == 'iio':
+    #First-inversion, 7th is a minor 6th above the base
+    elif chord.get_numeral_for_key(key) == 'iio7':
         seventh_index = chord.get_indices_from_interval(6)[0]
 
+    #Root-position, get the seventh normally
     else:
         seventh_index = chord.get_seventh_index()
 
@@ -241,91 +261,102 @@ def __get_dim7_seventh_index(chord, key):
 
 
 def validate_progression(progression, key):
-    """Central function to validate the passed chord progression according to SATB notation rules."""
+    '''Central function to validate the passed chord progression according to SATB notation rules.'''
 
-    #Create an instance variable to hold
+    progression_warnings = []
     progression_errors = []
 
-    #Holder for the previous chord while iterating
+    #Hold the previous chord while iterating for resolution errors
     prev_chord = None
     prev_relation = None
 
-    for i, chord in enumerate(progression, start=1):
+    for i, curr_chord in enumerate(progression, start=1):
         current_key = key
-        chord_numeral = chord.get_numeral_for_key(current_key, False)
+        chord_numeral = curr_chord.get_numeral_for_key(current_key, False)
 
-        if chord.quality == 'o7':
+        if curr_chord.quality == 'o7':
             chord_numeral = get_lt_numeral_for_dim7(chord_numeral)
 
         chord_relation = get_chord_relation_for_key(current_key, chord_numeral)
 
-        #1) Check for spelling errors
-        if len(chord) != 4:
+        #1) Check for spelling errors or unknown chords
+        if len(curr_chord) != 4:
             progression_errors.append({'type': 'spelling', 'code': 'ERR_NUM_VOICES', 'details': {'chord_index': i}})
             continue    
-
-        if chord.quality not in ['','m','o','+','ø','o7','maj7','m7','7']:
+        
+        if curr_chord.quality not in _VALIDATION_SETTINGS['chord_types']:
             progression_errors.append({'type': 'spelling', 'code': 'ERR_UNKNOWN_CHORD', 'details': {'chord_index': i}})
 
-        #Check for applied chords including the special case V/iv in a minor key
-        elif chord_relation == 'chromatic' or (chord_relation == 'mixture' and chord_numeral in ['I', 'III', 'III7', 'III6/5', 'III4/3', 'III4/2']):
+        #Check for applied chords or including the special case V/iv
+        elif chord_relation == 'chromatic' or (chord_relation == 'mixture' and chord_numeral == 'I'):
 
-            try: 
-                next_chord = progression[i]
-                secondary_numeral = chord.get_secondary_dominant_numeral(next_chord, False)
-    
-                if secondary_numeral != '':
-                    chord_numeral = secondary_numeral
-                    chord_relation = 'applied'
-                    current_key = next_chord.get_root_name()
-    
-                    if next_chord.quality in ['m', 'm7']:
-                        current_key = current_key.lower()
+            #If this chord isn't a recognizable chromatic chord, check if it's an applied chord
+            if chord_numeral not in _VALIDATION_SETTINGS['special_chromatic_chords']:
+                    
+                try: 
+                    next_chord = progression[i]
+                    applied_numeral = curr_chord.get_applied_numeral(next_chord, False)
+        
+                    if applied_numeral != '':
+                        chord_numeral = applied_numeral
+                        chord_relation = 'applied'
+                        current_key = next_chord.get_root_name()
+        
+                        if next_chord.quality in ['m', 'm7']:
+                            current_key = current_key.lower()
 
-                else:
+                    else:
+                        progression_errors.append({'type': 'spelling', 'code': 'ERR_UNKNOWN_CHORD', 'details': {'chord_index': i}})
+
+                except IndexError:
                     progression_errors.append({'type': 'spelling', 'code': 'ERR_UNKNOWN_CHORD', 'details': {'chord_index': i}})
 
-            except IndexError:
-                progression_errors.append({'type': 'spelling', 'code': 'ERR_UNKNOWN_CHORD', 'details': {'chord_index': i}})
-
         #2) Get voice spacing errors
-        progression_errors.extend(__check_voice_spacing(chord, i))
+        progression_errors.extend(__check_voice_spacing(curr_chord, i))
 
         #3) Check for range errors between voices in the current chord
-        for j, note in enumerate(chord.notes, start=1):
-            progression_errors.extend(__check_voice_in_range(j, note, i))
+        progression_errors.extend(__check_voice_in_range(curr_chord, i))
 
         #4) Get tendancy tone doubling errors
-        if chord_numeral in ['Imaj7', 'iii', 'V', 'viio', 'viiø']:
-            if error := __check_chord_doubling(chord, i, current_key, 'leading') : progression_errors.append(error)
+        if error := __check_chord_doubling(curr_chord, i, current_key, 'leading'): 
+            progression_errors.append(error)
 
-        if chord.has_seventh:
-            if error := __check_chord_doubling(chord, i, current_key, 'seventh') : progression_errors.append(error)
+        if curr_chord.quality in _VALIDATION_SETTINGS['seventh_chords']:
+            if error := __check_chord_doubling(curr_chord, i, current_key, 'seventh'): 
+                progression_errors.append(error)
 
         #4) Get movement and resolution errors between chords
         if prev_chord:
-            progression_errors.extend(__check_voice_movement(prev_chord, chord, i))
+            progression_errors.extend(__check_voice_movement(prev_chord, curr_chord, i))
 
             #If the previous chord was an applied chord, adjust the key to use
             if prev_relation == 'applied':
-                altered_key = chord.get_root_name()
+                altered_key = curr_chord.get_root_name()
 
-                if prev_chord.has_seventh:
-                    if error := __check_seventh_resolution(prev_chord, chord, altered_key, i): progression_errors.append(error)
+                if prev_chord.quality in _VALIDATION_SETTINGS['seventh_chords']:
+                    if error := __check_seventh_resolution(prev_chord, curr_chord, altered_key, i): 
+                        progression_errors.append(error)
                 
-                if prev_chord.get_numeral_for_key(altered_key, False) in ['Imaj7', 'iii', 'V', 'viio', 'viiø']:
-                    if error := __check_leading_resolution(prev_chord, chord, altered_key, i) : progression_errors.append(error)
+                if error := __check_leading_resolution(prev_chord, curr_chord, altered_key, i-1): 
+                    progression_errors.append(error)
 
             #Else, check the chords for the progression key as normal
             else:
 
-                if prev_chord.has_seventh:
-                    if error := __check_seventh_resolution(prev_chord, chord, current_key, i): progression_errors.append(error)
+                if prev_chord.quality in _VALIDATION_SETTINGS['seventh_chords']:
+                    if error := __check_seventh_resolution(prev_chord, curr_chord, current_key, i): 
+                        progression_errors.append(error)
                 
-                if prev_chord.get_numeral_for_key(current_key, False) in ['Imaj7', 'iii', 'V', 'vii']:
-                    if error := __check_leading_resolution(prev_chord, chord, current_key, i) : progression_errors.append(error)
+                if error := __check_leading_resolution(prev_chord, curr_chord, current_key, i-1): 
 
-        prev_chord = chord
+                    if error['type'] == 'warning':
+                        progression_warnings.append(error)
+
+                    else:
+                        progression_errors.append(error)
+
+        #Save the current chord's information for validating cross-chord errors
+        prev_chord = curr_chord
         prev_relation = chord_relation
 
     return progression_errors

@@ -270,7 +270,7 @@
                 for (let modifier of modifierElements) {
                     let modifierText = modifier.innerHTML.toLowerCase();
 
-                    if (modifierText.includes('i') || modifierText.includes('v')) {
+                    if (modifierText.includes('i') || modifierText.includes('v') || modifierText.includes('+') || modifierText.includes('n')) {
                         modifier.setAttribute('y', 250);
                     } else {
                         modifier.setAttribute(

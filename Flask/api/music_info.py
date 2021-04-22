@@ -1,12 +1,34 @@
-"""This module holds a series of constant values and functions used for calculating properties of
+'''
+This module holds a series of constant values and functions used for calculating properties of
 notes and chords according to musical notation rules. 
-"""
+'''
 
 from collections import defaultdict
 
-#Global CONST values
+#CONST file-scope values
 
-#An index system mapping each note's letter name to their corresponding value on a keyboard
+#The common accidentals that can precede a note
+ACCIDENTAL_STRINGS = ['bb', 'b', 'n', '#', 'x']
+
+#A mapping of chords of a certain quality to a string that decorates their numeral
+CHORD_QUALITY_STRINGS = defaultdict(lambda: '')
+CHORD_QUALITY_STRINGS.update({
+    'o': 'o',
+    '+': '+',
+    'sus2': 'sus2',
+    'sus4': 'sus4',
+    'maj7': 'M',
+    'm7': '',
+    'ø': 'ø',
+    'o7': 'o',
+    '7b5': '7b5'
+})
+
+#Chord inversion strings to decorate a chord numeral
+INVERSION_TRIAD_STRINGS = ['','6','6/4']
+INVERSION_SEVENTH_STRINGS = ['7','6/5','4/3','4/2']
+
+#Index system mapping each note's letter name to a value based on the 12 semitones in an octave
 NOTE_INDICES = {
     'B#': 0, 'C': 0, 'Dbb': 0, 'Bx': 1, 'C#': 1, 'Db': 1, 'Cx': 2, 'D': 2, 'Ebb': 2, 'D#': 3,
     'Eb': 3, 'Fbb': 3,'Dx': 4, 'E': 4, 'Fb': 4, 'E#': 5, 'F': 5, 'Gbb': 5, 'Ex': 6, 'F#': 6,
@@ -14,17 +36,28 @@ NOTE_INDICES = {
     'Bb': 10, 'Cbb': 10, 'Ax': 11, 'B': 11, 'Cb': 11
 }
 
-#The lists of diatonic and modal mixture chords in a major key
-MAJOR_KEY_NUMERALS = ['I','ii','iii','IV','V','vi','viio','viiø']
-MAJOR_MIXTURE_NUMERALS = ['i','iiø','iio','bIII','iv','v','bVI','bVII']
-
-#The lists of diatonic and modal mixture chords in a minor key
-MINOR_KEY_NUMERALS = ['i','iio','III','iv','v','VI','VII']
-MINOR_MIXTURE_NUMERALS = ['I','ii','#iii','IV','V','#vi','viio']
-
+#The numeral strings used for denoting chords without decorations
 NUMERAL_STRINGS = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII']
 
-#The list of notes naturally found in every major key
+#The lists of diatonic and modal mixture chord numerals in a major key
+MAJOR_KEY_NUMERALS = [
+    'I','ii','iii','IV','V','vi','viio','IM7','ii7','iiim7','IVM7','V7','vi7','viiø','viio7'
+]
+
+MAJOR_MIXTURE_NUMERALS = [
+    'i','iio','bIII','iv','v','bVI','bVII','i7','iiø','bIIIM7','iv7','v7','bVIM7','bVII7'
+]
+
+#The lists of diatonic and modal mixture chord numerals in a minor key
+MINOR_KEY_NUMERALS = [
+    'i','iio','III','iv','v','VI','VII','i7','iiø','IIIM7','iv7','v7','VIM7','VII7'
+]
+
+MINOR_MIXTURE_NUMERALS = [
+    'I','ii','#iii','IV','V','#vi','viio','IM7','ii7','#iii7','IVM7','V7','#vi7','viiø', 'viio7'
+]
+
+#The list of notes naturally found in a series of major scales
 MAJOR_KEY_NOTES = {
     'Cb': ['Cb', 'Db', 'Eb', 'Fb', 'Gb', 'Ab', 'Bb'],
     'C': ['C', 'D', 'E', 'F', 'G', 'A', 'B'],
@@ -46,16 +79,19 @@ MAJOR_KEY_NOTES = {
     'B': ['B','C#','D#','E','F#','G#','A#'],
 }
 
-#The list of notes naturally found in every minor key
+#The list of notes naturally found in a series of minor scales
 MINOR_KEY_NOTES = {
+    'Cb': ['Db','Ebb','Fb','Gb','Abb','Bbb','Cb'],
     'C': ['C','D','Eb','F','G','Ab','Bb'],
     'C#': ['C#','D#','E','F#','G#','A','B'],
+    'Db': ['Db','Eb','Fb','Gb','Ab','Bbb','Cb'],
     'D': ['D','E','F','G','A','Bb','C'],
     'D#': ['D#','E#','F#','G#','A#','B','C#'],
     'Eb': ['Eb','Fb','Gb','Ab','Bb','Cb','Db'],
     'E': ['E','F#','G','A','B','C','D'],
     'F': ['F','G','Ab','Bb','C','Db','Eb'],
     'F#': ['F#','G#','A','B','C#','D','E'],
+    'Gb': ['Db','Ebb','Fb','Gb','Ab','Bbb','Cb'],
     'G': ['G','A','Bb','C','D','Eb','F'],
     'G#': ['G#','A#','B','C#','D#','E','F#'],
     'Ab': ['Ab','Bb','Cb','Db','Eb','Fb','Gb'],
@@ -65,244 +101,182 @@ MINOR_KEY_NOTES = {
     'B': ['B','C#','D','E','F#','G','A'],
 }
 
-#The triads naturally found in every major key
-MAJOR_KEY_TRIADS = {
-    'C': ['C','Dm','Em','F','G','Am','Bo'],
-    'C#': ['C#','D#m','E#m','F#','G#','A#m','B#o'],
-    'Db': ['Db','Ebm','Fm','Gb','Ab','Bbm','Co'],
-    'D': ['D','Em','F#m','G','A','Bm','C#o'],
-    'Eb': ['Eb','Fm','Gm','Ab','Bb','Cm','Do'],
-    'E': ['E','F#m','G#m','A','B','C#m','D#o'],
-    'F': ['F','Gm','Am','Bb','C','Dm','Ebo'],
-    'F#': ['F#','G#m','A#m','B','C#','D#m','E#o'],
-    'Gb': ['Gb','Abm','Bbm','C','Db','Ebm','Fo'],
-    'G': ['G','Am','Bm','C','D','Em','F#o'],
-    'Ab': ['Ab','Bbm','Cm','Db','Eb','Fm','Go'],
-    'A': ['A','Bm','C#m','D','E','F#m','G#o'],
-    'Bb': ['Bb','Cm','Dm','Eb','F','Gm','Ao'],
-    'B': ['B','C#m','D#m','E','F#','G#m','A#o'],
-}
-
-#The seventh chords naturally found in every major key
-MAJOR_KEY_SEVENTHS = {
-    'C': ['Cmaj7', 'Dm7', 'Em7', 'Fmaj7', 'G7', 'Am7', 'Bø'],
-    'C#': ['C#maj7','D#m7','E#m7','F#maj7','G#7','A#m7','B#ø'],
-    'Db': ['Dbmaj7','Ebm7','Fm7','Gbmaj7','Ab7','Bbm7','Cø'],
-    'D': ['Dmaj7','Em7','F#m7','Gmaj7','A7','Bm7','C#ø'],
-    'Eb': ['Ebmaj7','Fm7','Gm7','Abmaj7','Bb7','Cm7','Dø'],
-    'E': ['Emaj7','F#m7','G#m7','Amaj7','B7','C#m7','D#ø'],
-    'F': ['Fmaj7','Gm7','Am7','Bbmaj7','C7','Dm7','Eø'],
-    'F#': ['F#maj7','G#m7','A#m7','Bmaj7','C#7','D#m7','E#ø'],
-    'Gb': ['Gbmaj7','Abm7','Bbm7','Cmaj7','Db7','Ebm7','Fø'],
-    'G': ['Gmaj7','Am7','Bm7','Cmaj7','D7','Em7','F#ø'],
-    'Ab': ['Abmaj7','Bbm7','Cm7','Dbmaj7','Eb7','Fm7','Gø'],
-    'A': ['Amaj7','Bm7','C#m7','Dmaj7','E7','F#m7','G#ø'],
-    'Bb': ['Bbmaj7','Cm7','Dm7','Ebmaj7','F7','Gm7','Aø'],
-    'B': ['Bmaj7','C#m7','D#m7','Emaj7','F#7','G#m7','A#ø'],
-}
-
-#The chords naturally found in every minor key
-MINOR_KEY_TRIADS = {
-    'C': ['Cm','Do','Eb','Fm','Gm','Ab','Bb'],
-    'C#': ['C#m','D#o','E','F#m','G#m','A','B'],
-    'D': ['Dm','Eo','F','Gm','Am','Bb','C'],
-    'D#': ['D#m','Eo','F#','G#m','A#m','B#','C#'],
-    'Eb': ['Ebm','Fbo','Gb','Abm','Bbm','C','Db'],
-    'E': ['Em','F#o','G','Am','Bm','C','D'],
-    'F': ['Fm','Go','Ab','Bbm','Cm','Db','Eb'],
-    'F#': ['F#m','G#o','A','Bm','C#m','D','E'],
-    'G': ['Gm','Ao','Bb','Cm','Dm','Eb','F'],
-    'G#': ['G#m','A#o','B','C#m','D#m','E#','F#'],
-    'Ab': ['Abm','Bbo','Cb','Dbm','Ebm','Fb','Gb'],
-    'A': ['Am','Bo','C','Dm','Em','F','G'],
-    'Bb': ['Bbm','Co','Db','Ebm','Fm','Gb','Ab'],
-    'B': ['Bm','C#o','D','Em','F#m','G','A'],
-}
-
-#The seventh chords naturally found in every minor key and the leading tone diminished chord
-MINOR_KEY_SEVENTHS = {
-    'C': ['Cm7','Do7','Ebmaj7','Fm','Gm','Abmaj7','Bb7','Bo7'],
-    'C#': ['C#m7','D#o7','Emaj7','F#m7','G#m7','Amaj7','B7','B#o7'],
-    'D': ['Dm7','Eo7','Fmaj7','Gm7','Am7','Bbmaj7','C7','C#o7'],
-    'D#': ['D#m7','Eo7','F#maj7','G#m7','A#m7','B#maj7','C#7','Cxo7'],
-    'Eb': ['Ebm7','Fbo7','Gbmaj7','Abm7','Bbm7','Cmaj7','Db7','Do7'],
-    'E': ['Em7','F#o7','Gmaj7','Am7','Bm7','Cmaj7','D7','D#o7'],
-    'F': ['Fm7','Go7','Abmaj7','Bbm7','Cm7','Dbmaj7','Eb7','Eo7'],
-    'F#': ['F#m7','G#o7','Amaj7','Bm7','C#m7','Dmaj7','E7','E#o7'],
-    'G': ['Gm7','Ao7','Bbmaj7','Cm7','Dm7','Ebmaj7','F7','F#o7'],
-    'G#': ['G#m7','A#o7','Bmaj7','C#m7','D#m7','E#maj7','F#7','Fxo7'],
-    'Ab': ['Abm7','Bbo7','Cbmaj7','Dbm7','Ebm7','Fbmaj7','Gb7','Go7'],
-    'A': ['Am7','Bo7','Cmaj7','Dm7','Em7','Fmaj7','G7','G#o7'],
-    'Bb': ['Bbm7','Co7','Dbmaj7','Ebm7','Fm7','Gbmaj7','Ab7','Ao7'],
-    'B': ['Bm7','C#o7','Dmaj7','Em7','F#m7','Gmaj7','A7','A#o7'],
-}
-
-INVERSION_TRIAD_STRINGS = ['','6','6/4']
-INVERSION_SEVENTH_STRINGS = ['7','6/5','4/3','4/2']
-
 #The mapping of interval strings to a matching chord quality and chord inversion
 INTERVAL_STRINGS = defaultdict(lambda: {'root_index': 0, 'quality': 'unknown', 'position': 0})
-INTERVAL_STRINGS.update(
-    {
-        '3': {'root_index': 0, 'quality': 'm', 'position': 0},
-        '4': {'root_index': 0, 'quality': '', 'position': 0},
-        '5': {'root_index': 1, 'quality': 'add5', 'position': 0},
-        '7': {'root_index': 0, 'quality': 'add5', 'position': 0},
-        '8': {'root_index': 1, 'quality': '', 'position': 1},
-        '9': {'root_index': 2, 'quality': 'm', 'position': 1},
-        '25': {'root_index': 0, 'quality': 'sus2', 'position': 0},
-        '33': {'root_index': 0, 'quality': 'o', 'position': 0},
-        '34': {'root_index': 0, 'quality': 'm', 'position': 0},
-        '35': {'root_index': 2, 'quality': '', 'position': 1},
-        '36': {'root_index': 2, 'quality': 'o', 'position': 1},
-        '43': {'root_index': 0, 'quality': '', 'position': 0},
-        '44': {'root_index': 0, 'quality': '+', 'position': 0},
-        '45': {'root_index': 2, 'quality': 'm', 'position': 1},
-        '52': {'root_index': 0, 'quality': 'sus4', 'position': 0},
-        '53': {'root_index': 1, 'quality': 'm', 'position': 2},
-        '54': {'root_index': 1, 'quality': '', 'position': 2},
-        '63': {'root_index': 1, 'quality': 'o', 'position': 2},
-        '69': {'root_index': 0, 'quality': 'o', 'position': 0},
-        '78': {'root_index': 0, 'quality': 'm', 'position': 0},
-        '79': {'root_index': 0, 'quality': '', 'position': 0},
-        '87': {'root_index': 1, 'quality': '', 'position': 1},
-        '88': {'root_index': 1, 'quality': '+', 'position': 1},
-        '89': {'root_index': 2, 'quality': 'm', 'position': 2},
-        '96': {'root_index': 1, 'quality': 'o', 'position': 1},
-        '97': {'root_index': 1, 'quality': 'm', 'position': 1},
-        '98': {'root_index': 2, 'quality': '', 'position': 2},
-        '99': {'root_index': 2, 'quality': 'o', 'position': 2},
-        '14': {'root_index': 1, 'quality': 'maj7', 'position': 3},
-        '17': {'root_index': 1, 'quality': 'add5/maj7', 'position': 0},
-        '23': {'root_index': 1, 'quality': 'm7', 'position': 3},
-        '24': {'root_index': 1, 'quality': '7', 'position': 3},
-        '37': {'root_index': 0, 'quality': 'm7', 'position': 0},
-        '41': {'root_index': 2, 'quality': 'add5/maj7', 'position': 0},
-        '46': {'root_index': 0, 'quality': '7', 'position': 0},
-        '47': {'root_index': 0, 'quality': 'maj7', 'position': 0},
-        '58': {'root_index': 2, 'quality': 'maj7', 'position': 3},
-        '59': {'root_index': 2, 'quality': 'm7', 'position': 3},
-        '62': {'root_index': 2, 'quality': '7', 'position': 1},
-        '68': {'root_index': 2, 'quality': 'maj7', 'position': 3},
-        '71': {'root_index': 2, 'quality': 'maj7', 'position': 1},
-        '72': {'root_index': 2, 'quality': 'm7', 'position': 1},
-        '74': {'root_index': 0, 'quality': 'add5/maj7', 'position': 0},
-        '105': {'root_index': 0, 'quality': 'm7', 'position': 0},
-        '106': {'root_index': 0, 'quality': '7', 'position': 0},
-        '115': {'root_index': 0, 'quality': 'maj7', 'position': 0},
-        '118': {'root_index': 0, 'quality': 'add5/maj7', 'position': 0},
-        '143': {'root_index': 1, 'quality': 'maj7', 'position': 3},
-        '179': {'root_index': 1, 'quality': 'maj7', 'position': 3},
-        '233': {'root_index': 1, 'quality': 'ø', 'position': 3},
-        '234': {'root_index': 1, 'quality': 'm7', 'position': 3},
-        '243': {'root_index': 1, 'quality': '7', 'position': 3},
-        '269': {'root_index': 1, 'quality': 'ø', 'position': 3},
-        '278': {'root_index': 1, 'quality': 'm7', 'position': 3},
-        '279': {'root_index': 1, 'quality': '7', 'position': 3},
-        '323': {'root_index': 2, 'quality': 'm7', 'position': 2},
-        '324': {'root_index': 2, 'quality': '7', 'position': 2},
-        '332': {'root_index': 3, 'quality': '7', 'position': 1},
-        '333': {'root_index': 0, 'quality': 'o7', 'position': 0},
-        '334': {'root_index': 0, 'quality': 'ø', 'position': 0},
-        '341': {'root_index': 3, 'quality': 'maj7', 'position': 1},
-        '342': {'root_index': 3, 'quality': 'ø', 'position': 1},
-        '343': {'root_index': 0, 'quality': 'm7', 'position': 0},
-        '359': {'root_index': 3, 'quality': 'm7', 'position': 2},
-        '368': {'root_index': 3, 'quality': '7', 'position': 2},
-        '369': {'root_index': 0, 'quality': 'o7', 'position': 0},
-        '378': {'root_index': 0, 'quality': 'ø', 'position': 0},
-        '379': {'root_index': 0, 'quality': 'm7', 'position': 0},
-        '414': {'root_index': 2, 'quality': 'maj7', 'position': 2},
-        '423': {'root_index': 2, 'quality': 'ø', 'position': 2},
-        '432': {'root_index': 3, 'quality': 'm7', 'position': 1},
-        '433': {'root_index': 0, 'quality': '7', 'position': 0},
-        '434': {'root_index': 0, 'quality': 'maj7', 'position': 0},
-        '453': {'root_index': 3, 'quality': 'maj7', 'position': 2},
-        '459': {'root_index': 3, 'quality': 'ø', 'position': 2},
-        '469': {'root_index': 0, 'quality': '7', 'position': 0},
-        '478': {'root_index': 0, 'quality': 'maj7', 'position': 0},
-        '535': {'root_index': 3, 'quality': 'maj7', 'position': 1},
-        '536': {'root_index': 3, 'quality': 'ø', 'position': 3},
-        '537': {'root_index': 1, 'quality': 'm7', 'position': 2},
-        '545': {'root_index': 3, 'quality': 'm7', 'position': 3},
-        '546': {'root_index': 1, 'quality': '7', 'position': 2},
-        '547': {'root_index': 1, 'quality': 'maj7', 'position': 2},
-        '574': {'root_index': 1, 'quality': 'maj7', 'position': 2},
-        '587': {'root_index': 2, 'quality': 'maj7', 'position': 3},
-        '596': {'root_index': 2, 'quality': 'ø', 'position': 3},
-        '597': {'root_index': 2, 'quality': 'm7', 'position': 3},
-        '627': {'root_index': 2, 'quality': '7', 'position': 1},
-        '635': {'root_index': 3, 'quality': '7', 'position': 3},
-        '636': {'root_index': 0, 'quality': 'o7', 'position': 0},
-        '637': {'root_index': 1, 'quality': 'ø', 'position': 2},
-        '645': {'root_index': 0, 'quality': 'ø', 'position': 0},
-        '687': {'root_index': 2, 'quality': '7', 'position': 3},
-        '695': {'root_index': 3, 'quality': '7', 'position': 1},
-        '696': {'root_index': 0, 'quality': 'o7', 'position': -1},
-        '697': {'root_index': 0, 'quality': 'ø', 'position': 0},
-        '711': {'root_index': 1, 'quality': 'add5/maj7', 'position': 0},
-        '714': {'root_index': 2, 'quality': 'maj7', 'position': 1},
-        '717': {'root_index': 2, 'quality': 'maj7', 'position': 1},
-        '726': {'root_index': 2, 'quality': 'ø', 'position': 1},
-        '727': {'root_index': 2, 'quality': 'm7', 'position': 1},
-        '735': {'root_index': 0, 'quality': 'm7', 'position': 0},
-        '736': {'root_index': 0, 'quality': '7', 'position': 0},
-        '745': {'root_index': 0, 'quality': 'maj7', 'position': 0},
-        '785': {'root_index': 3, 'quality': 'maj7', 'position': 1},
-        '786': {'root_index': 3, 'quality': 'ø', 'position': 1},
-        '787': {'root_index': 0, 'quality': 'm7', 'position': 0},
-        '795': {'root_index': 3, 'quality': 'm7', 'position': 1},
-        '796': {'root_index': 0, 'quality': '7', 'position': 0},
-        '797': {'root_index': 0, 'quality': 'maj7', 'position': 0},
-        '810': {'root_index': 1, 'quality': '7', 'position': 1},
-        '811': {'root_index': 1, 'quality': 'maj7', 'position': 1},
-        '854': {'root_index': 2, 'quality': 'maj7', 'position': 3},
-        '863': {'root_index': 2, 'quality': 'ø', 'position': 3},
-        '872': {'root_index': 3, 'quality': 'm7', 'position': 2},
-        '873': {'root_index': 1, 'quality': '7', 'position': 1},
-        '874': {'root_index': 1, 'quality': 'maj7', 'position': 1},
-        '898': {'root_index': 3, 'quality': 'maj7', 'position': 3},
-        '910': {'root_index': 1, 'quality': 'm7', 'position': 1},
-        '953': {'root_index': 2, 'quality': 'm7', 'position': 3},
-        '954': {'root_index': 2, 'quality': '7', 'position': 3},
-        '958': {'root_index': 3, 'quality': '7', 'position': 3},
-        '962': {'root_index': 3, 'quality': '7', 'position': 2},
-        '963': {'root_index': 0, 'quality': 'o7', 'position': 0},
-        '964': {'root_index': 1, 'quality': 'ø', 'position': 1},
-        '971': {'root_index': 3, 'quality': 'maj7', 'position': 2},
-        '972': {'root_index': 3, 'quality': 'ø', 'position': 2},
-        '973': {'root_index': 1, 'quality': 'm7', 'position': 1},
-        '989': {'root_index': 3, 'quality': 'm7', 'position': 3},
-        '999': {'root_index': 0, 'quality': 'o7', 'position': 0},
-        '1053': {'root_index': 0, 'quality': 'ø', 'position': 0},
-        '1054': {'root_index': 0, 'quality': 'm7', 'position': 0},
-        '1063': {'root_index': 0, 'quality': '7', 'position': 0},
-        '1089': {'root_index': 0, 'quality': 'ø', 'position': 0},
-        '1098': {'root_index': 0, 'quality': 'm7', 'position': 0},
-        '1099': {'root_index': 0, 'quality': '7', 'position': 0},
-        '1153': {'root_index': 0, 'quality': 'maj7', 'position': 0},
-        '1189': {'root_index': 0, 'quality': 'maj7', 'position': 0},
-        '3510': {'root_index': 2, 'quality': '7', 'position': 1},
-        '3511': {'root_index': 2, 'quality': 'maj7', 'position': 1},
-        '3610': {'root_index': 2, 'quality': 'ø', 'position': 1},
-        '4510': {'root_index': 2, 'quality': 'm7', 'position': 1},
-        '5105': {'root_index': 1, 'quality': 'm7', 'position': 2},
-        '5106': {'root_index': 1, 'quality': '7', 'position': 2},
-        '5115': {'root_index': 1, 'quality': 'maj7', 'position': 2},
-        '6105': {'root_index': 1, 'quality': 'ø', 'position': 2},
-        '8109': {'root_index': 1, 'quality': '7', 'position': 1},
-        '8118': {'root_index': 1, 'quality': 'maj7', 'position': 1},
-        '8910': {'root_index': 2, 'quality': 'm7', 'position': 2},
-        '9108': {'root_index': 1, 'quality': 'ø', 'position': 1},
-        '9109': {'root_index': 1, 'quality': 'm7', 'position': 1},
-        '9311': {'root_index': 2, 'quality': 'maj7', 'position': 2},
-        '9810': {'root_index': 2, 'quality': '7', 'position': 2},
-        '9910': {'root_index': 2, 'quality': 'ø', 'position': 2},
-    }
-)
+INTERVAL_STRINGS.update({
+    '3': {'root_index': 0, 'quality': 'm', 'position': 0},
+    '4': {'root_index': 0, 'quality': '', 'position': 0},
+    '5': {'root_index': 1, 'quality': 'add5', 'position': 0},
+    '7': {'root_index': 0, 'quality': 'add5', 'position': 0},
+    '8': {'root_index': 1, 'quality': '', 'position': 1},
+    '9': {'root_index': 2, 'quality': 'm', 'position': 1},
+    '25': {'root_index': 0, 'quality': 'sus2', 'position': 0},
+    '33': {'root_index': 0, 'quality': 'o', 'position': 0},
+    '34': {'root_index': 0, 'quality': 'm', 'position': 0},
+    '35': {'root_index': 2, 'quality': '', 'position': 1},
+    '36': {'root_index': 2, 'quality': 'o', 'position': 1},
+    '43': {'root_index': 0, 'quality': '', 'position': 0},
+    '44': {'root_index': 0, 'quality': '+', 'position': 0},
+    '45': {'root_index': 2, 'quality': 'm', 'position': 1},
+    '53': {'root_index': 1, 'quality': 'm', 'position': 2},
+    '52': {'root_index': 0, 'quality': 'sus4', 'position': 0},
+    '54': {'root_index': 1, 'quality': '', 'position': 2},
+    '63': {'root_index': 1, 'quality': 'o', 'position': 2},
+    '69': {'root_index': 0, 'quality': 'o', 'position': 0},
+    '78': {'root_index': 0, 'quality': 'm', 'position': 0},
+    '79': {'root_index': 0, 'quality': '', 'position': 0},
+    '87': {'root_index': 1, 'quality': '', 'position': 1},
+    '88': {'root_index': 1, 'quality': '+', 'position': 1},
+    '89': {'root_index': 2, 'quality': 'm', 'position': 2},
+    '96': {'root_index': 1, 'quality': 'o', 'position': 1},
+    '97': {'root_index': 1, 'quality': 'm', 'position': 1},
+    '98': {'root_index': 2, 'quality': '', 'position': 2},
+    '99': {'root_index': 2, 'quality': 'o', 'position': 2},
+    '14': {'root_index': 1, 'quality': 'maj7', 'position': 3},
+    '17': {'root_index': 1, 'quality': 'add5/maj7', 'position': 0},
+    '23': {'root_index': 1, 'quality': 'm7', 'position': 3},
+    '24': {'root_index': 1, 'quality': '7', 'position': 3},
+    '37': {'root_index': 0, 'quality': 'm7', 'position': 0},
+    '41': {'root_index': 2, 'quality': 'add5/maj7', 'position': 0},
+    '46': {'root_index': 0, 'quality': '7', 'position': 0},
+    '47': {'root_index': 0, 'quality': 'maj7', 'position': 0},
+    '58': {'root_index': 2, 'quality': 'maj7', 'position': 3},
+    '59': {'root_index': 2, 'quality': 'm7', 'position': 3},
+    '62': {'root_index': 2, 'quality': '7', 'position': 1},
+    '68': {'root_index': 2, 'quality': '7', 'position': 3},
+    '71': {'root_index': 2, 'quality': 'maj7', 'position': 1},
+    '72': {'root_index': 2, 'quality': 'm7', 'position': 1},
+    '74': {'root_index': 0, 'quality': 'add5/maj7', 'position': 0},
+    '105': {'root_index': 0, 'quality': 'm7', 'position': 0},
+    '106': {'root_index': 0, 'quality': '7', 'position': 0},
+    '115': {'root_index': 0, 'quality': 'maj7', 'position': 0},
+    '118': {'root_index': 0, 'quality': 'add5/maj7', 'position': 0},
+    '143': {'root_index': 1, 'quality': 'maj7', 'position': 3},
+    '179': {'root_index': 1, 'quality': 'maj7', 'position': 3},
+    '233': {'root_index': 1, 'quality': 'ø', 'position': 3},
+    '234': {'root_index': 1, 'quality': 'm7', 'position': 3},
+    '242': {'root_index': 3, 'quality': '7b5', 'position': 1},
+    '243': {'root_index': 1, 'quality': '7', 'position': 3},
+    '269': {'root_index': 1, 'quality': 'ø', 'position': 3},
+    '278': {'root_index': 1, 'quality': 'm7', 'position': 3},
+    '279': {'root_index': 1, 'quality': '7', 'position': 3},
+    '323': {'root_index': 2, 'quality': 'm7', 'position': 2},
+    '324': {'root_index': 2, 'quality': '7', 'position': 2},
+    '332': {'root_index': 3, 'quality': '7', 'position': 1},
+    '333': {'root_index': 0, 'quality': 'o7', 'position': 0},
+    '334': {'root_index': 0, 'quality': 'ø', 'position': 0},
+    '341': {'root_index': 3, 'quality': 'maj7', 'position': 1},
+    '342': {'root_index': 3, 'quality': 'ø', 'position': 1},
+    '343': {'root_index': 0, 'quality': 'm7', 'position': 0},
+    '359': {'root_index': 3, 'quality': 'm7', 'position': 2},
+    '368': {'root_index': 3, 'quality': '7', 'position': 2},
+    '369': {'root_index': 0, 'quality': 'o7', 'position': 0},
+    '378': {'root_index': 0, 'quality': 'ø', 'position': 0},
+    '379': {'root_index': 0, 'quality': 'm7', 'position': 0},
+    '414': {'root_index': 2, 'quality': 'maj7', 'position': 2},
+    '424': {'root_index': 0, 'quality': '7b5', 'position': 0},
+    '423': {'root_index': 2, 'quality': 'ø', 'position': 2},
+    '432': {'root_index': 3, 'quality': 'm7', 'position': 1},
+    '433': {'root_index': 0, 'quality': '7', 'position': 0},
+    '434': {'root_index': 0, 'quality': 'maj7', 'position': 0},
+    '453': {'root_index': 3, 'quality': 'maj7', 'position': 2},
+    '459': {'root_index': 3, 'quality': 'ø', 'position': 2},
+    '468': {'root_index': 0, 'quality': '7b5', 'position': 0},
+    '469': {'root_index': 0, 'quality': '7', 'position': 0},
+    '478': {'root_index': 0, 'quality': 'maj7', 'position': 0},
+    '535': {'root_index': 3, 'quality': 'maj7', 'position': 1},
+    '536': {'root_index': 3, 'quality': 'ø', 'position': 3},
+    '537': {'root_index': 1, 'quality': 'm7', 'position': 2},
+    '545': {'root_index': 3, 'quality': 'm7', 'position': 3},
+    '546': {'root_index': 1, 'quality': '7', 'position': 2},
+    '547': {'root_index': 1, 'quality': 'maj7', 'position': 2},
+    '574': {'root_index': 1, 'quality': 'maj7', 'position': 2},
+    '587': {'root_index': 2, 'quality': 'maj7', 'position': 3},
+    '596': {'root_index': 2, 'quality': 'ø', 'position': 3},
+    '597': {'root_index': 2, 'quality': 'm7', 'position': 3},
+    '626': {'root_index': 2, 'quality': '7b5', 'position': 1},
+    '627': {'root_index': 2, 'quality': '7', 'position': 1},
+    '635': {'root_index': 3, 'quality': '7', 'position': 3},
+    '636': {'root_index': 0, 'quality': 'o7', 'position': 0},
+    '637': {'root_index': 1, 'quality': 'ø', 'position': 2},
+    '645': {'root_index': 0, 'quality': 'ø', 'position': 0},
+    '646': {'root_index': 0, 'quality': '7b5', 'position': 0},
+    '686': {'root_index': 3, 'quality': '7b5', 'position': 1},
+    '687': {'root_index': 2, 'quality': '7', 'position': 3},
+    '695': {'root_index': 3, 'quality': '7', 'position': 1},
+    '696': {'root_index': 0, 'quality': 'o7', 'position': 0},
+    '697': {'root_index': 0, 'quality': 'ø', 'position': 0},
+    '711': {'root_index': 1, 'quality': 'add5/maj7', 'position': 0},
+    '714': {'root_index': 2, 'quality': 'maj7', 'position': 1},
+    '717': {'root_index': 2, 'quality': 'maj7', 'position': 1},
+    '726': {'root_index': 2, 'quality': 'ø', 'position': 1},
+    '727': {'root_index': 2, 'quality': 'm7', 'position': 1},
+    '735': {'root_index': 0, 'quality': 'm7', 'position': 0},
+    '736': {'root_index': 0, 'quality': '7', 'position': 0},
+    '745': {'root_index': 0, 'quality': 'maj7', 'position': 0},
+    '785': {'root_index': 3, 'quality': 'maj7', 'position': 1},
+    '786': {'root_index': 3, 'quality': 'ø', 'position': 1},
+    '787': {'root_index': 0, 'quality': 'm7', 'position': 0},
+    '795': {'root_index': 3, 'quality': 'm7', 'position': 1},
+    '796': {'root_index': 0, 'quality': '7', 'position': 0},
+    '797': {'root_index': 0, 'quality': 'maj7', 'position': 0},
+    '810': {'root_index': 1, 'quality': '7', 'position': 1},
+    '811': {'root_index': 1, 'quality': 'maj7', 'position': 1},
+    '854': {'root_index': 2, 'quality': 'maj7', 'position': 3},
+    '863': {'root_index': 2, 'quality': 'ø', 'position': 3},
+    '864': {'root_index': 1, 'quality': '7b5', 'position': 1},
+    '872': {'root_index': 3, 'quality': 'm7', 'position': 2},
+    '873': {'root_index': 1, 'quality': '7', 'position': 1},
+    '874': {'root_index': 1, 'quality': 'maj7', 'position': 1},
+    '898': {'root_index': 3, 'quality': 'maj7', 'position': 3},
+    '910': {'root_index': 1, 'quality': 'm7', 'position': 1},
+    '953': {'root_index': 2, 'quality': 'm7', 'position': 3},
+    '954': {'root_index': 2, 'quality': '7', 'position': 3},
+    '958': {'root_index': 3, 'quality': '7', 'position': 3},
+    '962': {'root_index': 3, 'quality': '7', 'position': 2},
+    '963': {'root_index': 0, 'quality': 'o7', 'position': 0},
+    '964': {'root_index': 1, 'quality': 'ø', 'position': 1},
+    '971': {'root_index': 3, 'quality': 'maj7', 'position': 2},
+    '972': {'root_index': 3, 'quality': 'ø', 'position': 2},
+    '973': {'root_index': 1, 'quality': 'm7', 'position': 1},
+    '989': {'root_index': 3, 'quality': 'm7', 'position': 3},
+    '998': {'root_index': 3, 'quality': '7', 'position': 3},
+    '999': {'root_index': 0, 'quality': 'o7', 'position': 0},
+    '1053': {'root_index': 0, 'quality': 'ø', 'position': 0},
+    '1054': {'root_index': 0, 'quality': 'm7', 'position': 0},
+    '1062': {'root_index': 0, 'quality': '7b5', 'position': 0},
+    '1063': {'root_index': 0, 'quality': '7', 'position': 0},
+    '1089': {'root_index': 0, 'quality': 'ø', 'position': 0},
+    '1098': {'root_index': 0, 'quality': 'm7', 'position': 0},
+    '1099': {'root_index': 0, 'quality': '7', 'position': 0},
+    '1153': {'root_index': 0, 'quality': 'maj7', 'position': 0},
+    '1189': {'root_index': 0, 'quality': 'maj7', 'position': 0},
+    '2610': {'root_index': 2, 'quality': '7b5', 'position': 1},
+    '3510': {'root_index': 2, 'quality': '7', 'position': 1},
+    '3511': {'root_index': 2, 'quality': 'maj7', 'position': 1},
+    '3610': {'root_index': 2, 'quality': 'ø', 'position': 1},
+    '4510': {'root_index': 2, 'quality': 'm7', 'position': 1},
+    '5105': {'root_index': 1, 'quality': 'm7', 'position': 2},
+    '5106': {'root_index': 1, 'quality': '7', 'position': 2},
+    '5115': {'root_index': 1, 'quality': 'maj7', 'position': 2},
+    '6105': {'root_index': 1, 'quality': 'ø', 'position': 2},
+    '6106': {'root_index': 0, 'quality': '7b5', 'position': 0},
+    '8108': {'root_index': 1, 'quality': '7b5', 'position': 1},
+    '8109': {'root_index': 1, 'quality': '7', 'position': 1},
+    '8118': {'root_index': 1, 'quality': 'maj7', 'position': 1},
+    '8910': {'root_index': 2, 'quality': 'm7', 'position': 2},
+    '9108': {'root_index': 1, 'quality': 'ø', 'position': 1},
+    '9109': {'root_index': 1, 'quality': 'm7', 'position': 1},
+    '9311': {'root_index': 2, 'quality': 'maj7', 'position': 2},
+    '9810': {'root_index': 2, 'quality': '7', 'position': 2},
+    '9910': {'root_index': 2, 'quality': 'ø', 'position': 2},
+    '10810': {'root_index': 0, 'quality': '7b5', 'position': 0},
+})
+
 
 #### PRIVATE METHODS ####
 def __get_notes_for_key(key):
+    '''Returns the notes for the passed key as an array.'''
 
     key_notes = []
 
@@ -314,25 +288,90 @@ def __get_notes_for_key(key):
         key_notes = MINOR_KEY_NOTES[key]
 
     return key_notes
-    
+
+
 def __strip_inversion_string(numeral):
+    '''
+    Strips the passed numeral of its inversion string if present.
+    
+    Note: This function will not strip the '7' from seventh numerals, as it is required for identifying 
+    the chord's quality.
+    '''
 
     stripped_numeral = numeral
 
-    #Remove the numeral's inversion string if present
-    for i, char in enumerate(numeral):
-        if char.isdigit():
-            stripped_numeral = numeral[0:i]
-            break
+    #Remove inversion strings from seventh chords
+    if '6/5' in numeral or '4/3' in numeral or '4/2' in numeral:
+        stripped_numeral = numeral[0:-3]
+
+        #Half-dim7 chords don't need an additional 7
+        if 'ø' not in numeral:
+            stripped_numeral += '7'
+
+    #Remove inversion strings from triads
+    elif '6' in numeral or '6/4' in numeral:
+        stripped_numeral = numeral[0:-1]
 
     return stripped_numeral
 
 
 #### PUBLIC METHODS ####
+def get_aug6_numeral(numeral, key, note_names):
+    '''
+    Convert a chord numeral acting as an augmented sixth chord into a more common notation 
+    found in 20th-century classical music.
+
+        Parameters:
+            numeral (string): The numeral to convert
+            key (string): The key contextualizing the numeral.
+            note_names (array): The array of note names defining the chord the numeral represents.
+
+        Return: 
+            aug6_numeral: The numeral passed, converted if deemed necessary.
+    '''
+    
+    #The augmented-sixth numeral to return
+    aug6_numeral = numeral
+    
+    stripped_numeral = __strip_inversion_string(numeral)
+
+    #Accidentals and distinct notes making up the chord
+    note_accidentals = []
+    distinct_notes = []
+
+    for note in note_names:
+        note_accidentals.append(get_note_accidental_in_key(note, key))
+
+        if note not in distinct_notes:
+            distinct_notes.append(note)
+
+    #Italian and German augmented sixth chords for a minor key
+    if stripped_numeral == 'VI7' and '#' in note_accidentals:
+
+        if len(distinct_notes) == 4:
+            aug6_numeral = 'Ger+6'
+
+        else:
+            aug6_numeral = 'It+6'
+
+    #Italian and German augmented sixth chords for a Major key
+    elif stripped_numeral == 'bVI7':
+
+        if len(distinct_notes) == 4:
+            aug6_numeral = 'Ger+6'
+
+        else:
+            aug6_numeral = 'It+6'
+
+    #French augmented sixth chord
+    elif stripped_numeral in ['II7b5','VI7b5','bVI7b5']:
+        aug6_numeral = 'Fr+6'
+
+    return aug6_numeral
 
 
 def get_chord_relation_for_key(key, search_numeral):
-    """Returns the relation of a chord with the given numeral relative to the given key."""
+    '''Returns the relation of a chord numeral relative to the passed key.'''
 
     chord_relation = ''
 
@@ -367,60 +406,58 @@ def get_chord_relation_for_key(key, search_numeral):
         
 
 def get_chord_for_intervals(interval_string):
-    """Returns a chord's identification based on its intervals"""
+    '''Returns a chord's identification information based on its intervals.'''
 
     return INTERVAL_STRINGS[interval_string]
 
 
-def get_lt_numeral_for_dim7(diminished_numeral, use_inversion=True):
-    """Modifies the passed numeral as a new numeral built from the leading tone, if applicable.
-    True is returned if the diminished numeral was converted, and False otherwise.
-    """
+def get_lt_numeral_for_dim7(diminished_numeral):
+    '''
+    Returns the passed numeral as its equivalent built from the leading tone.
+    
+    Note: If the numeral cannot be re-arranged relative to the leading tone,
+    the numeral is instead returned un-altered.
+    '''
 
     lt_numeral = diminished_numeral
 
-    if use_inversion:
+    if lt_numeral == 'iio7':
+        lt_numeral = 'viio6/5'
 
-        if lt_numeral in ['bvio7','vio7']:
-            lt_numeral = 'viio4/2'
+    elif lt_numeral == 'ivo7':
+        lt_numeral = 'viio4/3'
 
-        elif lt_numeral == 'ivo7':
-            lt_numeral = 'viio4/3'
+    elif lt_numeral in ['bvio7', 'vio7']:
+        lt_numeral = 'viio4/2'
 
-        elif lt_numeral == 'iio7':
-            lt_numeral = 'viio6/5'
-
-        elif lt_numeral in ['viio7','#viio7']:
-            lt_numeral = 'viio7'
-
-    else:
+    elif lt_numeral in ['viio7', '#viio7']:
+        lt_numeral = 'viio7'
         
-        if lt_numeral in ['iio7','ivo7','bvio7','vio7','viio7','#viio7']:
-            lt_numeral = 'viio7'
-
     return lt_numeral
 
 
-def get_key_note_for_degree(key, degree):
-    """Returns the name of the note at the specified scale degree within the passed key."""
-    
-    key_notes = __get_notes_for_key(key)
-
-    return key_notes[degree]
-
-
 def get_leading_tone_in_key(key):
-    """Returns the leading tone for the passed key whether major or minor."""
+    '''Returns the leading tone for the passed key whether major or minor.'''
     
     key = key[0].upper() + key[1:]
 
-    return MAJOR_KEY_NOTES[key][6]
+    return get_note_name_for_degree(key, 7)
+
+
+def get_note_name_for_degree(key, degree):
+    '''Returns the name of the note at the specified scale degree within the passed key.'''
+    
+    key_notes = __get_notes_for_key(key)
+
+    return key_notes[degree-1]
 
 
 def get_note_degree_in_key(name, key):
-    """Searches for the given note in the passed key and returns the index where it occurs 
-        or -1 if it doesn't exist within the key.
-    """
+    '''
+    Returns the index of the passed note in the given key if it exists within the key.
+    
+    If the note does not exist in the key, -1 is returned instead.
+    '''
 
     key_notes = __get_notes_for_key(key)
     
@@ -434,12 +471,18 @@ def get_note_degree_in_key(name, key):
 
 
 def get_note_accidental_in_key(search_name, key):
-    """Searches for the given note in the passed key and returns its accidental string 
-        if it doesn't exist within the key.
-    """
+    '''
+    Searches for the given note in the passed key and returns its accidental string 
+    if it doesn't exist within the key.
+
+    Note: This function's output is meant for proper chord notation visually, i.e.
+    when chord numerals are to be rendered in a graphical setting.
+    '''
     
-    accidental_strings = ['bb', 'b', 'n', '#', 'x']
     accidental_index = 0
+
+    #The accidental string to return for the passed note
+    note_accidental = ''
    
     key_notes = __get_notes_for_key(key)
 
@@ -471,30 +514,34 @@ def get_note_accidental_in_key(search_name, key):
 
     #Return the appropriate accidental string for the note
     if search_note_index in (key_note_index + 2, key_note_index - 10):
-        return accidental_strings[accidental_index + 2]
+        note_accidental = ACCIDENTAL_STRINGS[accidental_index + 2]
 
     elif search_note_index in (key_note_index + 1, key_note_index - 11):
-        return accidental_strings[accidental_index + 1]
+        note_accidental = ACCIDENTAL_STRINGS[accidental_index + 1]
 
     elif search_note_index in (key_note_index - 1, key_note_index + 11):
-        return accidental_strings[accidental_index - 1]
+        note_accidental = ACCIDENTAL_STRINGS[accidental_index - 1]
  
     elif search_note_index in (key_note_index - 2, key_note_index + 10):
-        return accidental_strings[accidental_index - 2]
+        note_accidental = ACCIDENTAL_STRINGS[accidental_index - 2]
 
-    else:
-        return ''
+    return note_accidental
 
 
-def identify_chord_numeral_for_key(key, chord_info, get_inversion=True):
-    """Gets and returns the roman numeral for this chord relative to the passed key.
-    
-    This function searches through the major and minor triads or sevenths for this chord to determine its 
-    function within the passed key.
-    
-    If the chord is found within the passed key, and get_inversion == True, 
-    the inversion string is appended to the numeral.
-    """
+def identify_chord_numeral_for_key(key, chord_info):
+    '''
+    Identifies and returns the numeral for this chord relative to the passed key.
+
+    This function will alter the numeral with accidental strings and an inversion string
+    if required.
+
+        Parameters:
+            key (str): The key the chord is being identified for.
+            chord_info (dict): Information defining the chord to identify.
+
+        Return:
+            chord_numeral (str)
+    '''
 
     chord_numeral = ''
 
@@ -502,19 +549,22 @@ def identify_chord_numeral_for_key(key, chord_info, get_inversion=True):
     root_note = chord_info['root']
     position = chord_info['position']
     quality = chord_info['quality']
-    has_seventh = chord_info['has_seventh']
 
     #1) Get the notes for the appropriate key to search through
     key_diatonic_notes = __get_notes_for_key(key)  
 
-    #If the note is diatonic to the key, get the appropriate numeral by index
+    #2a) If the note is diatonic to the key, get the appropriate numeral by index
     if root_note in key_diatonic_notes:
         chord_numeral = NUMERAL_STRINGS[key_diatonic_notes.index(root_note)]
         
-    #If the note is not diatonic to the key, determine its altered numeral
+    #2b) If the note is not diatonic to the key, determine its altered numeral
     else:
+
+        #The index and value of the note diatonic to the key
         diatonic_note_index = 0
         diatonic_note_value = 0
+
+        #The value of the root note, chromatic to the key
         chromatic_note_value = NOTE_INDICES[root_note]
 
         #Search for the stripped note_name in the key's notes
@@ -526,153 +576,83 @@ def identify_chord_numeral_for_key(key, chord_info, get_inversion=True):
                 diatonic_note_value = NOTE_INDICES[note]
                 break
 
-        #Chromatic note uses a raised (sharp) note
+        #Set the accidental string for the chromatic note relative to the key's diatonic note
         if chromatic_note_value == diatonic_note_value + 1:
             chord_numeral = f'#{NUMERAL_STRINGS[diatonic_note_index]}'
 
-        #Chromatic note uses a raised (double sharp) note
         elif chromatic_note_value == diatonic_note_value + 2:
             chord_numeral = f'x{NUMERAL_STRINGS[diatonic_note_index]}'
 
-        #Chromatic note uses a lowered (flat) note
         elif chromatic_note_value == diatonic_note_value - 1:
             chord_numeral = f'b{NUMERAL_STRINGS[diatonic_note_index]}'
 
-        #Chromatic note uses a lowered (double flat) note
         else:
             chord_numeral = f'bb{NUMERAL_STRINGS[diatonic_note_index]}'
 
-    #2) Adjust the numeral based on chord quality if necessary
-    if quality == '+':
-        chord_numeral += '+'
-
-    elif quality == 'maj7':
-        chord_numeral += 'M'
-
-    elif quality in ['m', 'm7', 'ø', 'o', 'o7']:
+    #3) Chords of these qualities use a lower-case numeral
+    if quality in ['m', 'm7', 'ø', 'o', 'o7']:
         chord_numeral = chord_numeral.lower()
-    
-        if quality == 'ø':
-            chord_numeral += 'ø'
 
-        elif quality in ('o', 'o7'):
-            chord_numeral += 'o'
+    chord_numeral += CHORD_QUALITY_STRINGS[quality]
 
-    #3) Append the appropriate inversion string to the numeral if requested
-    if get_inversion:
+    #4) Append the appropriate inversion string to the numeral
+    if quality in ['', 'm', 'o', '+']:
+        chord_numeral += INVERSION_TRIAD_STRINGS[position]
 
-        if has_seventh:
-            chord_numeral += INVERSION_SEVENTH_STRINGS[position]
+    elif quality in ['7', 'm7', 'maj7', 'ø', 'o7']:
+        chord_numeral += INVERSION_SEVENTH_STRINGS[position]
 
-        else:
-            chord_numeral += INVERSION_TRIAD_STRINGS[position]
+        #Half-diminished chords don't add a 7 in root position 
+        if quality == 'ø' and position == 0:
+            chord_numeral = chord_numeral[0:-1]
 
     return chord_numeral
 
 
-def identify_applied_numeral(base_chord_key, base_chord_quality, applied_chord_info, use_inversion):
+def identify_applied_numeral(base_chord_key, base_chord_quality, applied_chord_info):
+    '''
+    Returns an applied dominant numeral describing the passed applied chord's relation
+    to the passed 'base' chord.
 
+    Parameters:
+        base_chord_key (str): The key to base the applied chord in
+        base_chord_quality (str): The quality of the base chord
+        applied_chord_info (dict): Chord properties defining the applied chord
+
+    Return:
+        applied_numeral or '' if the applied chord doesn't act as a dominant to the base chord
+
+    Note: Fully-diminished seventh chords act as applied dominants if they can be represented
+    as a leading tone fully-diminished seventh chord.
+    '''
+
+    #The applied numeral to reutrn
     applied_numeral = ''
 
     if base_chord_quality in ['','m','maj7','7','m7']:
 
-        #If the base chord is of minor quality, use a minor key
         if base_chord_quality in ['m', 'm7']:
             base_chord_key = base_chord_key.lower()
 
-        #Fully-diminished applied-dominant seventh chords are a special case, inversions must be checked for
+        #Check if a fully-diminished seventh chord can be based on the leading tone
         if applied_chord_info['quality'] == 'o7':
 
             diminished_numeral = identify_chord_numeral_for_key(base_chord_key, applied_chord_info)
-
-            diminished_numeral = get_lt_numeral_for_dim7(diminished_numeral, use_inversion)
+            diminished_numeral = get_lt_numeral_for_dim7(diminished_numeral)
 
             if diminished_numeral in ['viio7', 'viio6/5', 'viio4/3', 'viio4/2']:
                 applied_numeral = diminished_numeral
-                
-        else:
-            retrieved_numeral = identify_chord_numeral_for_key(base_chord_key, applied_chord_info, False)
 
-            #Dominant or leading tone triad
-            if retrieved_numeral in ['V', 'viio', 'viiø']:
+        else:
+            retrieved_numeral = identify_chord_numeral_for_key(base_chord_key, applied_chord_info)
+            stripped_numeral = __strip_inversion_string(retrieved_numeral)
+
+            #Dominant or leading tone triad or seventh chord
+            if stripped_numeral in ['V', 'V7', 'viio', 'viiø', 'viio7']:
                 applied_numeral = retrieved_numeral
 
-            #Leading tone triad in a minor key
-            elif retrieved_numeral in ['#viio', '#viiø']:
+            #Leading tone triad or seventh chord in a minor key
+            elif stripped_numeral in ['#viio', '#viiø']:
                 applied_numeral = retrieved_numeral[1:]
 
-            #If the chord was a applied dominant and the user wants its inversion string, append it to the numeral
-            if applied_numeral != '' and use_inversion:
-
-                if applied_chord_info['has_seventh']:
-                    applied_numeral += INVERSION_SEVENTH_STRINGS[applied_chord_info['position']]
-                
-                else:
-                    applied_numeral += INVERSION_TRIAD_STRINGS[applied_chord_info['position']]
-
     return applied_numeral
-
-def identify_secondary_dominant_numeral(applied_chord_name, applied_chord_position, applied_chord_has_seventh, base_chord_key, base_chord_quality):
-    """Identifies and returns the numeral for the applied chord if it is an applied dominant to the base chord."""
-
-    applied_dominant_numeral = ''
- 
-    #Only major and minor chords can have an applied dominant
-    if base_chord_quality in ['','m','maj7','7','m7']:
-
-        #Fully-diminished applied-dominant seventh chords are a special case, inversions must be checked for
-        if 'o7' in applied_chord_name:
-
-            diminished_numeral = identify_chord_numeral_for_key(base_chord_key, {'root': applied_chord_name[0:-2], 'quality': 'o7', 'position': 0, 'has_seventh': True}, True)
-
-            if diminished_numeral == 'bvio7':
-                applied_dominant_numeral = 'viio4/2'
-
-            elif diminished_numeral == 'ivo7':
-                applied_dominant_numeral = 'viio4/3'
-
-            elif diminished_numeral == 'iio7':
-                applied_dominant_numeral = 'viio6/5'
-
-            elif diminished_numeral == 'viio7':
-                applied_dominant_numeral = diminished_numeral
-
-        else:
-            if applied_chord_has_seventh:
-                base_major_chords = MAJOR_KEY_SEVENTHS[base_chord_key]
-                base_minor_chords = MINOR_KEY_SEVENTHS[base_chord_key]
-
-                #Check if the applied chord is V7 in some form
-                if applied_chord_name == base_major_chords[4]:
-                    applied_dominant_numeral += MAJOR_KEY_NUMERALS[4]
-
-                #Check if the applied chord is viiø in some form (special case requiring altered numeral)
-                elif applied_chord_name == base_major_chords[6]:
-                    applied_dominant_numeral += 'viiø'
-
-                #Check if the applied chord is viio7 in some form
-                elif applied_chord_name == base_minor_chords[7]:
-                    applied_dominant_numeral += base_minor_chords[6]
-
-            else:
-                base_major_chords = MAJOR_KEY_TRIADS[base_chord_key]
-                base_minor_chords = MINOR_KEY_TRIADS[base_chord_key]
-
-                #Check if the applied chord is V in root position (exclusive)
-                if applied_chord_name == base_major_chords[4] and applied_chord_position == 0:
-                    applied_dominant_numeral += MAJOR_KEY_NUMERALS[4]
-
-                #Check if the applied chord is viio in root position (exclusive)
-                elif applied_chord_name == base_major_chords[6] and applied_chord_position == 0:
-                    applied_dominant_numeral += MAJOR_KEY_NUMERALS[6]
-
-            #If the chord was a applied dominant, get its inversion string
-            if applied_dominant_numeral != '':
-
-                if applied_chord_has_seventh:
-                    applied_dominant_numeral += INVERSION_SEVENTH_STRINGS[applied_chord_position]
-                
-                else:
-                    applied_dominant_numeral += INVERSION_TRIAD_STRINGS[applied_chord_position]
-
-    return applied_dominant_numeral
