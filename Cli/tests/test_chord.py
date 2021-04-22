@@ -106,10 +106,9 @@ class TestChords:
 
                 expected_accidentals = expected_key_accidentals[j]
                 actual_accidentals = chord.get_accidentals_for_key(key)
-                print(chord)
 
                 for (expected, actual) in zip(expected_accidentals, actual_accidentals):
-                    assert expected == actual
+                    assert expected == actual, 'Chord: j Expected: ' + expected + ', Actual: ' + actual 
 
 
     ### TRIAD CHORD TESTING ###
@@ -254,6 +253,6 @@ class TestChords:
 
         #Validate the output numeral for every pair of chords
         for i, (base_chord, applied_chord) in enumerate(zip(test_base_chords, test_applied_chords)):
-            actual_out = applied_chord.get_secondary_dominant_numeral(base_chord)
+            actual_out = applied_chord.get_applied_numeral(base_chord)
 
-            assert actual_out == expected_out[i]
+            assert actual_out == expected_out[i], 'Mismatch - Index ' + str(i)

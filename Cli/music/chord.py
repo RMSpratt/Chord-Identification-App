@@ -1,18 +1,22 @@
-""" This module exports the Chord class representing a sequence of notes identifiable as a chord
-    and the ChordFactory class for creating chords.
-"""
+''' 
+This module exports the Chord class representing a sequence of notes identifiable as a chord
+and the ChordFactory class for creating chords.
+'''
 
-from .music_info import identify_chord_numeral_for_key, identify_secondary_dominant_numeral, get_chord_for_intervals, identify_applied_numeral
+from .music_info import identify_applied_numeral, identify_chord_numeral_for_key
+from .music_info import get_chord_for_intervals
 from .note import NoteFactory
 
 
 class ChordFactory:
-    """Factory Class responsible for handling the creation of Chords using passed string or JSON/Dict-formatted data."""
+    '''
+    Factory Class responsible for handling the creation of Chords using passed string or JSON/Dict-formatted data.
+    '''
 
     _note_factory = NoteFactory()
 
     def create_chord(self, chord_info):
-        """Creates a chord using the passed chord string information."""
+        '''Creates a chord using the passed chord string information.'''
 
         if isinstance(chord_info, str):
             chord_data = self.parse_chord_string(chord_info)
@@ -21,16 +25,16 @@ class ChordFactory:
             chord_data = self.parse_chord_dict(chord_info)
 
         else:
-            raise ValueError('Invalid chord information format received.')
+            raise ValueError('Invalid chord format received. Accepted types: str and dict')
 
         if chord_data['valid']:
             return Chord(chord_data['notes'])
-            
+
         else:
             raise ValueError(chord_data['error'])
 
     def parse_chord_dict(self, chord_dict):
-        """Parses the passed dict detailing this chord's notes into its individual notes."""
+        '''Parses the passed dict detailing this chord's notes into its individual notes.'''
 
         notes = chord_dict['notes']
         chord_data = self.parse_chord_string(notes)
@@ -38,7 +42,7 @@ class ChordFactory:
         return chord_data
 
     def parse_chord_string(self, chord_string):
-        """Parses the passed string detailing this chord's notes into its individual notes."""
+        '''Parses the passed string detailing this chord's notes into its individual notes.'''
 
         notes = chord_string.split(',')
 
@@ -71,13 +75,15 @@ class ChordFactory:
 
 
 class Chord:
-    """Class defining a chord as a series of 3+ notes with a specific pattern of intervals between them."""
+    '''
+    Class defining a chord as a series of 3+ notes and a defined quality and/or position
+    based on how the intervals are arranged.
+    '''
 
     def __init__(self, chord_notes):
         self.position = 0
         self.root_index = 0
         self.quality = ''
-        self.has_seventh = False
 
         #Set the notes to the ones passed
         self.notes = chord_notes
@@ -86,13 +92,15 @@ class Chord:
         self.__identify_chord()
 
     def __get_interval_string_info(self):
-        """Crafts this chord's interval string for identifying its name and quality.
+        '''
+        Crafts this chord's interval string for identifying its name and quality.
         
-            This method will iterate through all of the chord's listed intervals and create a string that only incorporates
-            the intervals between unique notes in the chord. Ex. C3 E3 G3 C4 will omit G3 -> C4
-        """
+        This method will iterate through all of the chord's listed intervals and 
+        create a string that only incorporates the intervals between unique notes in the chord. 
+        Ex. C3 E3 G3 C4 will omit G3 -> C4
+        '''
 
-        interval_string = ""
+        interval_string = ''
 
         #Create a temporary copy of this chord's notes
         unique_note_names = []
@@ -116,9 +124,7 @@ class Chord:
         return (interval_string, unique_notes)
 
     def find_notes_by_name(self, search_name):
-        """Searches for and returns the index/indices of any notes in this chord that match
-        the name provided.
-        """
+        '''Returns the indices of any notes in this chord that match the name provided.'''
 
         note_indicies = []
 
@@ -129,7 +135,7 @@ class Chord:
         return note_indicies
 
     def get_accidentals_for_key(self, key):
-        """Returns an array of accidentals for this chord's notes"""
+        '''Returns an array of accidentals for this chord's notes'''
 
         accidentals = []
 
@@ -139,9 +145,9 @@ class Chord:
         return accidentals
 
     def get_indices_from_interval(self, interval): 
-        """Returns the index or indicies of the note(s) with the specified interval from the 
-        chord's root note.
-        """
+        '''
+        Returns the indicies of the note(s) with the specified interval from the chord's root note.
+        '''
 
         root_note = self.notes[self.root_index]
         matching_notes = []
@@ -152,72 +158,120 @@ class Chord:
 
         return matching_notes
 
-    def get_root_name(self):
-        """Returns the name of this chord's root note."""
+    def get_note_names(self):
+        '''Returns an array of just this chord's note names.'''
+        chord_notes = []
 
-        return self.notes[self.root_index].name
+        for note in self.notes:
+            chord_notes.append(note.name)
+
+        return chord_notes
+
+    def get_note_name_at_index(self, index):
+        '''Returns the specified note's name at the passed index in the chord.'''
+
+        note_name = ''
+
+        try:
+            search_name = self.notes[index].name
+
+        except IndexError:
+            pass
+
+        else:
+            note_name = search_name
+
+        return note_name
+
+    def get_root_name(self):
+        '''Returns the name of this chord's root note.'''
+
+        return self.get_note_name_at_index(self.root_index)
 
     def get_seventh_index(self):
-        """Returns the index of this chord's seventh, if it has one."""
+        '''Returns the index of this chord's seventh, based on its quality.'''
 
         note_index = -1
+        root_note = self.notes[self.root_index]
+    
+        for i, note in enumerate(self.notes):
 
-        if self.has_seventh:
-            root_note = self.notes[self.root_index]
-        
-            for i, note in enumerate(self.notes):
+            if note.name != root_note.name:
+                interval = root_note.get_interval(note)
 
-                if note.name != root_note.name:
-                    interval = root_note.get_interval(note)
+                #The seventh note's interval from the root note depends on the chord's quality
+                if interval == 11 and self.quality == 'maj7':
+                    note_index = i
 
-                    #The seventh note's interval from the root note depends on the chord's quality
-                    if interval == 11 and self.quality == 'maj7':
-                        note_index = i
+                elif interval == 10 and self.quality in ['7', 'm7', 'ø']:
+                    note_index = i
 
-                    elif interval == 10 and self.quality in ['7', 'm7', 'ø']:
-                        note_index = i
+                elif interval == 9 and self.quality == 'o7':
+                    note_index = i
 
-                    elif interval == 9 and self.quality == 'o7':
-                        note_index = i
-
-                    if note_index != -1:
-                        break
+                if note_index != -1:
+                    break
 
         return note_index
 
     def get_name(self, slash_notation=False):
-        """Returns this chord's name in slash notation or in a normal."""
+        '''Returns this chord's name in slash notation or in a normal.'''
+
+        chord_name = ''
 
         if slash_notation and self.position != 0:
-            return f'{self.notes[self.root_index].name}{self.quality}/{self.notes[0].name}'
+            chord_name = f'{self.notes[self.root_index].name}{self.quality}/{self.notes[0].name}'
 
         else:
-            return f'{self.notes[self.root_index].name}{self.quality}'
+            chord_name = f'{self.notes[self.root_index].name}{self.quality}'
+
+        return chord_name
 
     def get_numeral_for_key(self, key, use_inversion=True):
-        """Returns this chord's numeral relative to the given key. The inversion string is included if specified."""
+        '''
+        Returns this chord's numeral relative to the given key. 
+        
+        Parameters:
+            key (str): The key to base the chord in for determining its numeral.
+            use_inversion (bool): Whether or not to use an inversion string for the numeral.
+
+        Return:
+            numeral (str)
+        '''
 
         numeral = ''
 
         if self.quality != 'unknown':
-            numeral = identify_chord_numeral_for_key(key, {"root": self.notes[self.root_index].name, 
-            "quality": self.quality, "position": self.position, "has_seventh": self.has_seventh}, use_inversion)
+
+            if use_inversion:
+                numeral = identify_chord_numeral_for_key(key, {'root': self.notes[self.root_index].name, 
+                'quality': self.quality, 'position': self.position})
+
+            else: 
+                numeral = identify_chord_numeral_for_key(key, {'root': self.notes[self.root_index].name, 
+                'quality': self.quality, 'position': 0})
 
         return numeral
 
-    def get_secondary_dominant_numeral(self, base_chord, use_inversion=True):
-        """Returns this chord's numeral as a secondary dominant for the passed chord, if it acts as one."""
+    def get_applied_numeral(self, base_chord, use_inversion=True):
+        '''Returns this chord's numeral as an applied dominant for the base chord.'''
 
         #Get the root of the passed chord from its root index as the 'key'
         base_chord_root = base_chord.get_root_name()
+        applied_numeral = ''
 
-        return identify_applied_numeral(base_chord_root, base_chord.quality, {'root': self.notes[self.root_index].name, 
-        'quality': self.quality, 'position': self.position, 'has_seventh': self.has_seventh}, use_inversion)
+        if use_inversion:
+            applied_numeral = identify_applied_numeral(base_chord_root, base_chord.quality, 
+            {'root': self.get_root_name(), 'quality': self.quality, 'position': self.position})
 
-        # return identify_secondary_dominant_numeral(self.get_name(), self.position, self.has_seventh, base_chord_key, second_chord.quality)
+        else:
+            applied_numeral = identify_applied_numeral(base_chord_root, base_chord.quality, 
+            {'root': self.get_root_name(), 'quality': self.quality, 'position': 0})
+
+        return applied_numeral
 
     def __identify_chord(self):
-        """Identifies the name and quality of this chord by determining its root index and position."""
+        '''Identifies the name and quality of this chord using its root index and position.'''
 
         interval_string, unique_notes = self.__get_interval_string_info()
 
@@ -248,19 +302,15 @@ class Chord:
             self.quality = chord_obj['quality']
             self.position = chord_obj['position']
 
-            #Check if this chord has a seventh
-            if self.quality in ['7','m7','maj7','ø','o7']:
-                self.has_seventh = True
-
     def __len__(self):
-        """Returns the number of notes in this chord"""
+        '''Returns the number of notes in this chord.'''
 
         return len(self.notes)
 
     def __repr__(self):
-        """Returns a simple string representation of the chord for its re-creation."""
+        '''Returns a simple string representation of the chord for its re-creation.'''
 
-        chord_string = ""
+        chord_string = ''
 
         #Reconstruct the chord string passed to this class instance
         for _, note in enumerate(self.notes):

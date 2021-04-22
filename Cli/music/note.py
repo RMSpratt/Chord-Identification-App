@@ -1,14 +1,14 @@
-"""
+'''
     This module exports the Note class with name and octave information and uses the
     NoteFactory class for the creation of notes.
-"""
+'''
 
 from .music_info import get_note_degree_in_key, get_note_accidental_in_key
 from .exceptions import InvalidNoteError
 
 
 class NoteFactory:
-    """This class is responsible for parsing note strings into proper note objects for a chord."""
+    '''This class is responsible for parsing note strings into proper note objects for a chord.'''
 
     #The set of possible note names recognized by the program
     _note_names = {
@@ -19,17 +19,17 @@ class NoteFactory:
     }
 
     #The set of octaves a note can be defined as
-    _note_octaves = [0,1,2,3,4,5,6,7]
+    _note_octaves = [0,1,2,3,4,5,6,7,8]
 
     def calculate_note_value(self, name, octave):
-        """Calculates the numerical value of a note by taking its position within an octave
+        '''Calculates the numerical value of a note by taking its position within an octave
             and multiplying by the number of octaves above C0 it is.
-        """
+        '''
 
         return self._note_names[name] + octave * 12
 
     def create_note(self, note_string):
-        """This factory method creates and returns a note using the passed note string."""
+        '''This factory method creates and returns a note using the passed note string.'''
 
         #Parse the note into its name and octave
         note_name, note_octave = self.parse_note(note_string)
@@ -46,7 +46,7 @@ class NoteFactory:
         return Note(note_name, note_octave, note_value, note_index)
 
     def parse_note(self, note_string):
-        """Parses a given note string into its letter and octave components."""
+        '''Parses a given note string into its letter and octave components.'''
 
         note_name = 'invalid'
         note_octave = -1
@@ -68,12 +68,12 @@ class NoteFactory:
 
 
 class Note:
-    """Class holding all information relevant for defining a music note.
+    '''Class holding all information relevant for defining a music note.
         name - The letter name of the note, i.e. C, Db, E, A#
         octave - The octave of the note, restricted to 0-7
         index - The semitone index of the note in the range C (0) -> B (11)
         value - The note's position on the keyboard using its index and octave
-    """
+    '''
 
     def __init__(self, name, octave, value, index):
         self.name = name
@@ -87,17 +87,25 @@ class Note:
     def __str__(self):
         return f'{self.name}{self.octave}'
 
-    def get_interval(self, other_note):
-        """Returns the interval between this note and the passed note."""
+    def get_interval(self, other_note, use_octave=False):
+        '''Returns the interval between this note and the passed note.'''
 
-        return (other_note.index - self.index) % 12
+        interval = 0
+
+        if use_octave:
+            interval = abs(other_note.value - self.value)
+            
+        else:
+            interval = (other_note.index - self.index) % 12
+
+        return interval
 
     def get_degree_in_key(self, key):
-        """Returns the scale degree of this note in the passed key."""
+        '''Returns the scale degree of this note in the passed key.'''
 
         return get_note_degree_in_key(self.name, key)
 
     def get_accidental_for_key(self, key):
-        """Returns this note's accidental string in the passed key if it has one."""
+        '''Returns this note's accidental string in the passed key if it has one.'''
 
         return get_note_accidental_in_key(self.name, key)

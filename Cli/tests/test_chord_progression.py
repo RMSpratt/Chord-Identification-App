@@ -28,7 +28,7 @@ class TestChordProgressions:
         if error_filter:
             actual_errors = list(filter(lambda error: error['type'] == error_filter, actual_errors))
 
-        assert len(expected_errors) == len(actual_errors)
+        assert len(expected_errors) == len(actual_errors), "# errors E:" + str(len(expected_errors)) + " A:" + str(len(actual_errors))
 
         for (expected, actual) in zip(expected_errors, actual_errors):
             assert expected['code'] == actual['code']
@@ -60,24 +60,48 @@ class TestChordProgressions:
             ['G2,G3,D4,Bb4','F#2,A3,Eb4,C5','G2,G3,D4,Bb4','A2,F#3,Eb4,C5','Bb2,G3,D4,D5','C3,G3,Eb4,C5',
             'D3,F#3,C4,A4','Eb3,G3,Bb3,G4'],'g')
 
-        progression_numerals = progression_one.get_progression_chord_numerals()
+        progression_numerals = progression_one.get_progression_chord_numerals(use_satb=True)
         expected_numerals = ['i','viio7','i','viio6/5','i6','iv','V7','VI']
 
         self.validate_chord_numerals(expected_numerals, progression_numerals)
-        
 
+        #I - V4/2 - I6 - viiø6/5 --> IV - Fr+6 - V - bVI
+        progression_two = self.create_progression(
+            ['Gb2,Bb3,Gb4,Db4','Cb2,Ab3,F4,Db4','Bb2,Bb3,Gb4,Db5','Db3,Bb3,Ab4,Fb5','Cb2,Cb3,Gb4,Eb5','C3,Bbb3,Gb4,Ebb5','Db3,Ab3,F4,Db5','Ebb3,Gb3,Gb4,Bbb4'],'Gb'
+        )
+
+        progression_numerals = progression_two.get_progression_chord_numerals(True,use_satb=True)
+        expected_numerals = ['I','V4/2','I6','viiø6/5/IV','IV','Ger+6','V','bVI']
+
+        self.validate_chord_numerals(expected_numerals, progression_numerals)
+
+        
     ### TESTING FOUR-PART HARMONY RULE VIOLATIONS ###
     def test_no_errors(self):
         """Test for chord progression with no errors."""
 
-        #I - V4/3 - viio4/3 - I6 - bVI - iv - iio6/5 - V - I
-        normal_progression = self.create_progression(
+        #I - V4/3 - viiø4/3 - I6 - bVI - iv - iio6/5 - V - I
+        progression_one = self.create_progression(
             ['E2,B3,E4,G#4', 'F#2,B3,D#4,A4', 'A2,C#4,F#4,D#5', 'G#2,B3,G#4,E5', 'C3,G3,E4,C5', 'A2,A3,E4,C5', 
-            'A2,C4,F#4,E5', 'B2,B3,F#4,D#5', 'E2,B3,G#4,E5'], 'E')
+            'A2,C4,F#4,E5', 'B2,B3,F#4,D#5', 'E2,B3,G#4,E5'], 'E'
+        )
 
-        test_errors = normal_progression.validate_progression()
+        prog_one_errors = progression_one.validate_progression()
 
-        assert len(test_errors) == 0
+        #i - viio7 - V4/3 - i6 - iv6 - N6 - V - VI - V6-> - iv - i6 - G6 - V7 - i
+        progression_two = self.create_progression(
+            ['F#2,A3,F#4,C#5','E#2,B3,G#4,D5','G#2,B3,E#4,C#5','A2,A3,F#4,C#5','D3,B3,F#4,D5','B2,B3,G4,D5',
+            'C#3,G3,E#4,C#5','D3,A3,F#4,F#5','A#2,F#3,F#4,C#5','B2,F#3,D4,B4','A2,A3,F#4,C#5','B#3,G#3,F#4,D4',
+            'C#3,G#3,E#4,C#5','F#2,A3,F#4,C#5'], 'f#'
+        ) 
+
+        prog_two_errors = progression_two.validate_progression()
+
+        for error in prog_one_errors:
+            print(error)
+
+        assert len(prog_one_errors) == 0
+        assert len(prog_two_errors) == 0
 
     def test_doubling_errors(self):
         """Test for errors with doubling tendancy tones in a chord."""
@@ -114,21 +138,23 @@ class TestChordProgressions:
         lt_errors_one = lt_prog_one.validate_progression()
         lt_expected_one = [{'code': 'ERR_UNRESOLVED_LT', 'type': 'resolution', 'chord_index': 3, 'voice_index': 0}]
 
+        self.validate_satb_errors(lt_expected_one, lt_errors_one, 'resolution')
+
         #I - iii - IV - V7
         lt_prog_two = self.create_progression(['Cb2,Cb3,Gb4,Eb5','Eb3,Bb3,Gb4,Eb5','Fb3,Ab3,Fb4,Cb4',
         'Gb3,Gb3,Fb4,Bb4'],'Cb')
-        
+
         lt_errors_two = lt_prog_two.validate_progression() 
         lt_expected_two = [{'code': 'ERR_UNRESOLVED_LT', 'type': 'resolution', 'chord_index': 2, 'voice_index': 1}]
-        
+
+        self.validate_satb_errors(lt_expected_two, lt_errors_two, 'resolution')
+
         #i - V/iv - iv
         lt_prog_three = self.create_progression(['D#3,A#3,F#4,D#5','D#3,A#3,Fx4,D#5','G#2,B3,D#4,B4'],'d#')
         
         lt_errors_three = lt_prog_three.validate_progression()
         lt_expected_three = [{'code': 'ERR_UNRESOLVED_LT', 'type': 'resolution', 'chord_index': 2, 'voice_index': 2}]
 
-        self.validate_satb_errors(lt_expected_one, lt_errors_one, 'resolution')
-        self.validate_satb_errors(lt_expected_two, lt_errors_two, 'resolution')
         self.validate_satb_errors(lt_expected_three, lt_errors_three, 'resolution')
 
     def test_movement_errors(self):
@@ -161,7 +187,7 @@ class TestChordProgressions:
             {'code': 'ERR_UNRESOLVED_7TH', 'type': 'resolution', 'chord_index': 4, 'voice_index': 3}
         ]
 
-        #i - viio - i - viio4/2 - i (Validate chord quality o7 resolution)
+        #i - viio7 - i - viio4/2 - i (Validate chord quality o7 resolution)
         seventh_prog_two = self.create_progression(['Ab3,Ab2,Cb4,Eb4','G2,Bb3,Fb4,Db5','Ab2,Cb4,Ab4,Eb5','G3,Fb2,Db4,Bb4','Ab2,Ab3,Eb4,Cb4'],'ab')
         
         seventh_errors_two = seventh_prog_two.validate_progression()
@@ -170,7 +196,7 @@ class TestChordProgressions:
             {'code': 'ERR_UNRESOLVED_7TH', 'type': 'resolution', 'chord_index': 4, 'voice_index': 0}
         ]
 
-        #I - IV7 - iiø6/5 - V (Validate chord quality maj7 and ø resolution)
+        #I - IVM7 - ii6/5 - V (Validate chord quality maj7)
         seventh_prog_three = self.create_progression(['Eb2,G3,Eb4,Bb4','Ab2,G3,Eb4,C5','Ab2,C4,F4,Eb5','Bb2,D4,F4,Bb4'], 'Eb')
         seventh_errors_three = seventh_prog_three.validate_progression()
         seventh_expected_three = [
