@@ -91,7 +91,7 @@ class TestChordProgressions:
         #i - viio7 - V4/3 - i6 - iv6 - N6 - V - VI - V6-> - iv - i6 - G6 - V7 - i
         progression_two = self.create_progression(
             ['F#2,A3,F#4,C#5','E#2,B3,G#4,D5','G#2,B3,E#4,C#5','A2,A3,F#4,C#5','D3,B3,F#4,D5','B2,B3,G4,D5',
-            'C#3,G3,E#4,C#5','D3,A3,F#4,F#5','A#2,F#3,F#4,C#5','B2,F#3,D4,B4','A2,A3,F#4,C#5','B#3,G#3,F#4,D4',
+            'C#3,B3,E#4,C#5','D3,A3,F#4,F#5','A#2,F#3,F#4,C#5','B2,F#3,D4,B4','A2,A3,F#4,C#5','B#3,G#3,F#4,D4',
             'C#3,G#3,E#4,C#5','F#2,A3,F#4,C#5'], 'f#'
         ) 
 

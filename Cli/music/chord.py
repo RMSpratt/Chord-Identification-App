@@ -120,7 +120,7 @@ class Chord:
         for i, curr_note in enumerate(unique_notes[0:-1]):
             next_note = unique_notes[i+1]
             interval_string += str((next_note.value - curr_note.value) % 12)
-            
+
         return (interval_string, unique_notes)
 
     def find_notes_by_name(self, search_name):
@@ -200,7 +200,7 @@ class Chord:
                 interval = root_note.get_interval(note)
 
                 #The seventh note's interval from the root note depends on the chord's quality
-                if interval == 11 and self.quality == 'maj7':
+                if interval == 11 and self.quality in ['maj7', 'mM7']:
                     note_index = i
 
                 elif interval == 10 and self.quality in ['7', 'm7', 'ø']:
@@ -281,7 +281,7 @@ class Chord:
         if chord_obj['quality'] == 'unknown':
             self.root_index = 0
             self.position = 0
-            self.quality = ''
+            self.quality = 'N/A'
 
         else:
 

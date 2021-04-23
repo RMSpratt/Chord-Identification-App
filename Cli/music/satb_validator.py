@@ -155,7 +155,6 @@ def __check_leading_resolution(prev_chord, curr_chord, key, prev_chord_index):
 
     #Search for the leading tone in the previous chord
     for i, note in enumerate(prev_chord.get_note_names()):
-        print(note)
         if note == leading_tone_name:
             leading_tone_index = i
             break
@@ -186,7 +185,6 @@ def __check_leading_resolution(prev_chord, curr_chord, key, prev_chord_index):
 
             #Else, return a resolution error
             else:
-                print('Add the error')
                 resolution_error = {'type': 'resolution', 'code': 'ERR_UNRESOLVED_LT', 
                 'details': {'chord_index': prev_chord_index, 'voice_index': leading_tone_index}}
 
@@ -285,6 +283,8 @@ def validate_progression(progression, key):
             continue    
         
         if curr_chord.quality not in _VALIDATION_SETTINGS['chord_types']:
+            print(curr_chord)
+            print(curr_chord.quality)
             progression_errors.append({'type': 'spelling', 'code': 'ERR_UNKNOWN_CHORD', 'details': {'chord_index': i}})
 
         #Check for applied chords or including the special case V/iv
@@ -306,9 +306,11 @@ def validate_progression(progression, key):
                             current_key = current_key.lower()
 
                     else:
+                        print(curr_chord)
                         progression_errors.append({'type': 'spelling', 'code': 'ERR_UNKNOWN_CHORD', 'details': {'chord_index': i}})
 
                 except IndexError:
+                    print(curr_chord)
                     progression_errors.append({'type': 'spelling', 'code': 'ERR_UNKNOWN_CHORD', 'details': {'chord_index': i}})
 
         #2) Get voice spacing errors
