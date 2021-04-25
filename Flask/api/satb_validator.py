@@ -93,18 +93,17 @@ def __check_voice_in_range(chord, chord_index):
 
     max_voice_ranges = _VALIDATION_SETTINGS['voice_range']
 
-    range_low_codes = ['ERR_BASS_LOW', 'ERR_TENOR_LOW', 'ERR_ALTO_LOW', 'ERR_SOPRANO_LOW']
-    range_high_codes = ['ERR_BASS_HIGH', 'ERR_TENOR_HIGH', 'ERR_ALTO_HIGH', 'ERR_SOPRANO_HIGH']
-
     range_errors = []
 
     for i, note in enumerate(chord.notes):
 
         if note.value < max_voice_ranges[i][0]:
-            range_errors.append({'type': 'range', 'code': range_low_codes[i], 'details': {'chord_index': chord_index}})
+            range_errors.append({'type': 'range', 'code': 'ERR_VOICE_LOW', 'details': 
+            {'chord_index': chord_index, 'voice_index': i}})
 
         elif note.value > max_voice_ranges[i][1]:
-            range_errors.append({'type': 'range', 'code': range_high_codes[i], 'details': {'chord_index': chord_index}})
+            range_errors.append({'type': 'range', 'code': 'ERR_VOICE_HIGH', 'details': 
+            {'chord_index': chord_index, 'voice_index': i}})
 
     return range_errors
 
@@ -155,7 +154,6 @@ def __check_leading_resolution(prev_chord, curr_chord, key, prev_chord_index):
 
     #Search for the leading tone in the previous chord
     for i, note in enumerate(prev_chord.get_note_names()):
-        print(note)
         if note == leading_tone_name:
             leading_tone_index = i
             break
@@ -186,7 +184,6 @@ def __check_leading_resolution(prev_chord, curr_chord, key, prev_chord_index):
 
             #Else, return a resolution error
             else:
-                print('Add the error')
                 resolution_error = {'type': 'resolution', 'code': 'ERR_UNRESOLVED_LT', 
                 'details': {'chord_index': prev_chord_index, 'voice_index': leading_tone_index}}
 

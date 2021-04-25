@@ -102,7 +102,6 @@ class ChordProgression():
 
                 chord_numerals.append(chord_numeral)
 
-        print(chord_numerals)
         return chord_numerals
 
     def get_progression_chord_names(self, slash_notation=False):

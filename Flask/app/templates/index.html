@@ -11,6 +11,10 @@
                 padding: 0px;
             }
 
+            a:hover {
+                cursor: pointer;
+            }
+
             html {
                 font-family: Arial, Helvetica, sans-serif;
                 font-size: 16px;
@@ -24,7 +28,34 @@
                 margin-bottom: 50px;
             }
 
+            header h1 {
+                display: inline-block;
+                width: 60%;
+            }
+
+            header nav {
+                float: right;
+                width: 30%;
+            }
+
+            form input[type=submit] {
+                font-size: 1rem;
+                margin: 10px 35%;
+                height: 1.5rem;
+                width: 30%;
+            }
+
+            form input[type=submit]:hover {
+                cursor: pointer;
+            }
+
+            header nav a {
+                display: inline-block;
+                width: 40%;
+            }
+
             label {
+                font-weight: bold;
                 margin-right: 5px;
             }
 
@@ -34,12 +65,13 @@
                 width: 48%;
             }
 
-            .form-chord label {
-                width: 30%;
+            .form-chord label, .form-select label {
+                display: inline-block;
+                width: 20%;
             }
 
             .form-chord input {
-                font-size: 0.75rem;
+                font-size: 0.9rem;
                 width: 70%;
             }
 
@@ -48,8 +80,17 @@
                 width: 48%;
             }
 
+            .form-select select {
+                font-size: 0.9rem;
+                width: 70%;
+            }
+
             .ghost-note {
                 opacity: 0;
+            }
+
+            #addChordBtn {
+                margin: 5px 0px;
             }
 
             #chord-builder-form {
@@ -66,7 +107,6 @@
 
             #progression-chords {
                 margin: 20px 0px;
-                min-height: 150px;
             }
 
             #stave-svg {
@@ -91,83 +131,47 @@
     <body>
         <header>
             <h1>Chord Progression Builder and Analysis Tool</h1>
+            <nav>
+                <a id="link-howTo" href ="{{ url_for('how_to') }}">How To Use</a>
+                <a id="link-satb">SATB Info</a>
+            </nav>
         </header>
         <main>
-            <form id="chord-builder-form" method="POST">
+            <!-- Chord Progression builder form -->
+            <form action="{{ url_for('analysis') }}" method="POST" id="chord-builder-form" novalidate>
                 <h2>Chord Progression Builder Form</h2>
+                {{ form.csrf_token }}
                 <div class="form-select">
-                    <label for="keyOptions">Key:</label>
-                    <select id="keyOptions" name="key">
-                        <option value="C" selected>C Major</option>
-                        <option value="G">G Major</option>
-                        <option value="D">D Major</option>
-                        <option value="A">A Major</option>
-                        <option value="E">E Major</option>
-                        <option value="B">B Major</option>
-                        <option value="F#">F# Major</option>
-                        <option value="C#">C# Major</option>
-                        <option value="F">F Major</option>
-                        <option value="Bb">Bb Major</option>
-                        <option value="Eb">Eb Major</option>
-                        <option value="Ab">Ab Major</option>
-                        <option value="Db">Db Major</option>
-                        <option value="Gb">Gb Major</option>
-                        <option value="Cb">Cb Major</option>
-                        <option value="Am">A minor</option>
-                        <option value="Em">E minor</option>
-                        <option value="F#m">F# minor</option>
-                        <option value="C#m">C# minor</option>
-                        <option value="G#m">G# minor</option>
-                        <option value="D#m">D# minor</option>
-                        <option value="A#m">A# minor</option>
-                        <option value="Dm">D minor</option>
-                        <option value="Gm">G minor</option>
-                        <option value="Cm">C minor</option>
-                        <option value="Fm">F minor</option>
-                        <option value="Bbm">Bb minor</option>
-                        <option value="Ebm">Eb minor</option>
-                        <option value="Abm">Ab minor</option>
-                    </select>
+                    {{form.key.label}}{{form.key}}
                 </div>
                 <div class="form-select">
-                    <label for="timeOptions">Time Signature:</label>
-                    <select id="timeOptions" name="time">
-                        <option value="4/4" selected>4/4</option>
-                        <option value="3/4">3/4</option>
-                        <option value="6/8">6/8</option>
-                        <option value="12/8">12/8</option>
-                    </select>
+                    {{form.time.label}}{{form.time}}
                 </div>
+                <!-- Chord inputs -->
                 <div id="progression-chords">
+                    {% for chord in form.chords %} 
                     <div class="form-chord">
-                        <label for="chordInput">Chord:</label>
-                        <input id="chordInput" type="text" name="chord">
-                    </div>
-                    <div class="form-chord">
-                        <label for="chordInput">Chord:</label>
-                        <input id="chordInput" type="text" name="chord">
-                    </div>
-                    <div class="form-chord">
-                        <label for="chordInput">Chord:</label>
-                        <input id="chordInput" type="text" name="chord">
-                    </div>
-                    <div class="form-chord">
-                        <label for="chordInput">Chord:</label>
-                        <input id="chordInput" type="text" name="chord">
-                    </div>
+                        <tr>
+                            <td>{{ chord.label }}</td>
+                            <td>{{ chord }}</td>
+                        </tr>
+                    </div>   
+                    {% endfor %}
                 </div>
+                <!-- Button to add new chord input fields -->
+                <button id="addChordBtn">Add Chord</button>
                 <div>
-                    <label for="displayPiano">Piano:</label>
-                    <input id="displayPiano" type="radio" name="chordDisplay" value="piano" checked>
-                    <label for="displaySATB">SATB:</label>
-                    <input id="displaySATB" type="radio" name="chordDisplay" value="SATB">
+                    {{form.display_options.label}}
+                    {% for option in form.display_options %}
+                        <tr>
+                            <td>{{ option }}</td>
+                            <td>{{ option.label }}</td>
+                        </tr>
+                    {% endfor %}
                 </div>
-                <div id="form-buttons">
-                    <button id="addChordBtn">Add Chord</button>
-                    <button>Generate Progression</button>
-                </div>
+                {{ form.sample }}
+                {{form.submit()}} 
             </form>
-            
             <div id='stave-svg'></div>
         </main>
         <script>
@@ -178,17 +182,18 @@
                 ev.preventDefault();
 
                 let formChordsSection = document.getElementById('progression-chords');
+                let numChords = formChordsSection.children.length;
 
                 let newChordDiv = document.createElement('div');
                 newChordDiv.setAttribute('class', 'form-chord');
 
                 let newChordLabel = document.createElement('label');
-                newChordLabel.setAttribute('for', 'newChord2');
+                newChordLabel.setAttribute('for', 'chords-' + numChords);
                 newChordLabel.innerText = "Chord:";
 
                 let newChordInput = document.createElement('input');
-                newChordInput.setAttribute('id', 'newChord2');
-                newChordInput.setAttribute('name', 'chord');
+                newChordInput.setAttribute('id', 'chords-' + numChords);
+                newChordInput.setAttribute('name', 'chords-' + numChords);
 
                 newChordDiv.appendChild(newChordLabel);
                 newChordDiv.appendChild(newChordInput);
@@ -197,489 +202,6 @@
         </script>
 
         <!-- Script to build the stave -->
-        <script>
-            let VF = Vex.Flow;
-
-            function buildStave(key, chords, time, drawMode = 'SATB') {
-
-                //The div to put the music stave svg inside
-                let staffDiv = document.getElementById('stave-svg');
-                staffDiv.innerHTML = '';
-
-                let noteFormatter = new VF.Formatter();
-
-                let staveInfo;
-                let voices;
-                let ghostNotes;
-
-                if (drawMode === 'piano') {
-                    staveInfo = getPianoVoices(chords, time);
-                    voices = staveInfo[0];
-                    ghostNotes = staveInfo[1];
-
-                    //Format each voice's notes and set their beam direction
-                    for (let i = 0; i < voices[0].length; i++) {
-                        for (let j = 0; j < voices.length; j++) {
-                            noteFormatter
-                                .joinVoices([voices[j][i]])
-                                .format([voices[j][i]], 375);
-                            VF.Beam.generateBeams(voices[j][i].tickables);
-                        }
-                    }
-
-                    drawFullSVG(voices, time, key, 'piano', staffDiv);
-
-                } else {
-                    staveInfo = getSATBVoices(chords, time);
-                    voices = staveInfo[0];
-                    ghostNotes = staveInfo[1];
-
-                    //Format each voice's notes and set their beam direction
-                    for (let i = 0; i < voices[0].length; i++) {
-                        for (let j = 0; j < voices.length; j++) {
-                            noteFormatter
-                                .joinVoices([voices[j][i]])
-                                .format([voices[j][i]], 375);
-
-                            if (j === 0 || j === 2) {
-                                VF.Beam.generateBeams(voices[j][i].tickables, {
-                                    stem_direction: -1,
-                                });
-                            } else {
-                                VF.Beam.generateBeams(voices[j][i].tickables, {
-                                    stem_direction: 1,
-                                });
-                            }
-                        }
-                    }
-
-                    drawFullSVG(voices, time, key, 'SATB', staffDiv);
-                }
-
-                //Iterate through the score's ghost notes and hide them
-                for (let note_id of ghostNotes) {
-                    note_id = 'vf-' + note_id;
-
-                    let ghostNote = document.getElementById(note_id).childNodes[0];
-                    ghostNote.setAttribute('class', 'ghost-note');
-                }
-
-                let modifierElements = document.getElementsByTagName('text');
-
-                //Set the vertical position of the chord numerals and chord names
-                for (let modifier of modifierElements) {
-                    let modifierText = modifier.innerHTML.toLowerCase();
-
-                    if (modifierText.includes('i') || modifierText.includes('v') || modifierText.includes('+') || modifierText.includes('n')) {
-                        modifier.setAttribute('y', 250);
-                    } else {
-                        modifier.setAttribute(
-                            'y',
-                            staffDiv.offsetHeight - (staffDiv.offsetHeight - 30)
-                        );
-                    }
-                }
-            }
-
-            function drawFullSVG(voices, time, key, chordMode, staveSvg) {
-
-                let LEAD_BAR_WIDTH = 450;
-                let BAR_WIDTH = 400;
-
-                let barXOffset = 15;
-                let trebleYOffset = 25;
-                let bassYOffset = 125;
-
-                //Create the svg renderer
-                let renderer = new VF.Renderer(staveSvg, VF.Renderer.Backends.SVG);
-                let context;
-
-                let numBars = voices[0].length;
-                let lineBarCount = 0;
-
-                renderer.resize(1275, 300 + (300 * (Math.floor(numBars / 3))));
-                context = renderer.getContext();
-
-                for (let i = 0; i < numBars; i++) {
-                    let trebleStave;
-                    let bassStave;
-                    let ornamentations = [];
-
-                    //The first bar of each line draws the key signature and clef
-                    if (i % 3 === 0) {
-  
-                        //If this isn't the first line, increment the y offsets and reset the x offset
-                        if (i > 0) {
-                            barXOffset = 15;
-                            trebleYOffset += 300;
-                            bassYOffset += 300;
-                        }
-
-                        trebleStave = new VF.Stave(barXOffset, trebleYOffset, LEAD_BAR_WIDTH);
-                        bassStave = new VF.Stave(barXOffset, bassYOffset, LEAD_BAR_WIDTH);
-
-                        ornamentations.push(
-                            new Vex.Flow.StaveConnector(trebleStave, bassStave).setType(3)
-                        );
-                        ornamentations.push(
-                            new Vex.Flow.StaveConnector(trebleStave, bassStave).setType(1)
-                        );
-
-                        trebleStave.addClef('treble').addKeySignature(key);
-                        bassStave.addClef('bass').addKeySignature(key);
-
-                        //The very first bar has the time signature
-                        if (i == 0) {
-                            trebleStave.addTimeSignature(time);
-                            bassStave.addTimeSignature(time);
-                        }
-                        barXOffset += 450
-                    }
-
-                    else {
-                        trebleStave = new VF.Stave(barXOffset, trebleYOffset, BAR_WIDTH);
-                        bassStave = new VF.Stave(barXOffset, bassYOffset, BAR_WIDTH);
-                        barXOffset += 400;
-                    }
-
-                    //Add the end barline to the last bar in the progression
-                    if (i == numBars - 1) {
-                        ornamentations.push(
-                            new Vex.Flow.StaveConnector(trebleStave, bassStave).setType(6)
-                        );
-                    }
-
-                    //Draw both staves and any ornamentations
-                    trebleStave.setContext(context).draw();
-                    bassStave.setContext(context).draw();
-
-                    for (let ornamentation of ornamentations) {
-                        ornamentation.setContext(context).draw();
-                    }
-
-                    //Draw the voices according to SATB notation rules
-                    if (chordMode === 'SATB') {
-                        voices[0][i].draw(context, bassStave);
-                        voices[1][i].draw(context, bassStave);
-                        voices[2][i].draw(context, trebleStave);
-                        voices[3][i].draw(context, trebleStave);
-                    }
-
-                    //Draw the treble and bass parts for the piano chord voicings
-                    else {
-                        voices[0][i].draw(context, trebleStave);
-                        voices[1][i].draw(context, bassStave);
-                    }
-                }
-            }
-
-            /* Function: getPianoVoices
-            * Description: This function separates notes in each chord to place them within the treble or bass clef.
-            */
-            function getPianoVoices(chords, timeSignature) {
-
-                //The array of voices in the treble and bass staves to be returned
-                let voices = [[], []];
-
-                //All of the notes to be drawn in the treble stave
-                let trebleVoiceNotes = [];
-
-                //All of the notes to be drawn in the bass stave
-                let bassVoiceNotes = [];
-
-                //All of the ghost notes in the progression
-                let ghostNotes = [];
-
-                //The number of bars in the progression
-                let barIndex = 0;
-
-                //The number of beats for the current bar
-                let barBeatCount = 1;
-
-                //The number of beats maximum allowed in a bar
-                let beatsPerBar =
-                    timeSignature.split('/')[0] * (4 / timeSignature.split('/')[1]);
-
-                //Initialize the trebleVoiceNotes and bassVoiceNotes arrays of arrays
-                trebleVoiceNotes.push([]);
-                bassVoiceNotes.push([]);
-
-                //Iterate through each chord of the progression
-                for (let chord of chords) {
-                    let accidentals = chord.accidentals;
-
-                    let trebleNotes = [];
-                    let trebleAccidentals = [];
-                    let bassNotes = [];
-                    let bassAccidentals = [];
-
-                    let newTrebleChord;
-                    let newBassChord;
-
-                    let chordName = new VF.ChordSymbol()
-                        .addText(chord.name)
-                        .setVertical('top')
-                        .setHorizontal('center');
-
-                    let chordNumeral = new VF.ChordSymbol()
-                        .addText(chord.numeral)
-                        .setVertical('bottom')
-                        .setHorizontal('center');
-
-                    console.log(chordNumeral);
-                    //If the number of beats has exceed the number allowed for the bar, create a new array to hold notes for the next bar
-                    if (barBeatCount > beatsPerBar) {
-                        barIndex += 1;
-                        barBeatCount = 1;
-                        trebleVoiceNotes.push([]);
-                        bassVoiceNotes.push([]);
-                    }
-
-                    //1) Separate each chord's notes into the appropriate stave
-                    chord.notes.forEach(function (note, i) {
-                        
-                        //Notes C4 or higher
-                        if (note.charAt(note.length - 1) >= 4) {
-                            trebleNotes.push(note);
-                            trebleAccidentals.push(accidentals[i]);
-                        }
-
-                        //Notes B3 or lower
-                        else {
-                            bassNotes.push(note);
-                            bassAccidentals.push(accidentals[i]);
-                        }
-                    });
-
-                    //2) Build the Treble clef StaveNote
-                    if (trebleNotes.length > 0) {
-                        newTrebleChord = new VF.StaveNote({
-                            clef: 'treble',
-                            keys: trebleNotes,
-                            duration: 'q',
-                        });
-                    } else {
-                        newTrebleChord = new VF.StaveNote({
-                            clef: 'treble',
-                            keys: ['b/4'],
-                            duration: 'q',
-                        });
-                        ghostNotes.push(newTrebleChord.attrs.id);
-                    }
-
-                    //3) Build the Bass clef StaveNote
-                    if (bassNotes.length > 0) {
-                        newBassChord = new VF.StaveNote({
-                            clef: 'bass',
-                            keys: bassNotes,
-                            duration: 'q',
-                        });
-                    } else {
-                        newBassChord = new VF.StaveNote({
-                            clef: 'bass',
-                            keys: ['d/3'],
-                            duration: 'q',
-                        });
-                        ghostNotes.push(newBassChord.attrs.id);
-                    }
-
-                    //4) Add the accidentals for the chord
-                    trebleAccidentals.forEach((accidental, i) => {
-                        if (accidental !== '') {
-                            newTrebleChord.addAccidental(i, new VF.Accidental(accidental));
-                        }
-                    });
-
-                    bassAccidentals.forEach((accidental, i) => {
-                        if (accidental !== '') {
-                            newBassChord.addAccidental(i, new VF.Accidental(accidental));
-                        }
-                    });
-
-                    //5) Add the chord name and numeral modifiers to the chords created
-                    newTrebleChord.addModifier(0, chordName);
-                    newBassChord.addModifier(0, chordNumeral);
-
-                    //6) Add the chord to the list of StaveNotes for the current bar
-                    trebleVoiceNotes[barIndex].push(newTrebleChord);
-                    bassVoiceNotes[barIndex].push(newBassChord);
-
-                    barBeatCount++;
-                }
-
-                //Build the arrays of voices to display
-                for (let i = 0; i < barIndex + 1; i++) {
-                    voices[0].push(
-                        new VF.Voice({ num_beats: 4, beat_value: 4 })
-                            .setStrict(false)
-                            .addTickables(trebleVoiceNotes[i])
-                    );
-
-                    voices[1].push(
-                        new VF.Voice({ num_beats: 4, beat_value: 4 })
-                            .setStrict(false)
-                            .addTickables(bassVoiceNotes[i])
-                    );
-                }
-
-                return [voices, ghostNotes];
-            }
-
-            /* Function: getSATBVoices
-            * Description: This function separates notes in each chord to match SATB voicing rules.
-            */
-            function getSATBVoices(chords, timeSignature) {
-
-                //The array of soprano, alto, tenor, and bass voices to be returned
-                let voices = [[], [], [], []];
-
-                let bassNotes = [[]];
-                let tenorNotes = [[]];
-                let altoNotes = [[]];
-                let sopranoNotes = [[]];
-
-                let ghostNotes = [];
-
-                let barIndex = 0;
-
-                let barBeatCount = 1;
-
-                let beatsPerBar =
-                    timeSignature.split('/')[0] * (4 / timeSignature.split('/')[1]);
-
-                for (let chord of chords) {
-                    let notes = [];
-                    let accidentals = chord.accidentals;
-
-                    let chordName = new VF.ChordSymbol()
-                        .addText(chord.name)
-                        .setVertical('top')
-                        .setHorizontal('center');
-
-                    let chordNumeral = new VF.ChordSymbol()
-                        .addText(chord.numeral)
-                        .setVertical('bottom')
-                        .setHorizontal('center');
-
-                    //If the number of beats has exceed the number allowed for the bar, create a new array to hold notes for the next bar
-                    if (barBeatCount > beatsPerBar) {
-                        barIndex += 1;
-                        barBeatCount = 1;
-                        sopranoNotes.push([]);
-                        altoNotes.push([]);
-                        tenorNotes.push([]);
-                        bassNotes.push([]);
-                    }
-
-                    notes.push(
-                        new VF.StaveNote({
-                            clef: 'bass',
-                            keys: [chord.notes[0]],
-                            duration: 'q',
-                        }),
-                        new VF.StaveNote({
-                            clef: 'bass',
-                            keys: [chord.notes[1]],
-                            duration: 'q',
-                        }),
-                        new VF.StaveNote({
-                            clef: 'treble',
-                            keys: [chord.notes[2]],
-                            duration: 'q',
-                        }),
-                        new VF.StaveNote({
-                            clef: 'treble',
-                            keys: [chord.notes[3]],
-                            duration: 'q',
-                        })
-                    );
-
-                    accidentals.forEach((accidental, i) => {
-                        
-                        if (accidental !== '') {
-                            notes[i].addAccidental(0, new VF.Accidental(accidental));
-                        }
-                    });
-
-                    //Add the name and numeral to the notes of the chord
-                    notes[3].addModifier(0, chordName);
-                    notes[0].addModifier(0, chordNumeral);
-
-                    //Save each note to the appropriate voice
-                    bassNotes[barIndex].push(notes[0]);
-                    tenorNotes[barIndex].push(notes[1]);
-                    altoNotes[barIndex].push(notes[2]);
-                    sopranoNotes[barIndex].push(notes[3]);
-
-                    barBeatCount++;
-                }
-
-                //Build the voice line for each bar of the progression
-                for (let i = 0; i < barIndex + 1; i++) {
-                    voices[0].push(
-                        new VF.Voice({ num_beats: 4, beat_value: 4 })
-                            .setStrict(false)
-                            .addTickables(bassNotes[i])
-                    );
-
-                    voices[1].push(
-                        new VF.Voice({ num_beats: 4, beat_value: 4 })
-                            .setStrict(false)
-                            .addTickables(tenorNotes[i])
-                    );
-
-                    voices[2].push(
-                        new VF.Voice({ num_beats: 4, beat_value: 4 })
-                            .setStrict(false)
-                            .addTickables(altoNotes[i])
-                    );
-
-                    voices[3].push(
-                        new VF.Voice({ num_beats: 4, beat_value: 4 })
-                            .setStrict(false)
-                            .addTickables(sopranoNotes[i])
-                    );
-                }
-
-                return [voices, ghostNotes];
-            }
-
-            $(document).on('submit', '#chord-builder-form', function (e) {
-                e.preventDefault();
-
-                let chordInputs = $('input[name="chord"]');
-                let chordString = '';
-
-                let chordDisplay = document.querySelector('input[name="chordDisplay"]:checked').value;
-
-                for (let chordIN of chordInputs) {
-                    if (chordIN.value !== '') {
-                        chordString += chordIN.value + '|';
-                    }
-                }
-
-                $.ajax({
-                    type: 'POST',
-                    url: '/analysis',
-                    data: {
-                        key: $('#keyOptions').val(),
-                        time: $('#timeOptions').val(),
-                        chords: chordString,
-                    },
-                    success: function (data) {
-                        if (data.key !== null && data.chords.error === undefined) {
-                            buildStave(
-                                data.key,
-                                data.chords.chords,
-                                data.time,
-                                chordDisplay
-                            );
-                        }
-                    },
-                });
-            });
-
-
-        </script>
+        <script src="{{ url_for('static', filename='scripts/staveBuilder.js') }}"></script>
     </body>
 </html>

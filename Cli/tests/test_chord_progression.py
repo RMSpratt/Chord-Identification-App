@@ -97,9 +97,6 @@ class TestChordProgressions:
 
         prog_two_errors = progression_two.validate_progression()
 
-        for error in prog_one_errors:
-            print(error)
-
         assert len(prog_one_errors) == 0
         assert len(prog_two_errors) == 0
 
