@@ -93,17 +93,18 @@ def __check_voice_in_range(chord, chord_index):
 
     max_voice_ranges = _VALIDATION_SETTINGS['voice_range']
 
+    range_low_codes = ['ERR_BASS_LOW', 'ERR_TENOR_LOW', 'ERR_ALTO_LOW', 'ERR_SOPRANO_LOW']
+    range_high_codes = ['ERR_BASS_HIGH', 'ERR_TENOR_HIGH', 'ERR_ALTO_HIGH', 'ERR_SOPRANO_HIGH']
+
     range_errors = []
 
     for i, note in enumerate(chord.notes):
 
         if note.value < max_voice_ranges[i][0]:
-            range_errors.append({'type': 'range', 'code': 'ERR_VOICE_LOW', 'details': 
-            {'chord_index': chord_index, 'voice_index': i}})
+            range_errors.append({'type': 'range', 'code': range_low_codes[i], 'details': {'chord_index': chord_index}})
 
         elif note.value > max_voice_ranges[i][1]:
-            range_errors.append({'type': 'range', 'code': 'ERR_VOICE_HIGH', 'details': 
-            {'chord_index': chord_index, 'voice_index': i}})
+            range_errors.append({'type': 'range', 'code': range_high_codes[i], 'details': {'chord_index': chord_index}})
 
     return range_errors
 
@@ -176,14 +177,8 @@ def __check_leading_resolution(prev_chord, curr_chord, key, prev_chord_index):
                 if note == leading_tone_name:
                     new_leading_tone_index = i
 
-            #If the leading tone was passed to the current chord, return a warning for a delayed resolution
-            if new_leading_tone_index != -1:
-                resolution_error = {'type': 'warning', 'code': 'WARN_DELAYED_LT', 
-                'details': {'chord_index': prev_chord_index, 'lt_index': new_leading_tone_index, 
-                'resolve_notes': resolution_values}}
-
-            #Else, return a resolution error
-            else:
+            #If the leading tone wasn't passed to the next chord, it's a resolution error
+            if new_leading_tone_index == -1:
                 resolution_error = {'type': 'resolution', 'code': 'ERR_UNRESOLVED_LT', 
                 'details': {'chord_index': prev_chord_index, 'voice_index': leading_tone_index}}
 
@@ -260,7 +255,6 @@ def __get_dim7_seventh_index(chord, key):
 def validate_progression(progression, key):
     '''Central function to validate the passed chord progression according to SATB notation rules.'''
 
-    progression_warnings = []
     progression_errors = []
 
     #Hold the previous chord while iterating for resolution errors
@@ -345,12 +339,7 @@ def validate_progression(progression, key):
                         progression_errors.append(error)
                 
                 if error := __check_leading_resolution(prev_chord, curr_chord, current_key, i-1): 
-
-                    if error['type'] == 'warning':
-                        progression_warnings.append(error)
-
-                    else:
-                        progression_errors.append(error)
+                    progression_errors.append(error)
 
         #Save the current chord's information for validating cross-chord errors
         prev_chord = curr_chord

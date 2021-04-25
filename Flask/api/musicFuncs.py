@@ -87,6 +87,7 @@ def __format_satb_errors(satb_errors):
 
     satb_voice_indices = {0: 'Soprano', 1: 'Alto', 2: 'Tenor', 3: 'Bass'}
 
+    #The list of error messages to be sent to the client
     error_messages = []
 
     for error in satb_errors:
@@ -127,7 +128,7 @@ def __format_satb_errors(satb_errors):
             if error['code'] == 'ERR_SA_DISTANCE':
                 new_message = f'Too much distance between soprano and alto voices in chord {chord_index}.'
             
-            elif error['code'] == 'ERR_SA_DISTANCE':
+            elif error['code'] == 'ERR_AT_DISTANCE':
                 new_message = f'Too much distance between alto and tenor voices in chord {chord_index}.'
 
             if error['code'] == 'ERR_TB_DISTANCE':
@@ -158,9 +159,8 @@ def __format_satb_errors(satb_errors):
                 new_message += f' in the voices {voice_one_name} {voice_two_name}.'
 
             else:
-                if error['code'] == 'ERR_PARALLEL_5TH':
-                    new_message = f'Parallel 8ves between chords {prev_chord_index} and {curr_chord_index}'
-                    new_message += f' in the voices {voice_one_name} {voice_two_name}.'
+                new_message = f'Parallel 8ves between chords {prev_chord_index} and {curr_chord_index}'
+                new_message += f' in the voices {voice_one_name} {voice_two_name}.'
 
         error_messages.append(new_message)
 

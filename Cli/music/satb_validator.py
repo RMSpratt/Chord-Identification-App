@@ -177,14 +177,8 @@ def __check_leading_resolution(prev_chord, curr_chord, key, prev_chord_index):
                 if note == leading_tone_name:
                     new_leading_tone_index = i
 
-            #If the leading tone was passed to the current chord, return a warning for a delayed resolution
-            if new_leading_tone_index != -1:
-                resolution_error = {'type': 'warning', 'code': 'WARN_DELAYED_LT', 
-                'details': {'chord_index': prev_chord_index, 'lt_index': new_leading_tone_index, 
-                'resolve_notes': resolution_values}}
-
-            #Else, return a resolution error
-            else:
+            #If the leading tone wasn't passed to the next chord, it's a resolution error
+            if new_leading_tone_index == -1:
                 resolution_error = {'type': 'resolution', 'code': 'ERR_UNRESOLVED_LT', 
                 'details': {'chord_index': prev_chord_index, 'voice_index': leading_tone_index}}
 
@@ -261,7 +255,6 @@ def __get_dim7_seventh_index(chord, key):
 def validate_progression(progression, key):
     '''Central function to validate the passed chord progression according to SATB notation rules.'''
 
-    progression_warnings = []
     progression_errors = []
 
     #Hold the previous chord while iterating for resolution errors
@@ -283,8 +276,6 @@ def validate_progression(progression, key):
             continue    
         
         if curr_chord.quality not in _VALIDATION_SETTINGS['chord_types']:
-            print(curr_chord)
-            print(curr_chord.quality)
             progression_errors.append({'type': 'spelling', 'code': 'ERR_UNKNOWN_CHORD', 'details': {'chord_index': i}})
 
         #Check for applied chords or including the special case V/iv
@@ -306,11 +297,9 @@ def validate_progression(progression, key):
                             current_key = current_key.lower()
 
                     else:
-                        print(curr_chord)
                         progression_errors.append({'type': 'spelling', 'code': 'ERR_UNKNOWN_CHORD', 'details': {'chord_index': i}})
 
                 except IndexError:
-                    print(curr_chord)
                     progression_errors.append({'type': 'spelling', 'code': 'ERR_UNKNOWN_CHORD', 'details': {'chord_index': i}})
 
         #2) Get voice spacing errors
@@ -350,12 +339,7 @@ def validate_progression(progression, key):
                         progression_errors.append(error)
                 
                 if error := __check_leading_resolution(prev_chord, curr_chord, current_key, i-1): 
-
-                    if error['type'] == 'warning':
-                        progression_warnings.append(error)
-
-                    else:
-                        progression_errors.append(error)
+                    progression_errors.append(error)
 
         #Save the current chord's information for validating cross-chord errors
         prev_chord = curr_chord
