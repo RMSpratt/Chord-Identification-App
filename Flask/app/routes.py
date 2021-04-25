@@ -15,13 +15,14 @@ def analysis():
 
     form = ProgressionBuilderForm(request.form)
     chords = form.chords.data
-    key = form.key.data
-    time = form.time.data
+    key_signature = form.key.data
+    time_signature = form.time.data
     display_format = form.display_options.data or 'piano'
+    analyze_satb = form.analyze_satb.data
 
-    progression_info = musicFuncs.analyze_progression(chords, key)
+    progression_info = musicFuncs.analyze_progression(chords, key_signature, analyze_satb)
 
-    return {'chords': progression_info, 'time': time, 'key': key, 'displayForm': display_format}
+    return {'chords': progression_info, 'time': time_signature, 'key': key_signature, 'displayForm': display_format}
 
 
 @app.route('/how_to')

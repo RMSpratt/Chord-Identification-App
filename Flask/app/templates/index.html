@@ -1,10 +1,16 @@
 <!DOCTYPE html>
-<html>
+<html lang='en'>
     <head>
-        <script src="https://aarondavidnewman.github.io/vexflow_smoosic/releases/vexflow-debug.js"></script>
-        <script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+        <meta charset='UTF-8'>
+        <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+        <title>Chord Progression Builder and Analysis Tool</title>
+        <link rel="preconnect" href="https://fonts.gstatic.com"> 
+        <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+        <script src='https://aarondavidnewman.github.io/vexflow_smoosic/releases/vexflow-debug.js'></script>
+        <script src='https://code.jquery.com/jquery-3.5.1.js' integrity='sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=' crossorigin='anonymous'></script>
         <style>
 
+            /* TAG SELECTORS */
             * {
                 box-sizing: border-box;
                 margin: 0px;
@@ -15,27 +21,22 @@
                 cursor: pointer;
             }
 
-            html {
-                font-family: Arial, Helvetica, sans-serif;
-                font-size: 16px;
+            /* Styling for the Progression Builder Form */
+            form {
+                background-color: hsl(29,80%,60%);
+                border: 2px solid hsl(19,80%,25%);
+                margin: 50px auto;
+                padding: 10px 2.5%;
+                width: 50%;
             }
 
-            header {
-                background-color: orange;
-                box-shadow: 0 5px 5px darkorange;
-                height: 75px;
-                padding: 20px 5px;
-                margin-bottom: 50px;
+            form h2 {
+                margin-bottom: 20px;
+                text-align: center;
             }
 
-            header h1 {
-                display: inline-block;
-                width: 60%;
-            }
-
-            header nav {
-                float: right;
-                width: 30%;
+            form input {
+                border: 1px solid hsl(19,80%,25%);
             }
 
             form input[type=submit] {
@@ -49,20 +50,61 @@
                 cursor: pointer;
             }
 
-            header nav a {
+            html {
+                font-family: Calibri, 'Trebuchet MS', sans-serif;
+                font-size: 16px;
+            }
+
+            header {
+                background-color: hsl(29,80%,60%);
+                box-shadow: 0 5px 5px hsl(29,80%,40%);
+                height: 75px;
+                padding: 20px 2.5%;
+                margin-bottom: 50px;
+            }
+
+            header a {
                 display: inline-block;
                 width: 40%;
             }
 
+            header h1 {
+                display: inline-block;
+                width: 65%;
+            }
+
+            header nav {
+                float: right;
+                height: 25px;
+                margin: 20px 0px;
+                text-align: center;
+                width: 30%;
+            }
+
             label {
+                font-size: 1rem;
                 font-weight: bold;
                 margin-right: 5px;
             }
 
+            input, select {
+                font-size: 1rem;
+            }
+
+            /* CLASS SELECTORS */
             .form-chord {
                 display: inline-block;
                 margin: 10px 0px;
-                width: 48%;
+                max-height: 35px;
+                width: 47.5%;
+            }
+
+            .form-chord:nth-child(odd) {
+                margin-right: 5%;
+            }
+
+            .form-chord input {
+                width: 75%;
             }
 
             .form-chord label, .form-select label {
@@ -70,43 +112,54 @@
                 width: 20%;
             }
 
-            .form-chord input {
-                font-size: 0.9rem;
-                width: 70%;
+            .form-section {
+                font-size: 0px;
+                margin: 25px 0px;
             }
 
             .form-select {
                 display: inline-block;
-                width: 48%;
+                width: 47.5%;
+            }
+
+            .form-select:first-of-type {
+                margin-right: 5%;
             }
 
             .form-select select {
-                font-size: 0.9rem;
-                width: 70%;
+                width: 75%;
             }
 
             .ghost-note {
                 opacity: 0;
             }
 
-            #addChordBtn {
-                margin: 5px 0px;
+            /* ID SELECTORS */
+            #form-add-btn {
+                display: inline-block;
+                font-size: 0.75rem;
+                margin: 0 35%;
+                height: 1.5rem;
+                width: 30%;
             }
 
-            #chord-builder-form {
-                border: 2px solid black;
-                margin: 0 auto;
-                padding: 10px 2%;
+            #form-add-btn:hover {
+                cursor: pointer;
+            }
+
+            #form-display-options input { 
+                margin-left: 10%;
+                margin-right: 5px;
+            }
+
+            #satb-error-panel {
+                margin: 50px auto;
                 width: 50%;
             }
 
-            #chord-builder-form h2 {
-                margin-bottom: 20px;
+            #satb-error-panel h2 {
+                margin-bottom: 25px;
                 text-align: center;
-            }
-
-            #progression-chords {
-                margin: 20px 0px;
             }
 
             #stave-svg {
@@ -114,94 +167,90 @@
                 overflow: auto;
                 width: 90%;
             }
-
-            button {
-                font-size: 0.75rem;
-                margin: 0 9%;
-                height: 1.5rem;
-                width: 30%;
-            }
-
-            button:hover {
-                cursor: pointer;
-            }
-
         </style>
     </head>
     <body>
         <header>
             <h1>Chord Progression Builder and Analysis Tool</h1>
             <nav>
-                <a id="link-howTo" href ="{{ url_for('how_to') }}">How To Use</a>
-                <a id="link-satb">SATB Info</a>
+                <a id='link-howTo' href ='{{ url_for('how_to') }}'>How To Use</a>
+                <a id='link-satb'>SATB Info</a>
             </nav>
         </header>
         <main>
             <!-- Chord Progression builder form -->
-            <form action="{{ url_for('analysis') }}" method="POST" id="chord-builder-form" novalidate>
+            <form action='{{ url_for('analysis') }}' method='POST' id='chord-builder-form' novalidate>
                 <h2>Chord Progression Builder Form</h2>
                 {{ form.csrf_token }}
-                <div class="form-select">
-                    {{form.key.label}}{{form.key}}
+                <div class='form-section'>
+                    <div class='form-select'>
+                        {{ form.key.label }}{{ form.key }}
+                    </div>
+                    <div class='form-select'>
+                        {{ form.time.label }}{{ form.time }}
+                    </div>
                 </div>
-                <div class="form-select">
-                    {{form.time.label}}{{form.time}}
-                </div>
-                <!-- Chord inputs -->
-                <div id="progression-chords">
-                    {% for chord in form.chords %} 
-                    <div class="form-chord">
-                        <tr>
-                            <td>{{ chord.label }}</td>
-                            <td>{{ chord }}</td>
-                        </tr>
-                    </div>   
-                    {% endfor %}
+                <div class='form-section'>
+                    <div id='form-chords'>
+                        {% for chord in form.chords -%} 
+                            <div class='form-chord'>
+                                {{ chord.label }}{{ chord }}
+                            </div>   
+                        {%- endfor %}
+                    </div>
                 </div>
                 <!-- Button to add new chord input fields -->
-                <button id="addChordBtn">Add Chord</button>
-                <div>
+                <button id='form-add-btn'>Add Chord</button>
+                <div id='form-display-options' class='form-section'>
                     {{form.display_options.label}}
                     {% for option in form.display_options %}
-                        <tr>
-                            <td>{{ option }}</td>
-                            <td>{{ option.label }}</td>
-                        </tr>
+                        {{ option }}{{ option.label }}
                     {% endfor %}
                 </div>
-                {{ form.sample }}
+                <div class='form-section'>
+                    {{ form.analyze_satb.label }}{{ form.analyze_satb }}
+                </div>
                 {{form.submit()}} 
             </form>
+
+            <!-- The musical stave to be drawn -->
             <div id='stave-svg'></div>
+            <div id='satb-error-panel'></div>
         </main>
         <script>
 
-            let addBtn = document.getElementById('addChordBtn');
+            let addBtn = document.getElementById('form-add-btn');
 
             addBtn.onclick = (ev) => {
                 ev.preventDefault();
 
-                let formChordsSection = document.getElementById('progression-chords');
+                let formChordsSection = document.getElementById('form-chords');
                 let numChords = formChordsSection.children.length;
 
-                let newChordDiv = document.createElement('div');
-                newChordDiv.setAttribute('class', 'form-chord');
+                if (numChords < 24) {
+                    let newChordDiv = document.createElement('div');
+                    newChordDiv.setAttribute('class', 'form-chord');
 
-                let newChordLabel = document.createElement('label');
-                newChordLabel.setAttribute('for', 'chords-' + numChords);
-                newChordLabel.innerText = "Chord:";
+                    let newChordLabel = document.createElement('label');
+                    newChordLabel.setAttribute('for', 'chords-' + numChords);
+                    newChordLabel.innerText = 'Chord:';
 
-                let newChordInput = document.createElement('input');
-                newChordInput.setAttribute('id', 'chords-' + numChords);
-                newChordInput.setAttribute('name', 'chords-' + numChords);
+                    let newChordInput = document.createElement('input');
+                    newChordInput.setAttribute('id', 'chords-' + numChords);
+                    newChordInput.setAttribute('name', 'chords-' + numChords);
 
-                newChordDiv.appendChild(newChordLabel);
-                newChordDiv.appendChild(newChordInput);
-                formChordsSection.appendChild(newChordDiv);
+                    newChordDiv.appendChild(newChordLabel);
+                    newChordDiv.appendChild(newChordInput);
+                    formChordsSection.appendChild(newChordDiv);
+                }
+
+                else {
+                    window.alert('Only a maximum of 24 chords are permitted for generation.');
+                }
             }
         </script>
 
         <!-- Script to build the stave -->
-        <script src="{{ url_for('static', filename='scripts/staveBuilder.js') }}"></script>
+        <script src='{{ url_for('static', filename='scripts/staveBuilder.js') }}'></script>
     </body>
 </html>
