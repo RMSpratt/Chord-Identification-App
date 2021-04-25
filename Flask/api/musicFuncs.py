@@ -85,10 +85,12 @@ def __format_chord(chord):
 def __format_satb_errors(satb_errors):
     '''Converts retrieved errors in a SATB progression to user-friendly messages.'''
 
-    satb_voice_indices = {0: 'Soprano', 1: 'Alto', 2: 'Tenor', 3: 'Bass'}
+    satb_voice_indices = {0: 'Bass', 1: 'Tenor', 2: 'Alto', 3: 'Soprano'}
 
     #The list of error messages to be sent to the client
     error_messages = []
+
+    print(satb_errors)
 
     for error in satb_errors:
         new_message = ''
@@ -136,14 +138,15 @@ def __format_satb_errors(satb_errors):
 
         #Tendancy tone resolution errors
         elif error['type'] == 'resolution':
+            chord_index = error['details']['chord_index']
             voice_index = error['details']['voice_index']
             voice_name = satb_voice_indices[voice_index]
 
             if error['code'] == 'ERR_UNRESOLVED_LT':
-                new_message = f'Unresolved {voice_name} leading tone in chord {chord_index}.'
+                new_message = f'Unresolved leading tone in chord {chord_index} {voice_name} voice.'
 
             else:
-                new_message = f'Unresolved {voice_name} chordal seventh in chord {chord_index}.'
+                new_message = f'Unresolved seventh in chord {chord_index} {voice_name} voice.'
             
         #Movement errors
         elif error['type'] == 'movement':

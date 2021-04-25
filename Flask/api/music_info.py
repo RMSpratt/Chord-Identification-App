@@ -17,9 +17,7 @@ CHORD_QUALITY_STRINGS.update({
     '+': '+',
     'sus2': 'sus2',
     'sus4': 'sus4',
-    'b5': 'b5',
     'maj7': 'M',
-    'mM7': 'M7',
     'm7': '',
     'ø': 'ø',
     'o7': 'o',
@@ -623,7 +621,7 @@ def identify_chord_numeral_for_key(key, chord_info):
             chord_numeral = f'bb{NUMERAL_STRINGS[diatonic_note_index]}'
 
     #3) Chords of these qualities use a lower-case numeral
-    if quality in ['m', 'm7', 'ø', 'o', 'o7', 'mM7']:
+    if quality in ['m', 'm7', 'ø', 'o', 'o7']:
         chord_numeral = chord_numeral.lower()
 
     chord_numeral += CHORD_QUALITY_STRINGS[quality]

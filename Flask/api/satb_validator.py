@@ -13,7 +13,7 @@ from .music_info import get_chord_relation_for_key, get_lt_numeral_for_dim7
 _VALIDATION_SETTINGS = {
     'max_distance': [12, 12, 24],
     'voice_range': [[26,50],[36,57],[43,62],[47,69]],
-    'chord_types': ['','m','o','+','7','M7','m7','ø','o7', '7b5'],
+    'chord_types': ['','m','o','+','7','maj7','m7','ø','o7','7b5'],
     'seventh_chords': ['7','maj7','m7','ø','o7'],
     'special_chromatic_chords': ['bII','bVI7','VI7','II7b5','VI7b5']
 }
@@ -93,18 +93,17 @@ def __check_voice_in_range(chord, chord_index):
 
     max_voice_ranges = _VALIDATION_SETTINGS['voice_range']
 
-    range_low_codes = ['ERR_BASS_LOW', 'ERR_TENOR_LOW', 'ERR_ALTO_LOW', 'ERR_SOPRANO_LOW']
-    range_high_codes = ['ERR_BASS_HIGH', 'ERR_TENOR_HIGH', 'ERR_ALTO_HIGH', 'ERR_SOPRANO_HIGH']
-
     range_errors = []
 
     for i, note in enumerate(chord.notes):
 
         if note.value < max_voice_ranges[i][0]:
-            range_errors.append({'type': 'range', 'code': range_low_codes[i], 'details': {'chord_index': chord_index}})
+            range_errors.append({'type': 'range', 'code': 'ERR_VOICE_LOW', 'details': 
+            {'chord_index': chord_index, 'voice_index': i}})
 
         elif note.value > max_voice_ranges[i][1]:
-            range_errors.append({'type': 'range', 'code': range_high_codes[i], 'details': {'chord_index': chord_index}})
+            range_errors.append({'type': 'range', 'code': 'ERR_VOICE_HIGH', 'details': 
+            {'chord_index': chord_index, 'voice_index': i}})
 
     return range_errors
 
@@ -212,7 +211,6 @@ def __check_seventh_resolution(prev_chord, curr_chord, key, curr_chord_index):
 
     #Check if the voice in the current chord at the index of the seventh is the resolution note
     if curr_chord.notes[seventh_index].name != resolution_note:
-
         passed_seventh = False
 
         #If the seventh wasn't resolved, check if it was passed to the next chord (delayed resolution)
