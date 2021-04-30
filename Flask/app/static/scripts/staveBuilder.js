@@ -539,7 +539,7 @@ function getSATBVoices(chords, timeSignature) {
 
 
 //Callback function to respond to the user submitting a chord progression for analysis
-$('#chord-form-submit').click(function(e) {
+$('#form-submit').click(function(e) {
     e.preventDefault();
 
     let formData = new FormData(document.getElementById('chord-builder-form'));

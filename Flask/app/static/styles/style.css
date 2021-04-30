@@ -1,0 +1,223 @@
+.how-to section {
+  background-color: #f5c4a3;
+  border-radius: 10px;
+  padding: 10px 2%;
+  margin: 25px auto;
+  width: 90%;
+}
+.how-to section h2 {
+  margin-bottom: 15px;
+  text-decoration: underline;
+}
+.how-to section h3 {
+  margin: 15px 0;
+}
+.how-to section p {
+  margin: 10px 0;
+}
+.how-to section ul {
+  list-style-position: inside;
+}
+.how-to li, .how-to .indent {
+  margin-left: 2.5%;
+}
+.how-to .list-spacing {
+  margin-bottom: 15px;
+}
+
+@media screen and (max-width: 768px) {
+  section h2 {
+    text-align: center;
+  }
+}
+/* TAG SELECTORS */
+* {
+  box-sizing: border-box;
+  margin: 0px;
+  padding: 0px;
+}
+
+html {
+  font-family: Calibri, "Trebuchet MS", sans-serif;
+  font-size: 16px;
+}
+
+a:hover {
+  cursor: pointer;
+}
+
+/* Styling for the Progression Builder Form */
+form {
+  background-color: #ffc299;
+  border: 2px solid #802800;
+  margin: 50px auto;
+  width: 50%;
+}
+form h2 {
+  text-align: center;
+}
+form input {
+  border: 1px solid black;
+}
+
+header {
+  background-color: #ff8533;
+  box-shadow: 0 5px 5px #cc5200;
+  height: 75px;
+  padding: 20px 2.5%;
+  margin-bottom: 50px;
+}
+header a {
+  display: inline-block;
+  width: 40%;
+}
+header h1 {
+  display: inline-block;
+  width: 65%;
+}
+header nav {
+  float: right;
+  height: 25px;
+  margin: 20px 0px;
+  text-align: center;
+  width: 30%;
+}
+
+input, select {
+  font-size: 1rem;
+}
+
+label {
+  font-size: 1rem;
+  font-weight: bold;
+  margin-right: 5px;
+}
+
+/* CLASS SELECTORS */
+.form-body {
+  padding: 10px 2.5%;
+}
+
+.form-chord {
+  display: inline-block;
+  margin: 10px 0px;
+  max-height: 35px;
+  width: 47.5%;
+}
+.form-chord:nth-child(odd) {
+  margin-right: 5%;
+}
+.form-chord input {
+  width: 75%;
+}
+
+.form-chord label, .form-select label {
+  display: inline-block;
+  margin-right: 5%;
+  width: 20%;
+}
+
+.form-header {
+  background-color: #ff8533;
+  box-shadow: 0 5px 5px #cc5200;
+  padding: 5px 0;
+}
+
+.form-section {
+  font-size: 0px;
+  margin: 25px 0px;
+}
+
+.form-select {
+  display: inline-block;
+  width: 47.5%;
+}
+.form-select:first-of-type {
+  margin-right: 5%;
+}
+.form-select select {
+  width: 75%;
+}
+
+.ghost-note {
+  opacity: 0;
+}
+
+/* ID SELECTORS */
+#form-add-btn {
+  background-color: #00c2cc;
+  border: 1px solid black;
+  border-radius: 5px;
+  display: inline-block;
+  margin: 10px 35%;
+  padding: 2px;
+  width: 30%;
+}
+#form-add-btn:hover {
+  cursor: pointer;
+  font-weight: bold;
+}
+
+#form-display-options input {
+  margin-left: 10%;
+  margin-right: 5px;
+}
+
+#form-submit {
+  background-color: #00c2cc;
+  border-radius: 5px;
+  margin: 10px 35%;
+  padding: 2px;
+  width: 30%;
+}
+#form-submit:hover {
+  cursor: pointer;
+  font-weight: bold;
+}
+
+#satb-error-panel {
+  margin: 50px auto;
+  width: 50%;
+}
+#satb-error-panel h2 {
+  margin-bottom: 25px;
+  text-align: center;
+}
+
+#stave-svg {
+  margin: 0 5%;
+  overflow: auto;
+  width: 90%;
+}
+
+/* Media queries */
+@media screen and (max-width: 1200px) {
+  form {
+    width: 60%;
+  }
+
+  #form-add-btn, #form-submit {
+    font-size: 0.8rem;
+  }
+}
+@media screen and (max-width: 768px) {
+  form {
+    width: 70%;
+  }
+
+  header {
+    height: 125px;
+  }
+  header h1 {
+    display: block;
+    text-align: center;
+    width: 100%;
+  }
+  header nav {
+    margin-bottom: 0px;
+    margin-top: 30px;
+    width: 100%;
+  }
+}
+
+/*# sourceMappingURL=style.css.map */

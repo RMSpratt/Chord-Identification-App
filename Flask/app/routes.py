@@ -24,7 +24,10 @@ def analysis():
 
     return {'chords': progression_info, 'time': time_signature, 'key': key_signature, 'displayForm': display_format}
 
-
 @app.route('/how_to')
 def how_to():
     return render_template('howTo.html')
+
+@app.route('/satb_rules')
+def satb_rules():
+    return render_template('satbRules.html')

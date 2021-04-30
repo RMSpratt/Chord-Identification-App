@@ -1,46 +1,88 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <style>
-            #chord-builder-form {
-                border: 2px solid black;
-                margin: 0 auto;
-                padding: 10px 2%;
-                width: 50%;
-            }
-
-            #chord-builder-form h2 {
-                margin-bottom: 20px;
-                text-align: center;
-            }
-
-            label {
-                margin-right: 5px;
-            }
-
-            .form-chord {
-                display: inline-block;
-                margin: 10px 0px;
-                width: 48%;
-            }
-
-            .form-chord label {
-                width: 30%;
-            }
-
-            .form-chord input {
-                font-size: 0.75rem;
-                width: 70%;
-            }
-
-            .form-select {
-                display: inline-block;
-                width: 48%;
-            }
-
-        </style>
-    </head>
-    <body>
-        <h1>How to Use Page</h1>
-    </body>
-</html>
+{% extends "base.html" %}
+{% block child_content %}
+    <header>
+        <h1>Instructions for Use</h1>
+        <nav>
+            <a id='link-main' href="{{ url_for('index') }}">Home</a>
+            <a id='link-satb' href="{{ url_for('satb_rules') }}">SATB Info</a>
+        </nav>
+    </header>
+    <main class='how-to'>
+        <section>
+            <h2>About this Tool</h2>
+            <p>
+                This web tool was designed with the intent to provide simple chord numeral and 
+                name identification for a sequence of chords organized as a progression. 
+                Chords can be provided for the progression as a sequence of notes in each 
+                available chord field in the Progression Builder form, up to a maximum of 20 
+                chords.
+            </p>
+            <p>Logic is in place to identify chords of the following qualities:</p>
+            <ul>
+                <li>Major, minor, augmented, and diminished triads</li>
+                <li>Suspended chords (sus2 and sus4)</li>
+                <li>Flat 5 chords and add5 chords</li>
+                <li>Major and minor seventh chords</li>
+                <li>Half-diminished and fully-diminished seventh chords</li>
+                <li>Dominant 7 chords</li>
+            </ul>
+            <p class='how-to-section-em'>
+                <strong>Note:</strong> Chords with added extensions such as 9ths, 11ths, and 13ths 
+                are not supported and may not be identified as expected.
+            </p>
+        </section>
+        <section>
+            <h2>Using the Form</h2>
+            <p>
+                The Chord Progression Builder Form has a few options available for generating a 
+                visual chord progression, described below.
+            </p>
+            <p class='list-spacing'>
+                <strong>Key:</strong> This determines the key for the chord sequence or progression 
+                for numeral analysis.
+            </p>
+            <p class='list-spacing'>
+                <strong>Time:</strong> This sets the time signature for the chord progression, and 
+                is purely a visual setting.
+            </p>
+            <p class='list-spacing'>
+                <strong>Chord Display Format:</strong> This determines how the chords are grouped 
+                and how each note's beam will behave. 
+            </p>
+            <p class='indent'>
+                <strong>Piano:</strong> This option will draw and group notes C4 and lower within 
+                the bass stave, and will draw and group those above in the treble stave. 
+            </p>
+            <p class='indent'>
+                <strong>SATB:</strong> This option expects four notes representing each voice in 
+                classical four-part harmony writing. For more information about this form of 
+                notation, see the SATB Info page. 
+            </p>
+            <p>
+                <strong>Analyze Option: </strong>This option determines whether the chords provided
+                will be assessed according to SATB part-writing rules. 
+            </p>
+            <p class='indent list-spacing'>
+                ** For the full list of rules included in this analysis, see the 
+                aforementioned SATB Info page.
+            </p>
+            <h3>Entering Chords</h3>
+            <p>
+                Chords are entered to the form in comma-separated format by specifying the name of 
+                the note and the octave it belongs to.
+            </p>
+            <p>
+                The accepted note names range from A - F with support for accidentals. The accepted
+                note octave value ranges from 0 - 8, though notes at extremely low or high octaves 
+                may not be easily visible when drawn.
+            </p>
+            <p>
+                Notes can be specified with the accidentals: 'bb', 'b', '#', and 'x' representing
+                a double flat, single flat, single sharp, and double sharp respectively.
+            </p>
+        </section>
+        <section>
+            <h2>Examples</h2>
+        </section>
+    </main>
+{% endblock %}

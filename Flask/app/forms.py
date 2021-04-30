@@ -27,4 +27,4 @@ class ProgressionBuilderForm(FlaskForm):
     analyze_satb = BooleanField('Analyze voice leading for SATB rules')
 
     #Generate Progression, submit option
-    submit = SubmitField('Generate Progression', id='chord-form-submit')
+    submit = SubmitField('Draw Progression', id='form-submit')

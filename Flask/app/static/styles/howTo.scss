@@ -1,0 +1,49 @@
+$primary-colour: hsl(24,100%,80%);
+$section-colour: hsl(24,80%,80%);
+$border-colour: hsl(19,100%,25%);
+$header-colour: hsl(24,100%,60%);
+$accent-colour: hsl(183,100%,40%);
+$shadow-colour: hsl(24,100%,40%);
+
+.how-to {
+
+    section {
+        background-color: $section-colour;
+        border-radius: 10px;
+        padding: 10px 2%;
+        margin: 25px auto;
+        width: 90%;
+
+        h2 {
+            margin-bottom: 15px;
+            text-decoration: underline;
+        }
+
+        h3 {
+            margin: 15px 0;
+        }
+
+        p {
+            margin: 10px 0;
+        }
+
+        ul {
+            list-style-position: inside;
+        }
+    }
+
+    li, .indent {
+        margin-left: 2.5%;
+    }
+
+    .list-spacing {
+        margin-bottom: 15px;
+    }
+}
+
+@media screen and (max-width: 768px) {
+
+    section h2 {
+        text-align: center;
+    }
+}
