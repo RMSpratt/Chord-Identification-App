@@ -35,7 +35,7 @@ class ChordProgression():
             new_chord = self._chord_factory.create_chord(chord_string)
 
         except ValueError:
-            raise ValueError('The chord to create: ' + str(new_chord) + ' is invalid.') from ValueError
+            raise ValueError('The chord: ' + str(new_chord) + ' is invalid.') from ValueError
 
         else:
             if index:
@@ -74,7 +74,7 @@ class ChordProgression():
             for i, chord in enumerate(self.chords):
                 chord_numeral = chord.get_numeral_for_key(self.key)
 
-                #Convert fully-diminished seventh chords to be relative to the leading tone if applicable
+                #Convert o7 chords to be relative to the leading tone if applicable
                 if chord.quality == 'o7':
                     chord_numeral = get_lt_numeral_for_dim7(chord_numeral)
 

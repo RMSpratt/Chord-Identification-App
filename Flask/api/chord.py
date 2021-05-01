@@ -18,6 +18,8 @@ class ChordFactory:
     def create_chord(self, chord_info):
         '''Creates a chord using the passed chord string information.'''
 
+        new_chord = None
+
         if isinstance(chord_info, str):
             chord_data = self.parse_chord_string(chord_info)
 
@@ -28,10 +30,12 @@ class ChordFactory:
             raise ValueError('Invalid chord format received. Accepted types: str and dict')
 
         if chord_data['valid']:
-            return Chord(chord_data['notes'])
+            new_chord = Chord(chord_data['notes'])
 
         else:
             raise ValueError(chord_data['error'])
+
+        return new_chord
 
     def parse_chord_dict(self, chord_dict):
         '''Parses the passed dict detailing this chord's notes into its individual notes.'''
@@ -131,7 +135,7 @@ class Chord:
         for i, note in enumerate(self.notes):
             if note.name == search_name:
                 note_indicies.append(i)
-            
+
         return note_indicies
 
     def get_accidentals_for_key(self, key):
@@ -220,7 +224,7 @@ class Chord:
         chord_name = ''
 
         if self.quality != 'unknown':
-  
+
             if slash_notation and self.position != 0:
                 chord_name = f'{self.notes[self.root_index].name}{self.quality}/{self.notes[0].name}'
 
@@ -322,4 +326,3 @@ class Chord:
 
     def __str__(self):
         return self.__repr__()
-       

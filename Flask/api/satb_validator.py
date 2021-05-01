@@ -250,9 +250,46 @@ def __get_dim7_seventh_index(chord, key):
     return seventh_index
 
 
+def __identify_chord_relation(key, curr_chord, next_chord):
+    '''Identifies and returns the relation of the passed chord to the passed key.'''
+
+    chord_relation = ''
+
+    chord_numeral = curr_chord.get_numeral_for_key(key, False)
+
+    #Convert o7 chords to be relative to the leading tone if possible
+    if curr_chord.quality == 'o7':
+        chord_numeral = get_lt_numeral_for_dim7(chord_numeral)
+
+    print(next_chord)
+    chord_relation = get_chord_relation_for_key(key, chord_numeral)
+
+    #Check for applied chords or special chromatic chords
+    if chord_relation == 'mixture' and chord_numeral == 'I' and next_chord:
+        chord_relation = 'applied'
+
+    elif chord_relation == 'chromatic':
+
+        if chord_numeral in _VALIDATION_SETTINGS['special_chromatic_chords']:
+            chord_relation = 'chromatic_known'
+
+        elif next_chord:
+            applied_numeral = curr_chord.get_applied_numeral(next_chord, False)
+
+            if applied_numeral != '':
+                chord_numeral = applied_numeral
+                chord_relation = 'applied'
+                current_key = next_chord.get_root_name()
+
+                if next_chord.quality in ['m', 'm7']:
+                    current_key = current_key.lower()
+
+    return chord_relation
+
 def validate_progression(progression, key):
     '''Central function to validate the passed chord progression according to SATB notation rules.'''
 
+    print('Validate')
     progression_errors = []
 
     #Hold the previous chord while iterating for resolution errors
@@ -261,52 +298,39 @@ def validate_progression(progression, key):
 
     for i, curr_chord in enumerate(progression, start=1):
         current_key = key
-        chord_numeral = curr_chord.get_numeral_for_key(current_key, False)
 
-        if curr_chord.quality == 'o7':
-            chord_numeral = get_lt_numeral_for_dim7(chord_numeral)
+        #1) Get the relation of the chord for the current key
+        if i < len(progression):
+            chord_relation = __identify_chord_relation(key, curr_chord, progression[i])
 
-        chord_relation = get_chord_relation_for_key(current_key, chord_numeral)
+        else:
+            chord_relation = __identify_chord_relation(key, curr_chord, None)
 
-        #1) Check for spelling errors or unknown chords
+        #If this chord is an applied chord, adjust the key to be relative to the next chord
+        if chord_relation == 'applied':
+            current_key = progression[i].get_root_name()
+
+            if progression[i].quality in ['m', 'm7']:
+                current_key = current_key.lower()
+
+        #2) Check for spelling errors or unknown chords
         if len(curr_chord) != 4:
             progression_errors.append({'type': 'spelling', 'code': 'ERR_NUM_VOICES', 'details': {'chord_index': i}})
-            continue    
-        
+            continue
+
         if curr_chord.quality not in _VALIDATION_SETTINGS['chord_types']:
             progression_errors.append({'type': 'spelling', 'code': 'ERR_UNKNOWN_CHORD', 'details': {'chord_index': i}})
 
-        #Check for applied chords or including the special case V/iv
-        elif chord_relation == 'chromatic' or (chord_relation == 'mixture' and chord_numeral == 'I'):
+        elif chord_relation == 'chromatic':
+            progression_errors.append({'type': 'spelling', 'code': 'ERR_UNKNOWN_CHORD', 'details': {'chord_index': i}})
 
-            #If this chord isn't a recognizable chromatic chord, check if it's an applied chord
-            if chord_numeral not in _VALIDATION_SETTINGS['special_chromatic_chords']:
-                    
-                try: 
-                    next_chord = progression[i]
-                    applied_numeral = curr_chord.get_applied_numeral(next_chord, False)
-        
-                    if applied_numeral != '':
-                        chord_numeral = applied_numeral
-                        chord_relation = 'applied'
-                        current_key = next_chord.get_root_name()
-        
-                        if next_chord.quality in ['m', 'm7']:
-                            current_key = current_key.lower()
-
-                    else:
-                        progression_errors.append({'type': 'spelling', 'code': 'ERR_UNKNOWN_CHORD', 'details': {'chord_index': i}})
-
-                except IndexError:
-                    progression_errors.append({'type': 'spelling', 'code': 'ERR_UNKNOWN_CHORD', 'details': {'chord_index': i}})
-
-        #2) Get voice spacing errors
+        #3) Get voice spacing errors
         progression_errors.extend(__check_voice_spacing(curr_chord, i))
 
-        #3) Check for range errors between voices in the current chord
+        #4) Check for range errors between voices in the current chord
         progression_errors.extend(__check_voice_in_range(curr_chord, i))
 
-        #4) Get tendancy tone doubling errors
+        #5) Get tendancy tone doubling errors
         if error := __check_chord_doubling(curr_chord, i, current_key, 'leading'): 
             progression_errors.append(error)
 
@@ -314,7 +338,7 @@ def validate_progression(progression, key):
             if error := __check_chord_doubling(curr_chord, i, current_key, 'seventh'): 
                 progression_errors.append(error)
 
-        #4) Get movement and resolution errors between chords
+        #6) Get movement and resolution errors between chords
         if prev_chord:
             progression_errors.extend(__check_voice_movement(prev_chord, curr_chord, i))
 
@@ -325,7 +349,7 @@ def validate_progression(progression, key):
                 if prev_chord.quality in _VALIDATION_SETTINGS['seventh_chords']:
                     if error := __check_seventh_resolution(prev_chord, curr_chord, altered_key, i): 
                         progression_errors.append(error)
-                
+
                 if error := __check_leading_resolution(prev_chord, curr_chord, altered_key, i-1): 
                     progression_errors.append(error)
 
@@ -335,12 +359,13 @@ def validate_progression(progression, key):
                 if prev_chord.quality in _VALIDATION_SETTINGS['seventh_chords']:
                     if error := __check_seventh_resolution(prev_chord, curr_chord, current_key, i): 
                         progression_errors.append(error)
-                
+
                 if error := __check_leading_resolution(prev_chord, curr_chord, current_key, i-1): 
                     progression_errors.append(error)
 
         #Save the current chord's information for validating cross-chord errors
         prev_chord = curr_chord
+        print(chord_relation)
         prev_relation = chord_relation
 
     return progression_errors

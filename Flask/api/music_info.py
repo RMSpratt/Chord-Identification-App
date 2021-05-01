@@ -301,7 +301,6 @@ INTERVAL_STRINGS.update({
     '9810': {'root_index': 2, 'quality': '7', 'position': 2},
     '9910': {'root_index': 2, 'quality': 'ø', 'position': 2},
     '10810': {'root_index': 0, 'quality': '7b5', 'position': 0},
-
 })
 
 
@@ -311,7 +310,7 @@ def __get_notes_for_key(key):
 
     key_notes = []
 
-    if (key[0].isupper()):
+    if key[0].isupper():
         key_notes = MAJOR_KEY_NOTES[key]
 
     else:
@@ -324,7 +323,7 @@ def __get_notes_for_key(key):
 def __strip_inversion_string(numeral):
     '''
     Strips the passed numeral of its inversion string if present.
-    
+
     Note: This function will not strip the '7' from seventh numerals, as it is required for identifying 
     the chord's quality.
     '''
@@ -360,10 +359,10 @@ def get_aug6_numeral(numeral, key, note_names):
         Return: 
             aug6_numeral: The numeral passed, converted if deemed necessary.
     '''
-    
+
     #The augmented-sixth numeral to return
     aug6_numeral = numeral
-    
+
     stripped_numeral = __strip_inversion_string(numeral)
 
     #Accidentals and distinct notes making up the chord
@@ -434,7 +433,7 @@ def get_chord_relation_for_key(key, search_numeral):
             chord_relation = 'chromatic'
 
     return chord_relation
-        
+
 
 def get_chord_for_intervals(interval_string):
     '''Returns a chord's identification information based on its intervals.'''
@@ -445,7 +444,7 @@ def get_chord_for_intervals(interval_string):
 def get_lt_numeral_for_dim7(diminished_numeral):
     '''
     Returns the passed numeral as its equivalent built from the leading tone.
-    
+
     Note: If the numeral cannot be re-arranged relative to the leading tone,
     the numeral is instead returned un-altered.
     '''
@@ -463,13 +462,13 @@ def get_lt_numeral_for_dim7(diminished_numeral):
 
     elif lt_numeral in ['viio7', '#viio7']:
         lt_numeral = 'viio7'
-        
+
     return lt_numeral
 
 
 def get_leading_tone_in_key(key):
     '''Returns the leading tone for the passed key whether major or minor.'''
-    
+
     key = key[0].upper() + key[1:]
 
     return get_note_name_for_degree(key, 7)
@@ -477,7 +476,7 @@ def get_leading_tone_in_key(key):
 
 def get_note_name_for_degree(key, degree):
     '''Returns the name of the note at the specified scale degree within the passed key.'''
-    
+
     key_notes = __get_notes_for_key(key)
 
     return key_notes[degree-1]
@@ -486,12 +485,12 @@ def get_note_name_for_degree(key, degree):
 def get_note_degree_in_key(name, key):
     '''
     Returns the index of the passed note in the given key if it exists within the key.
-    
+
     If the note does not exist in the key, -1 is returned instead.
     '''
 
     key_notes = __get_notes_for_key(key)
-    
+
     #Search for the note in the key and return the matching note's index
     for i, note_name in enumerate(key_notes):
 
@@ -509,12 +508,12 @@ def get_note_accidental_in_key(search_name, key):
     Note: This function's output is meant for proper chord notation visually, i.e.
     when chord numerals are to be rendered in a graphical setting.
     '''
-    
+
     accidental_index = 0
 
     #The accidental string to return for the passed note
     note_accidental = ''
-   
+
     key_notes = __get_notes_for_key(key)
 
     #Search for the note by its letter name in the passed key
@@ -552,7 +551,7 @@ def get_note_accidental_in_key(search_name, key):
 
     elif search_note_index in (key_note_index - 1, key_note_index + 11):
         note_accidental = ACCIDENTAL_STRINGS[accidental_index - 1]
- 
+
     elif search_note_index in (key_note_index - 2, key_note_index + 10):
         note_accidental = ACCIDENTAL_STRINGS[accidental_index - 2]
 
@@ -587,7 +586,7 @@ def identify_chord_numeral_for_key(key, chord_info):
     #2a) If the note is diatonic to the key, get the appropriate numeral by index
     if root_note in key_diatonic_notes:
         chord_numeral = NUMERAL_STRINGS[key_diatonic_notes.index(root_note)]
-        
+
     #2b) If the note is not diatonic to the key, determine its altered numeral
     else:
 

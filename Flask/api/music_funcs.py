@@ -1,9 +1,11 @@
-import json
+'''
+This module acts as the access point for the Flask application to the music package functions.
+'''
 
 from .chord import ChordFactory
 from .chord_progression import ChordProgression
 
-def analyze_progression(chords, key='C', validate=True):
+def generate_progression(chords, key='C', validate=True):
     '''
     Main API function to analyze and return information about the received chord progression.
     
@@ -16,11 +18,15 @@ def analyze_progression(chords, key='C', validate=True):
         progression_obj (dict)
     '''
 
+    #The progression info object to be returned
+    progression_obj = {}
+    progression_obj['chords'] = []
+
     progression_chords = []
 
     chord_factory = ChordFactory()
 
-    if chords == None or len(chords) == 0:
+    if chords is None or len(chords) == 0:
         return {'error': 'NO_VALID_CHORDS'}
 
     #Build each chord and add it to the progression
@@ -35,7 +41,7 @@ def analyze_progression(chords, key='C', validate=True):
     if len(progression_chords) == 0:
         return {'error': 'NO_VALID_CHORDS'}
 
-    if ('m' in key):
+    if 'm' in key:
         key = key[0:-1]
         key = key.lower()
         
@@ -49,20 +55,15 @@ def analyze_progression(chords, key='C', validate=True):
     #Get any accidentals for the chords in this key
     chord_accidentals = new_progression.get_progression_chord_accidentals()
 
-    progression_obj = {}
-    progression_obj['chords'] = []
-
     #Create the progression object to return
     for i, (name, numeral, chord) in enumerate(zip(chord_names, chord_numerals, progression_chords)):
-        formatted_notes = __format_chord(chord)
-        progression_obj['chords'].append({'name': name, 'numeral': numeral, 'notes': formatted_notes, 
+        progression_obj['chords'].append({'name': name, 'numeral': numeral, 'notes': __format_chord(chord), 
         'accidentals': chord_accidentals[i]})
 
     #If the user requested the SATB errors for the progression, retrieve and format them
     if validate:
         progression_errors = new_progression.validate_progression()
-        progression_error_messages = __format_satb_errors(progression_errors)
-        progression_obj['satb_errors'] = progression_error_messages
+        progression_obj['satb_errors'] = __format_satb_errors(progression_errors)
 
     return progression_obj
 

@@ -59,11 +59,11 @@ class NoteFactory:
                 break
 
         #Validate the parsed name and octave for the note
-        if note_name in self._note_names.keys() and note_octave in self._note_octaves:
-            return (note_name, note_octave)
+        if note_name not in self._note_names.keys() or note_octave not in self._note_octaves:
+            note_name = 'invalid'
+            note_octave = -1
 
-        else:
-            return ('invalid', -1)
+        return (note_name, note_octave)
 
 
 class Note:
@@ -93,7 +93,7 @@ class Note:
 
         if use_octave:
             interval = abs(other_note.value - self.value)
-            
+
         else:
             interval = (other_note.index - self.index) % 12
 
