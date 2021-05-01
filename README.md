@@ -6,48 +6,11 @@ This web-hosted Python project provides functionality for identifying chords and
 
 The primary features offered the app are listed and described below.
 
-### Identifying Chords
-Chords entered by the user are identified to provide its name and numeral relative to a selected key. Major and minor keys are supported, but theoretical keys, i.e. G#+ are excluded for selection.
+**Identifying Chords:** Chords entered by the user are identified to provide its name and numeral relative to a selected key. Major and minor keys are supported, but theoretical keys, i.e. G#+ are excluded for selection.
 
-Currently all of the following chord types are supported for identification:
+**Identifying Chords:** All of the chords entered by the user are combined into a progression for a selected key so that the progression can be analyzed according to SATB four-part harmony writing rules. Analysis is optional, and any violations to the rules supported by the application are returned for view with appropriate chord and voice indices.
 
-- Major and minor triads
-- Augmented and diminished triads
-- Suspended chords (sus2 and sus4)
-- Add5 and b5 triads
-- Major and minor seventh chords
-- Dominant seventh chords
-- Half-diminished and fully-diminished seventh chords
-- 7b5 chords
-
-Some special cases for chords are checked for by the application and may alter the name or numeral returned for a chord. These are:
-
-- The Neopolitan chord
-- The augmented sixth chords
-- Applied/Secondary dominants
-- Leading tone fully-diminished seventh chords (including inversions)
-
-An example of a set of chords input to the application form is below:
-![image](https://user-images.githubusercontent.com/10410051/116792053-74ffda00-aa8c-11eb-89bd-8d25262556fc.png)
-
-### Analyzing Chord Progressions 
-All of the chords entered by the user are combined into a progression for a selected key so that the progression can be analyzed according to SATB four-part harmony writing rules. Analysis is optional, and any violations to the rules supported by the application are returned for view with appropriate chord and voice indices.
-
-Currently all of the following SATB rules are checked for:
-- Voices exceeding their typical note range
-- Intervals between voices being too large
-- Unresolved leading tones and chordal sevenths
-- Doubled leading tones and chordal sevenths
-- Parallel 5th and 8ve movement
-- Chords unknown to the key
-
-**Note:** I tried to avoid tackling more subjective or less agreed upon rules for progressions such as which chord tones to double depending on chord quality, and the having too many leaps in inner voices or in consecutive chords.
-
-### Rendering Chord Progressions
-All of the chords entered by the user are displayed on a musical staff or on multiple staves rendered by the VexFlow library. More information on VexFlow can be found here: https://www.vexflow.com.
-
-An example of a rendered chord progression is below:
-![image](https://user-images.githubusercontent.com/10410051/116791560-47656180-aa89-11eb-94d4-dc9128e88b21.png)
+**Rendering Chord Progressions:** All of the chords entered by the user are displayed on a musical staff or on multiple staves rendered by the VexFlow library. More information on VexFlow can be found here: https://www.vexflow.com.
 
 
 ## Build and Running Instructions
@@ -76,3 +39,8 @@ While I don't have plans to implement more features to this app at this time, al
 - More SATB rule checks including: voice crossing, hidden 5ths and 8ves, parallel unisons
 - The ability to read in CSV files of chords for rendering and analysis
 - Support for chords with extensions, i.e. 9ths, 11ths, and 13ths
+
+
+## More Information
+
+More information pertaining to the specifics of the features offered including running instructions can be found in the web app's 'How to Use' and 'SATB Information' pages, or in the Wiki pages in this repository.
