@@ -27,6 +27,8 @@ Some special cases for chords are checked for by the application and may alter t
 - Applied/Secondary dominants
 - Leading tone fully-diminished seventh chords (including inversions)
 
+An example of a set of chords input to the application form is below:
+![image](https://user-images.githubusercontent.com/10410051/116792053-74ffda00-aa8c-11eb-89bd-8d25262556fc.png)
 
 ### Analyzing Chord Progressions 
 All of the chords entered by the user are combined into a progression for a selected key so that the progression can be analyzed according to SATB four-part harmony writing rules. Analysis is optional, and any violations to the rules supported by the application are returned for view with appropriate chord and voice indices.
@@ -54,20 +56,23 @@ If you would like to download this app and run it on your local device, please s
 
 **Build the application:**
 1. Navigate to the Flask sub-folder.
-2. Configure a virtual environment with the command:
+2. Configure a virtual environment with the command: 'python3 -m venv venv' or 'py -3 -m venv venv' on Windows.
 3. Install the build requirements with the command: pip install -r requirements.txt
 
 **Run the application:**
-1. Activate the virtual environment, '. venv/bin/activate' on MAC OS devices.
+1. Activate the virtual environment, '. venv/bin/activate' or 'venv\Scripts\activate' on Windows. 
 2. Enter the command 'flask run' from within the Flask sub-directory.
 3. Navigate to the localhost link generated.
 
+**Note:** If using VS Code, check that you have the correct Python Interpreter selected if you have trouble running the application. I have found that restarting VS Code and re-doing the run steps has also helped in the past when the improper interpreter isn't being used.
 
-## Possible Future Updates
+
+## Potential Future Updates
 
 While I don't have plans to implement more features to this app at this time, all of the following features could appear if I return to the project:
 
 - Web settings for chord notation when rendered i.e. not using slash chord names, configuring middle-C
+- More clear errors for the client when entering chords to the web form.
 - More SATB rule checks including: voice crossing, hidden 5ths and 8ves, parallel unisons
 - The ability to read in CSV files of chords for rendering and analysis
 - Support for chords with extensions, i.e. 9ths, 11ths, and 13ths
