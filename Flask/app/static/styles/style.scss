@@ -15,15 +15,34 @@ $shadow-colour: hsl(24,100%,40%);
 html {
     font-family: Calibri, 'Trebuchet MS', sans-serif;
     font-size: 16px;
+    height: 100%;
 }
 
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+}
+
+footer {
+    background-color: $header-colour;
+    color: black;
+    height: 80px;
+    margin-top: auto;
+    padding: 10px;
+    width: 100%;
+    text-align: center;
+
+    p {
+        margin: 10px 0;
+    }
+}
 
 header {
     background-color: $header-colour;
     box-shadow: 0 5px 5px $shadow-colour;
     height: 75px;
     padding: 20px 2.5%;
-    margin-bottom: 50px;
 
     a {
         background-color: $accent-colour;
@@ -68,6 +87,10 @@ label {
     margin-right: 5px;
 }
 
+main {
+    margin: 25px 0;
+}
+
 /* Media queries */
 @media screen and (max-width: 1200px) {
     form {
@@ -87,6 +110,10 @@ label {
 }
 
 @media screen and (max-width: 768px) {
+
+    footer {
+        height: 100px;
+    }
 
     header {
         height: 125px;

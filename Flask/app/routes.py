@@ -1,6 +1,6 @@
 from app import app
 from flask import render_template, request, Response, redirect, url_for
-from api import musicFuncs 
+from api import music_funcs 
 from .forms import ProgressionBuilderForm
 #Note: Routes must precede the function they are related to
 @app.route('/')
@@ -20,7 +20,7 @@ def analysis():
     display_format = form.display_options.data or 'piano'
     analyze_satb = form.analyze_satb.data
 
-    progression_info = musicFuncs.analyze_progression(chords, key_signature, analyze_satb)
+    progression_info = music_funcs.generate_progression(chords, key_signature, analyze_satb)
 
     return {'chords': progression_info, 'time': time_signature, 'key': key_signature, 'displayForm': display_format}
 
