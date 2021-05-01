@@ -602,10 +602,13 @@ $('#form-submit').click(function(e) {
             if (!data.chords.error) {
                 buildStave(data.key, data.chords.chords, data.time, data.displayForm);
                 
-                
                 if (data.chords.satb_errors) {
                     displaySATBErrors(data.chords.satb_errors);
                 }
+            }
+
+            else if (data.chords.error === 'NO_VALID_CHORDS') {
+                window.alert('No valid chords were provided.\nExpected format: note-name/octave, ...');
             }
         }
     });   
