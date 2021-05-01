@@ -7,4 +7,98 @@
             <a id='link-satb' href="{{ url_for('how_to') }}">How To Use</a>
         </nav>
     </header>
+    <main class='info-page'>
+        <section>
+            <h2>SATB Features</h2>
+            <p>
+                The SATB features in this application refer to the four part-writing style that 
+                builds a choir of Soprano, Alto, Tenor, and Bass voice parts. This writing style 
+                is commonly studied in post-secondary music programs to teach good principles of 
+                voice leading and part-writing for four distinct voices or parts.
+            </p>
+            <p>
+                There are set of rules and good practices used for denoting how musical pieces in 
+                SATB form should be written. For this application, I have decided to focus on the 
+                most agreed upon rules to avoid subjectivity, and because different instructors may 
+                have different requirements for part-writing. 
+            </p>
+            <p>
+                That being said, it is possible that I have still made some choices for the rules 
+                from my experience that may not match what's expected by some instructors or music 
+                professionals.
+            </p>
+        </section>
+        <section>
+            <h2>Rules Accounted For</h2>
+            <p>
+                The rules that this application will analyze and report violations for are broken 
+                down into subcategories and listed below.
+            </p>
+            <h3>Voice Range</h3>
+            <p>
+                Each voice has a general range it should stay within to match the common vocal 
+                ranges for each part. This application uses the following ranges:
+            </p>
+            <ul>
+                <li>Soprano: </li>
+                <li>Alto: </li>
+                <li>Tenor: </li>
+                <li>Bass: </li>
+            </ul>
+            <p><strong>Note:</strong> C4 is used as 'middle-C' for this application.</p>
+            <h3>Voice Spacing</h3>
+            <p>
+                Each voice has a maximum interval expected between its neighbour voices as:
+            </p>
+            <ul>
+                <li>Soprano-Alto: One octave</li>
+                <li>Alto-Tenor: One octave</li>
+                <li>Tenor-Bass: Two octaves</li>
+            </ul>
+            <h3>Voice Movement</h3>
+            <p>
+                In the category of movement errors including reoslution errors, the following 
+                errors are checked for:
+            </p>
+            <ul>
+                <li>Leading tones must resolve upward to the tonic or down to the dominant</li>
+                <li>Chordal sevenths must resolve down to the third (of the key).</li>
+                <li>Parallel 5ths and 8ves are prohibited between adjacent chords.</li>
+            </ul>
+            <h3>Chord Spelling</h3>
+            <p>
+                A group of voices making up a chord will have some validation on the notes used to 
+                ensure that the leading tone and the chordal seventh is not doubled. 
+            </p>
+            <p>
+                <strong>Note:</strong> If less or more than four notes (voices) are used in a chord, 
+                this will also be flagged as an error.
+            </p>
+            <h3>Chord Types Allowed</h3>
+            <p>
+                Any chords diatonic to the progression key, or those that act as mixture chords are 
+                permitted. Applied dominant chords are also allowed and will be labeled as such. 
+                Any other chords considered 'chromatic' to the key will result in an error with the 
+                exception of the Neopolitan chord and the augmented sixth chords, (Italian, French, 
+                and German).
+            </p>
+        </section>
+        <section>
+            <h2>Additional Resources</h2>
+            <p>
+                I tried to keep my explanations of music theory concepts and SATB part-writing
+                brief, as there are certainly much better explanations and websites available
+                for reading.
+            </p>
+            <p>
+                With this in mind, here are a few websites/sources I regularly reference and
+                have referenced in the development of this tool:
+            </p>
+            <ul>
+                <li>https://musictheory.pugetsound.edu/mt21c/VoiceLeading.html</li>
+                <li>https://www.schoolofcomposition.com/beginners-guide-to-4-part-harmony/</li>
+                <li>https://www.mymusictheory.com/learn-music-theory/for-students/grade-6/online-course/175-the-rules-of-harmony</li>
+            </ul>
+        </section>
+    </main>
 {% endblock %}

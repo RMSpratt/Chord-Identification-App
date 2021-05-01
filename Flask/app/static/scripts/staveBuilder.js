@@ -18,11 +18,26 @@ function buildStave(key, chords, time, drawMode) {
 
     let noteFormatter = new VF.Formatter();
 
-    //Information for drawing the stave
+    //Music Information for drawing the stave
     let staveInfo;
     let voices;
     let ghostNotes;
-    let beatsPerLine = time.split('/')[0] * 3;
+
+    let screenWidth = (window.innerWidth > 0) ? window.innerWidth : screen.width;
+
+    /* Set the number of notes that can be drawn on a single barline based on the width of the
+        user's screen. This seemed to be the most reasonable way to make the SVG dynamically
+        resizable without having the notes be illegible.
+    */
+    let notesPerLine = time.split('/')[0];
+
+    if (screenWidth > 1275) {
+        notesPerLine *= 3
+    }
+
+    else if (screenWidth > 875) {
+        notesPerLine *= 2;
+    }
 
     //Draw the progression with chords following typical piano score notation
     if (drawMode === 'piano') {
@@ -41,7 +56,6 @@ function buildStave(key, chords, time, drawMode) {
         }
 
         drawFullSVG(voices, time, key, 'piano', staffDiv);
-
     } 
     
     //Draw the progression with chords following typical four-part (SATB) harmony notation
@@ -91,10 +105,10 @@ function buildStave(key, chords, time, drawMode) {
 
         //Each new barline uses an additional offset amount for the height of the stave
         let barLineOffset = drawMode === 'piano' ? 300 : 325;
-        let yOffset = Math.floor(modifierCount / (beatsPerLine * 2));
+        let yOffset = Math.floor(modifierCount / (notesPerLine * 2));
 
-        let chordNameY = 35 + (yOffset * barLineOffset);    
-        let chordNumeralY = drawMode === 'piano' ? 250 : 275;
+        let chordNameY = 25 + (yOffset * barLineOffset);    
+        let chordNumeralY = drawMode === 'piano' ? 275 : 300;
         chordNumeralY +=  yOffset * barLineOffset;
 
         //Chord symbols appear below a stave
@@ -111,25 +125,37 @@ function buildStave(key, chords, time, drawMode) {
 }
 
 
+/* Function: displaySATBErrors
+ * Description: This function displays all of the errors retrieved from analyzing the chord
+ * progression with four-part harmony rules.
+ */
 function displaySATBErrors(errors) {
-    console.log(errors);
 
     let satbErrorPanel = document.getElementById('satb-error-panel');
-    satbErrorPanel.innerHTML = '';
+    let satbPanelBody = document.getElementById('error-panel-body');
 
-    let satbErrorHeader = document.createElement('h2');
-    satbErrorHeader.innerText = 'SATB Voice Leading Errors'
-    
-    satbErrorPanel.appendChild(satbErrorHeader);
+    satbPanelBody.innerHTML = '';
+    satbErrorPanel.hidden = false;
 
-    for (let error of errors) {
-        let errorMsg = document.createElement('p');
-        errorMsg.innerText = error;
+    //Add a default message if no errors were returned
+    if (errors.length == 0) {
 
-        satbErrorPanel.appendChild(errorMsg);
+        let defaultMsg = document.createElement('p');
+        defaultMsg.innerText = 'No errors found.';
+
+        satbPanelBody.appendChild(defaultMsg);
     }
 
-    document.getElementsByTagName('main')[0].append(satbErrorPanel);
+    //Otherwise, display all of the errors
+    else {
+        
+        for (let error of errors) {
+            let errorMsg = document.createElement('p');
+            errorMsg.innerText = error;
+
+            satbPanelBody.appendChild(errorMsg);
+        }
+    }
 }
 
 
@@ -145,6 +171,25 @@ function displaySATBErrors(errors) {
  *     staveSVG - The musical stave (svg) to populate with notes
 */ 
 function drawFullSVG(voices, time, key, chordMode, staveSvg) {
+
+    let screenWidth = (window.innerWidth > 0) ? window.innerWidth : screen.width;
+    let svgWidth;
+    let barsPerLine;
+
+    if (screenWidth <= 875) {
+        barsPerLine = 1;
+        svgWidth = 475;
+    }
+
+    else if (screenWidth <= 1275) {
+        barsPerLine = 2;
+        svgWidth = 875;
+    }
+
+    else {
+        barsPerLine = 3;
+        svgWidth = 1275;
+    }
 
     //Values defining the alignment and sizing of bars in the full stave
     let leadBarWidth = 450;
@@ -162,7 +207,7 @@ function drawFullSVG(voices, time, key, chordMode, staveSvg) {
     let renderer = new VF.Renderer(staveSvg, VF.Renderer.Backends.SVG);
     let context;
 
-    renderer.resize(1275, barHeight + (barHeight * (Math.floor(numBars / 3))));
+    renderer.resize(svgWidth, barHeight + (barHeight * (Math.floor(numBars / barsPerLine))));
     context = renderer.getContext();
 
     for (let i = 0; i < numBars; i++) {
@@ -171,7 +216,7 @@ function drawFullSVG(voices, time, key, chordMode, staveSvg) {
         let ornamentations = [];
 
         //The first bar of each line draws the key signature and clef
-        if (i % 3 === 0) {
+        if (i % barsPerLine === 0) {
 
             //If this isn't the first line of bars, increment the y offsets and reset the x offset
             if (i > 0) {

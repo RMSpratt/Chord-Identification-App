@@ -7,7 +7,7 @@
             <a id='link-satb' href="{{ url_for('satb_rules') }}">SATB Info</a>
         </nav>
     </header>
-    <main class='how-to'>
+    <main class='info-page'>
         <section>
             <h2>About this Tool</h2>
             <p>
@@ -80,9 +80,34 @@
                 Notes can be specified with the accidentals: 'bb', 'b', '#', and 'x' representing
                 a double flat, single flat, single sharp, and double sharp respectively.
             </p>
+            <p>
+                <strong>Note:</strong> A chord must have at least three distinct notes to be drawn.
+            </p>
         </section>
         <section>
-            <h2>Examples</h2>
+            <h2>Example</h2>
+            <p>
+                Below is an example of a sample set of chords and settings that would be entered 
+                into the form and the corresponding musical staff produced.
+            </p>
+            <div id='section-example-parameters'>
+                <p>Key: E Major</p>
+                <p>Time Signature: 4/4</p>
+                <p>Chord Inputs:</p>
+                <ul>
+                    <li>E2,B3,E4,G#4</li>
+                    <li>F#2,B3,D#4,A4</li>
+                    <li>A2,C#4,F#4,D#5</li>
+                    <li>G#2,B3,G#4,E5</li>
+                    <li>C3,G3,E4,C5</li>
+                    <li>A2,A3,E4,C5</li>
+                    <li>A2,C4,F#4,E5</li>
+                    <li>B2,B3,F#4,D#5</li>
+                </ul>
+                <p>Display Format: Piano</p>
+                <p>Analyze SATB Errors: No</p>
+            </div>
+            <img id='section-example-image' src="{{url_for('static', filename='images/example.png')}}">
         </section>
     </main>
 {% endblock %}

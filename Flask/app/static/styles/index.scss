@@ -1,0 +1,146 @@
+$primary-colour: hsl(24,80%,80%);
+$accent-colour: hsl(183,100%,40%);
+$shadow-colour: hsl(24,100%,40%);
+$header-colour: hsl(24,100%,60%);
+
+/* Styling for the Progression Builder Form */
+form {
+    background-color: $primary-colour;
+    border: 2px solid $shadow-colour;
+    margin: 25px auto;
+    width: 50%;
+
+    h2 {
+        text-align: center;
+    }
+
+    input[type=button], input[type=submit] {
+            background-color: $accent-colour;
+            border: 0px;
+            border-radius: 8px;
+            margin: 10px 35%;
+            padding: 4px 2px;
+            width: 30%;
+
+            &:hover {
+                cursor: pointer;
+                font-weight: bold;
+            }
+        }
+    }
+
+
+
+/* CLASS SELECTORS */
+.form-body {
+    padding: 10px 2.5%;
+}
+
+.form-chord {
+    display: inline-block;
+    margin: 10px 0px;
+    max-height: 35px;
+    width: 47.5%;
+
+    &:nth-child(odd) {
+        margin-right: 5%;
+    }
+
+    input {
+        border: 1px solid $shadow-colour;
+        width: 75%;
+    }
+}
+
+.form-chord label, .form-select label {
+    display: inline-block;
+    margin-right: 5%;
+    width: 20%;
+}
+
+.form-header {
+    background-color: $header-colour;
+    box-shadow: 0 5px 5px $shadow-colour;
+    padding: 5px 0;
+}
+
+.form-section {
+    font-size: 0px;
+    margin: 25px 0px;
+}
+
+.form-select {
+    display: inline-block;
+    width: 47.5%;
+
+    &:first-of-type {
+        margin-right: 5%;
+    }
+
+    select {
+        width: 75%;
+    }
+}
+
+.ghost-note {
+    opacity: 0;
+}
+
+/* ID SELECTORS */
+
+
+// Form selectors
+#form-display-options input { 
+    margin-left: 10%;
+    margin-right: 5px;
+}
+
+//Error panel and SVG selectors
+#satb-error-panel {
+    background-color: $primary-colour;
+    border: 2px solid $shadow-colour;
+    margin: 25px auto;
+    width: 50%;
+
+    #error-panel-title {
+        background-color: $header-colour;
+        box-shadow: 0 5px 5px $shadow-colour;
+        margin-bottom: 15px;
+        padding: 2px;
+        text-align: center;
+    }
+
+    #error-panel-body {
+        padding: 0 5px;
+
+        p {
+            margin-bottom: 5px;
+        }
+    }
+}
+
+#stave-svg {
+    margin: 0 5%;
+    overflow: auto;
+    width: 90%;
+}
+
+@media screen and (max-width: 768px) {
+    #satb-error-panel {
+        width: 80%;
+    } 
+}
+
+@media screen and (max-width: 600px) {
+
+    .form-chord {
+
+        input {
+            width: 65%;
+        }
+
+        label {
+            width: 30%;
+        }
+    }
+}

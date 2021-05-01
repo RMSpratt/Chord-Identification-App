@@ -1,11 +1,8 @@
-$primary-colour: hsl(24,100%,80%);
 $section-colour: hsl(24,80%,80%);
-$border-colour: hsl(19,100%,25%);
 $header-colour: hsl(24,100%,60%);
-$accent-colour: hsl(183,100%,40%);
 $shadow-colour: hsl(24,100%,40%);
 
-.how-to {
+.info-page {
 
     section {
         background-color: $section-colour;
@@ -20,7 +17,7 @@ $shadow-colour: hsl(24,100%,40%);
         }
 
         h3 {
-            margin: 15px 0;
+            margin: 25px 0 15px 0;
         }
 
         p {
@@ -41,7 +38,39 @@ $shadow-colour: hsl(24,100%,40%);
     }
 }
 
+#section-example-parameters {
+    display: inline-block;
+    margin-right: 2%;
+    width: 28%;
+}
+
+img {
+    border: 1px solid $shadow-colour;
+    float: right;
+    height: auto;
+    max-width: 70%;
+}
+
+@media screen and (max-width: 900px) {
+
+    #section-example-parameters {
+        display: block;
+        margin-right: 0;
+        width: 100%;
+    }
+
+    img {
+        float: none;
+        max-width: 100%;
+        margin: 10px 0;
+    }
+}
+
 @media screen and (max-width: 768px) {
+
+    section {
+        padding: 10px 4%;
+    }
 
     section h2 {
         text-align: center;
