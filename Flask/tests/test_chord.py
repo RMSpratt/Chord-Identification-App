@@ -4,7 +4,7 @@ Note functions by extension.
 
 import pytest
 
-from music.chord import ChordFactory
+from api.chord import ChordFactory
 
 class TestChords:
     """Set of functions for testing Chord functionality."""

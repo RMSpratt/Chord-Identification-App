@@ -4,7 +4,6 @@
 '''
 
 from .music_info import get_note_degree_in_key, get_note_accidental_in_key
-from .exceptions import InvalidNoteError
 
 
 class NoteFactory:
@@ -41,7 +40,7 @@ class NoteFactory:
             note_value = self.calculate_note_value(note_name, note_octave)
 
         else:
-            raise InvalidNoteError(note_string)
+            raise ValueError(note_string)
 
         return Note(note_name, note_octave, note_value, note_index)
 

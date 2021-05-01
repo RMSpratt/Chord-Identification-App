@@ -83,7 +83,7 @@ class Chord:
     def __init__(self, chord_notes):
         self.position = 0
         self.root_index = 0
-        self.quality = ''
+        self.quality = 'unknown'
 
         #Set the notes to the ones passed
         self.notes = chord_notes
@@ -219,11 +219,13 @@ class Chord:
 
         chord_name = ''
 
-        if slash_notation and self.position != 0:
-            chord_name = f'{self.notes[self.root_index].name}{self.quality}/{self.notes[0].name}'
+        if self.quality != 'unknown':
+  
+            if slash_notation and self.position != 0:
+                chord_name = f'{self.notes[self.root_index].name}{self.quality}/{self.notes[0].name}'
 
-        else:
-            chord_name = f'{self.notes[self.root_index].name}{self.quality}'
+            else:
+                chord_name = f'{self.notes[self.root_index].name}{self.quality}'
 
         return chord_name
 
@@ -281,7 +283,6 @@ class Chord:
         if chord_obj['quality'] == 'unknown':
             self.root_index = 0
             self.position = 0
-            self.quality = 'N/A'
 
         else:
 

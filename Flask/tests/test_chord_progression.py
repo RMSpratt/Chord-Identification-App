@@ -1,6 +1,6 @@
 """Contains the TestChordProgression class for testing the ChordProgression class."""
 
-from music.chord_progression import ChordProgression
+from api.chord_progression import ChordProgression
 
 class TestChordProgressions:
     """Test functions for ChordProgression functionality."""
@@ -34,10 +34,10 @@ class TestChordProgressions:
             assert expected['code'] == actual['code']
             assert expected['type'] == actual['type']
             
-            if expected['type'] in ['spacing', 'range', 'spelling']:
+            if expected['type'] in ('spacing', 'spelling'):
                 assert expected['chord_index'] == actual['details']['chord_index']
 
-            elif expected['type'] == 'resolution':
+            elif expected['type'] in ('resolution', 'range'):
                 assert expected['chord_index'] == actual['details']['chord_index']
                 assert expected['voice_index'] == actual['details']['voice_index']
 
@@ -222,14 +222,14 @@ class TestChordProgressions:
         test_range_errors = test_range_prog.validate_progression()
 
         test_range_expected = [
-            {'code': 'ERR_BASS_HIGH', 'type': 'range', 'chord_index': 1},
-            {'code': 'ERR_TENOR_HIGH', 'type': 'range', 'chord_index': 1},
-            {'code': 'ERR_ALTO_HIGH', 'type': 'range', 'chord_index': 1},
-            {'code': 'ERR_SOPRANO_HIGH', 'type': 'range', 'chord_index': 1},
-            {'code': 'ERR_BASS_LOW', 'type': 'range', 'chord_index': 3},
-            {'code': 'ERR_TENOR_LOW', 'type': 'range', 'chord_index': 3},
-            {'code': 'ERR_ALTO_LOW', 'type': 'range', 'chord_index': 3},
-            {'code': 'ERR_SOPRANO_LOW', 'type': 'range', 'chord_index': 3}
+            {'code': 'ERR_VOICE_HIGH', 'type': 'range', 'chord_index': 1, 'voice_index': 0},
+            {'code': 'ERR_VOICE_HIGH', 'type': 'range', 'chord_index': 1, 'voice_index': 1},
+            {'code': 'ERR_VOICE_HIGH', 'type': 'range', 'chord_index': 1, 'voice_index': 2},
+            {'code': 'ERR_VOICE_HIGH', 'type': 'range', 'chord_index': 1, 'voice_index': 3},
+            {'code': 'ERR_VOICE_LOW', 'type': 'range', 'chord_index': 3, 'voice_index': 0},
+            {'code': 'ERR_VOICE_LOW', 'type': 'range', 'chord_index': 3, 'voice_index': 1},
+            {'code': 'ERR_VOICE_LOW', 'type': 'range', 'chord_index': 3, 'voice_index': 2},
+            {'code': 'ERR_VOICE_LOW', 'type': 'range', 'chord_index': 3, 'voice_index': 3}
         ]
 
         self.validate_satb_errors(test_range_expected, test_range_errors, 'range')

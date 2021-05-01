@@ -3,8 +3,6 @@ import json
 from .chord import ChordFactory
 from .chord_progression import ChordProgression
 
-apiFactory = ChordFactory()
-
 def analyze_progression(chords, key='C', validate=True):
     '''
     Main API function to analyze and return information about the received chord progression.
@@ -20,13 +18,15 @@ def analyze_progression(chords, key='C', validate=True):
 
     progression_chords = []
 
+    chord_factory = ChordFactory()
+
     if chords == None or len(chords) == 0:
         return {'error': 'NO_VALID_CHORDS'}
 
     #Build each chord and add it to the progression
     for chord_string in chords:
         try:
-            new_chord = apiFactory.create_chord(chord_string)
+            new_chord = chord_factory.create_chord(chord_string)
             progression_chords.append(new_chord)
             
         except ValueError:
@@ -89,8 +89,6 @@ def __format_satb_errors(satb_errors):
 
     #The list of error messages to be sent to the client
     error_messages = []
-
-    print(satb_errors)
 
     for error in satb_errors:
         new_message = ''
