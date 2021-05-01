@@ -6,8 +6,8 @@ This web-hosted Python project provides functionality for identifying chords and
 
 The primary features offered the app are listed and described below.
 
-
-**Identifying Chords:** Chords entered by the user are identified to provide its name and numeral relative to a selected key. Major and minor keys are supported, but theoretical keys, i.e. G#+ are excluded for selection.
+### Identifying Chords
+Chords entered by the user are identified to provide its name and numeral relative to a selected key. Major and minor keys are supported, but theoretical keys, i.e. G#+ are excluded for selection.
 
 Currently all of the following chord types are supported for identification:
 
@@ -28,7 +28,8 @@ Some special cases for chords are checked for by the application and may alter t
 - Leading tone fully-diminished seventh chords (including inversions)
 
 
-**Analyzing Chord Progressions:** All of the chords entered by the user are combined into a progression for a selected key so that the progression can be analyzed according to SATB four-part harmony writing rules. Analysis is optional, and any violations to the rules supported by the application are returned for view with appropriate chord and voice indices.
+### Analyzing Chord Progressions 
+All of the chords entered by the user are combined into a progression for a selected key so that the progression can be analyzed according to SATB four-part harmony writing rules. Analysis is optional, and any violations to the rules supported by the application are returned for view with appropriate chord and voice indices.
 
 Currently all of the following SATB rules are checked for:
 - Voices exceeding their typical note range
@@ -40,7 +41,8 @@ Currently all of the following SATB rules are checked for:
 
 **Note:** I tried to avoid tackling more subjective or less agreed upon rules for progressions such as which chord tones to double depending on chord quality, and the having too many leaps in inner voices or in consecutive chords.
 
-**Rendering Chord Progressions:** All of the chords entered by the user are displayed on a musical staff or on multiple staves rendered by the VexFlow library. More information on VexFlow can be found here: https://www.vexflow.com.
+### Rendering Chord Progressions
+All of the chords entered by the user are displayed on a musical staff or on multiple staves rendered by the VexFlow library. More information on VexFlow can be found here: https://www.vexflow.com.
 
 An example of a rendered chord progression is below:
 ![image](https://user-images.githubusercontent.com/10410051/116791560-47656180-aa89-11eb-94d4-dc9128e88b21.png)
@@ -48,7 +50,7 @@ An example of a rendered chord progression is below:
 
 ## Build and Running Instructions
 
-If you would like to download this app and run it on your local device, please see the steps below. Take note that the application was built using python3 and may not be compatible with earlier versions of Python2.
+If you would like to download this app and run it on your local device, please see the steps below. Take note that the application was built using Python 3.8 and may not be compatible with earlier versions of Python.
 
 **Build the application:**
 1. Navigate to the Flask sub-folder.
@@ -68,4 +70,4 @@ While I don't have plans to implement more features to this app at this time, al
 - Web settings for chord notation when rendered i.e. not using slash chord names, configuring middle-C
 - More SATB rule checks including: voice crossing, hidden 5ths and 8ves, parallel unisons
 - The ability to read in CSV files of chords for rendering and analysis
-
+- Support for chords with extensions, i.e. 9ths, 11ths, and 13ths
